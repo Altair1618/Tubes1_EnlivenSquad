@@ -33,18 +33,40 @@ public class BotService {
         this.playerAction = playerAction;
     }
 
+    public void setPlayerHeading(int heading) {
+        playerAction.heading = heading;
+    }
+
+    public GameObject getNearestFood() {
+        var foodList = gameState.getGameObjects()
+                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD)
+                .sorted(Comparator
+                        .comparing(item -> getDistanceBetween(bot, item)))
+                .collect(Collectors.toList());
+
+        return foodList.get(0);
+    }
+
+    public List<GameObject> getOtherPlayerList() {
+        var playerList = gameState.getPlayerGameObjects()
+                .stream().filter(item -> item.getId() != this.bot.getId())
+                .sorted(Comparator
+                        .comparing(item -> getDistanceBetween(bot, item)))
+                .collect(Collectors.toList());
+
+        return playerList;
+    }
+
+    public GameObject getNearestPlayer() {
+        return getOtherPlayerList().get(0);
+    }
+
     public void computeNextPlayerAction(PlayerAction playerAction) {
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = new Random().nextInt(360);
 
         if (!gameState.getGameObjects().isEmpty()) {
-            var foodList = gameState.getGameObjects()
-                    .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD)
-                    .sorted(Comparator
-                            .comparing(item -> getDistanceBetween(bot, item)))
-                    .collect(Collectors.toList());
-
-            playerAction.heading = getHeadingBetween(foodList.get(0));
+            setPlayerHeading(getHeadingBetween(getNearestPlayer()));
         }
 
         this.playerAction = playerAction;
