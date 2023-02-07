@@ -129,9 +129,6 @@ public class GameObject {
     Position position = new Position(stateList.get(4), stateList.get(5));
     
     Integer length = stateList.size();
-
-    if (stateList.size() <= 6)  return new GameObject(id, stateList.get(0), stateList.get(1), stateList.get(2), position, ObjectTypes.valueOf(stateList.get(3)));
-
     Integer effectsCode = 0;
     Integer torpedoSalvoCount = 0;
     Integer supernovaAvailable = 0;

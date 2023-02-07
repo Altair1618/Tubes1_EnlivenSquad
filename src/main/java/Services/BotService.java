@@ -6,10 +6,13 @@ import Models.*;
 import java.util.*;
 import java.util.stream.*;
 
+import Services.RadarService;
+
 public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
+    static private RadarService radarService = new RadarService();
 
     public BotService() {
         this.playerAction = new PlayerAction();
@@ -37,36 +40,15 @@ public class BotService {
         playerAction.heading = heading;
     }
 
-    public GameObject getNearestFood() {
-        var foodList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD)
-                .sorted(Comparator
-                        .comparing(item -> getDistanceBetween(bot, item)))
-                .collect(Collectors.toList());
-
-        return foodList.get(0);
-    }
-
-    public List<GameObject> getOtherPlayerList() {
-        var playerList = gameState.getPlayerGameObjects()
-                .stream().filter(item -> item.getId() != this.bot.getId())
-                .sorted(Comparator
-                        .comparing(item -> getDistanceBetween(bot, item)))
-                .collect(Collectors.toList());
-
-        return playerList;
-    }
-
-    public GameObject getNearestPlayer() {
-        return getOtherPlayerList().get(0);
-    }
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = new Random().nextInt(360);
 
         if (!gameState.getGameObjects().isEmpty()) {
-            setPlayerHeading(getHeadingBetween(getNearestPlayer()));
+            GameObject nearestPlayer = radarService.getNearestPlayer(gameState, bot);
+            int nextHeading = radarService.getHeadingBetween(bot, nearestPlayer);
+            setPlayerHeading(nextHeading);
         }
 
         this.playerAction = playerAction;
@@ -85,22 +67,4 @@ public class BotService {
         Optional<GameObject> optionalBot = gameState.getPlayerGameObjects().stream().filter(gameObject -> gameObject.id.equals(bot.id)).findAny();
         optionalBot.ifPresent(bot -> this.bot = bot);
     }
-
-    private double getDistanceBetween(GameObject object1, GameObject object2) {
-        var triangleX = Math.abs(object1.getPosition().x - object2.getPosition().x);
-        var triangleY = Math.abs(object1.getPosition().y - object2.getPosition().y);
-        return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
-    }
-
-    private int getHeadingBetween(GameObject otherObject) {
-        var direction = toDegrees(Math.atan2(otherObject.getPosition().y - bot.getPosition().y,
-                otherObject.getPosition().x - bot.getPosition().x));
-        return (direction + 360) % 360;
-    }
-
-    private int toDegrees(double v) {
-        return (int) (v * (180 / Math.PI));
-    }
-
-
 }
