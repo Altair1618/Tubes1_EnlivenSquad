@@ -68,6 +68,10 @@ public class GameObject {
     this.speed = speed;
   }
 
+  public int getHeading() {
+    return currentHeading;
+  }
+
   public Position getPosition() {
     return position;
   }
