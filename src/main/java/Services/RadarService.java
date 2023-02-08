@@ -19,13 +19,11 @@ public class RadarService {
     }
 
     public List<GameObject> getOtherPlayerList(GameState gameState, GameObject bot) {
-        var playerList = gameState.getPlayerGameObjects()
+        return gameState.getPlayerGameObjects()
                 .stream().filter(item -> item.getId() != bot.getId())
                 .sorted(Comparator
                         .comparing(item -> getDistanceBetween(bot, item)))
                 .collect(Collectors.toList());
-
-        return playerList;
     }
 
     public GameObject getNearestPlayer(GameState gameState, GameObject bot) {
@@ -52,6 +50,49 @@ public class RadarService {
                 .collect(Collectors.toList());
 
         return objectList;
+    }
+    
+    public int getOtherPlayerHeading(GameObject otherBot) {
+        return otherBot.getHeading();
+    }
+
+    public boolean isSupernovaPickupExist(GameState gameState) {
+        // Mengecek apakah terdapat supernova pickup di world
+        var SupernovaPickup = gameState.getGameObjects().stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP).collect(Collectors.toList());
+        return !SupernovaPickup.isEmpty();
+    }
+
+    public GameObject getSupernovaPickupObject(GameState gameState) {
+        // I.S Supernova Pickup Exist
+        var SupernovaPickup = gameState.getGameObjects().stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP).collect(Collectors.toList());
+        return SupernovaPickup.get(0);
+    }
+
+    public GameObject getNearestPlayerFromSupernovaPickup(GameState gameState) {
+        // I.S Supernova Pickup Exist
+        var distanceList = gameState.getPlayerGameObjects()
+                .stream()
+                .sorted(Comparator
+                        .comparing(item -> getDistanceBetween(getSupernovaPickupObject(gameState), item)))
+                .collect(Collectors.toList());
+
+        return distanceList.get(0);
+    }
+
+    public boolean isSupernovaBombExist(GameState gameState) {
+        // Mengecek apakah terdapat bom supernova di world
+        var SupernovaPickup = gameState.getGameObjects().stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB).collect(Collectors.toList());
+        return !SupernovaPickup.isEmpty();
+    }
+
+    public List<GameObject> getSupernovaBombs(GameState gameState) {
+        // I.S Supernova Pickup Exist
+        var bombList = gameState.getGameObjects()
+                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB)
+                .collect(Collectors.toList());
+
+        return bombList;
+
     }
 
     public double getDistanceBetween(GameObject object1, GameObject object2) {

@@ -2,9 +2,9 @@ package Enums;
 import java.util.*;
 
 public enum Effects {
-    AFTER_BURNER(1),
-    ASTEROID_FIELD(2),
-    GAS_CLOUD(4),
+    AFTERBURNER(1),
+    ASTEROIDFIELD(2),
+    GASCLOUD(4),
     SUPERFOOD(8),
     SHIELD(16);
 
