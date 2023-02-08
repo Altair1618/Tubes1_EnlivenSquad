@@ -9,11 +9,13 @@ public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
-    private RadarService radarService = new RadarService();
+
+    private SupernovaService supernovaService;
 
     public BotService() {
         this.playerAction = new PlayerAction();
         this.gameState = new GameState();
+        this.supernovaService = new SupernovaService();
     }
 
 
@@ -51,8 +53,8 @@ public class BotService {
         playerAction.heading = new Random().nextInt(360);
 
         if (!gameState.getGameObjects().isEmpty()) {
-            if (radarService.isSupernovaPickupExist(gameState)) {
-                setHeading(radarService.getHeadingBetween(bot, radarService.getSupernovaPickupObject(gameState)));
+            if (supernovaService.isSupernovaPickupExist(gameState)) {
+                setHeading(RadarService.getHeadingBetween(bot, supernovaService.getSupernovaPickupObject(gameState)));
                 System.out.println("Mengejar supernova");
             }
 //            else {
@@ -61,7 +63,7 @@ public class BotService {
         }
 
         if (bot.supernovaAvailable == 1) {
-            if (radarService.isSupernovaBombExist(gameState)) {
+            if (supernovaService.isSupernovaBombExist(gameState)) {
                 playerAction.action = PlayerActions.DETONATESUPERNOVA;
                 System.out.println("Meledakkan Supernova");
             } else {

@@ -6,8 +6,6 @@ import java.util.*;
 
 public class GasCloudService {
 
-    static private RadarService radarService = new RadarService();
-
     public List<GameObject> collapsingClouds;
 
     GasCloudService()
@@ -23,7 +21,7 @@ public class GasCloudService {
     public List<GameObject> updateCollapsingClouds(GameState gameState, GameObject bot)
     {
         // update atribut collapsingClouds berisi cloud yang sedang collapse saat ini dengan bot
-        collapsingClouds = radarService.getCollapsingObjects(gameState, bot, ObjectTypes.GASCLOUD);
+        collapsingClouds = RadarService.getCollapsingObjects(gameState, bot, ObjectTypes.GASCLOUD);
 
         return collapsingClouds;
     }
@@ -41,7 +39,7 @@ public class GasCloudService {
         long total = 0;
 
         for (GameObject cloud : collapsingClouds) {
-            total += radarService.getHeadingBetween(cloud, bot);
+            total += RadarService.getHeadingBetween(cloud, bot);
         }
 
         return (int) (total / collapsingClouds.size());
