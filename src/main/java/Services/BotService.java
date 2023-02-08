@@ -4,9 +4,6 @@ import Enums.*;
 import Models.*;
 
 import java.util.*;
-import java.util.stream.*;
-
-import Services.RadarService;
 
 public class BotService {
     private GameObject bot;
@@ -36,7 +33,15 @@ public class BotService {
         this.playerAction = playerAction;
     }
 
-    public void setPlayerHeading(int heading) {
+    public PlayerActions getAction() {
+        return this.playerAction.action;
+    }
+
+    public void setAction(PlayerActions playerAction) {
+        this.playerAction.action = playerAction;
+    }
+
+    public void setHeading(int heading) {
         playerAction.heading = heading;
     }
 
@@ -46,9 +51,23 @@ public class BotService {
         playerAction.heading = new Random().nextInt(360);
 
         if (!gameState.getGameObjects().isEmpty()) {
-            GameObject nearestPlayer = radarService.getNearestPlayer(gameState, bot);
-            int nextHeading = radarService.getHeadingBetween(bot, nearestPlayer);
-            setPlayerHeading(nextHeading);
+            if (radarService.isSupernovaPickupExist(gameState)) {
+                setHeading(radarService.getHeadingBetween(bot, radarService.getSupernovaPickupObject(gameState)));
+                System.out.println("Mengejar supernova");
+            }
+//            else {
+//                setHeading(radarService.getHeadingBetween(bot, radarService.getNearestFood(gameState, bot)));
+//            }
+        }
+
+        if (bot.supernovaAvailable == 1) {
+            if (radarService.isSupernovaBombExist(gameState)) {
+                playerAction.action = PlayerActions.DETONATESUPERNOVA;
+                System.out.println("Meledakkan Supernova");
+            } else {
+                playerAction.action = PlayerActions.FIRESUPERNOVA;
+                System.out.println("Menembak Supernova");
+            }
         }
 
         this.playerAction = playerAction;
