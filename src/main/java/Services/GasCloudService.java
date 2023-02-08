@@ -23,7 +23,7 @@ public class GasCloudService {
     public List<GameObject> updateCollapsingClouds(GameState gameState, GameObject bot)
     {
         // update atribut collapsingClouds berisi cloud yang sedang collapse saat ini dengan bot
-        collapsingClouds = radarService.getCollapsingObjects(gameState, bot, ObjectTypes.GAS_CLOUD);
+        collapsingClouds = radarService.getCollapsingObjects(gameState, bot, ObjectTypes.GASCLOUD);
 
         return collapsingClouds;
     }
