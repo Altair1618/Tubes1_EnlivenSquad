@@ -6,19 +6,19 @@ import java.util.*;
 
 public class GasCloudService {
 
-    public List<GameObject> collapsingClouds;
+    static public List<GameObject> collapsingClouds;
 
     GasCloudService()
     {
         collapsingClouds = new ArrayList<GameObject>();
     }
 
-    public List<GameObject> getCollapsingClouds()
+    static public List<GameObject> getCollapsingClouds()
     {
         return collapsingClouds;
     }
 
-    public List<GameObject> updateCollapsingClouds(GameState gameState, GameObject bot)
+    static public List<GameObject> updateCollapsingClouds(GameState gameState, GameObject bot)
     {
         // update atribut collapsingClouds berisi cloud yang sedang collapse saat ini dengan bot
         collapsingClouds = RadarService.getCollapsingObjects(gameState, bot, ObjectTypes.GASCLOUD);
@@ -26,13 +26,13 @@ public class GasCloudService {
         return collapsingClouds;
     }
 
-    public boolean isCloudCollapsing(GameObject bot)
+    static public boolean isCloudCollapsing(GameObject bot)
     {
         // memeriksa apakah bot sedang di dalam cloud
         return Effects.getEffectList(bot.effectsCode).get(0);
     }
 
-    public int getHeadingEscape(GameObject bot)
+    static public int getHeadingEscape(GameObject bot)
     {
         // mengembalikan arah terbaik player untuk keluar dari cloud (PENDEKATAN RATA-RATA)
 
