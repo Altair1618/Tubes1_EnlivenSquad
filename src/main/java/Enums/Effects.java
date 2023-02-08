@@ -14,9 +14,10 @@ public enum Effects {
         this.value = value;
     }
 
-    public static List<Integer> getEffectList(Integer value) {
+    public static List<Boolean> getEffectList(Integer value) {
         
-        List<Integer> res = new ArrayList<Integer>();
+        // mengembalikan list status efek yang ada pada player 
+        List<Boolean> res = new ArrayList<Boolean>();
         Integer temp = value;
         Integer ctr = 16;
 
@@ -25,12 +26,12 @@ public enum Effects {
             if (temp >= ctr)
             {
                 temp -= ctr;
-                res.add(1);
+                res.add(true);
             }
 
             else
             {
-                res.add(0);
+                res.add(false);
             }
 
             ctr /= 2;

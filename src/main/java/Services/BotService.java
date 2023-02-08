@@ -4,15 +4,13 @@ import Enums.*;
 import Models.*;
 
 import java.util.*;
-import java.util.stream.*;
 
-import Services.RadarService;
 
 public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
-    static private RadarService radarService = new RadarService();
+    private RadarService radarService = new RadarService();
 
     public BotService() {
         this.playerAction = new PlayerAction();
