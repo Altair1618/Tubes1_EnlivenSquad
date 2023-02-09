@@ -147,11 +147,11 @@ public class RadarService {
 
     }
 
-    // static public int vectorToDegree(WorldVector v)
-    // {
-        
-    //     return getHeadingBetween(new Position(), new Position(v.x, v.y));
-    // }
+    static public double vectorToDegree(WorldVector v)
+    {
+        var direction = Math.atan2(v.y, v.x) * 180 / Math.PI;
+        return (direction + 360) % 360;
+    }
 
     static public WorldVector degreeToVector(int heading)
     {

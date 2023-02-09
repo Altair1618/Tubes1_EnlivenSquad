@@ -1,5 +1,6 @@
 package Models;
 
+
 public class WorldVector {
 
     public double x;
@@ -46,5 +47,44 @@ public class WorldVector {
     public WorldVector add(WorldVector v1, WorldVector v2)
     {
         return new WorldVector(v1.x + v2.x, v1.y + v2.y);
+    }
+
+    public void normalize()
+    {
+        double magnitude = Math.sqrt(x * x + y * y);
+
+        x /= magnitude;
+        y /= magnitude;
+    }
+
+    public WorldVector toNormalize()
+    {
+        WorldVector res = new WorldVector(x, y);
+        
+        res.normalize();
+
+        return res;
+
+    }
+
+    public WorldVector mult(double constant)
+    {
+        return new WorldVector(x * constant, y * constant);
+    }
+
+    public WorldVector div(double constant)
+    {
+        return new WorldVector(x / constant, y / constant);
+    }
+
+    public boolean isZero()
+    {
+        return (Math.abs(x) < Double.MIN_VALUE && Math.abs(y) < Double.MIN_VALUE);
+    }
+
+    public WorldVector getAdjacent()
+    {
+        // rotate the vector 90 degrees counterclock wise
+        return new WorldVector(-y, x);
     }
 }
