@@ -81,6 +81,13 @@ public class FieldService {
         // mengembalikan true jika player dapat teleport dengan worm hole tertentu
         return wormHole.size > bot.size;
     }
+
+    static public Boolean isOutsideMap(GameState gameState, GameObject bot)
+    {
+        Position center = gameState.world.centerPoint;
+
+        return (gameState.world.radius < RadarService.getDistanceBetween(bot, center) + bot.size);
+    }
     
     
 

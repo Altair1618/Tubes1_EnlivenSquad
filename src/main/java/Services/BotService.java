@@ -49,25 +49,26 @@ public class BotService {
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = new Random().nextInt(360);
 
-        if (!gameState.getGameObjects().isEmpty()) {
-            if (SupernovaService.isSupernovaPickupExist(gameState)) {
-                setHeading(RadarService.getHeadingBetween(bot, SupernovaService.getSupernovaPickupObject(gameState)));
-                System.out.println("Mengejar supernova");
-            }
-//            else {
-//                setHeading(radarService.getHeadingBetween(bot, radarService.getNearestFood(gameState, bot)));
-//            }
-        }
+//         if (!gameState.getGameObjects().isEmpty()) {
+//             if (SupernovaService.isSupernovaPickupExist(gameState)) {
+//                 setHeading(RadarService.getHeadingBetween(bot, SupernovaService.getSupernovaPickupObject(gameState)));
+//                 System.out.println("Mengejar supernova");
+//             }
+// //            else {
+// //                setHeading(radarService.getHeadingBetween(bot, radarService.getNearestFood(gameState, bot)));
+// //            }
+//         }
 
-        if (bot.supernovaAvailable == 1) {
-            if (SupernovaService.isSupernovaBombExist(gameState)) {
-                playerAction.action = PlayerActions.DETONATESUPERNOVA;
-                System.out.println("Meledakkan Supernova");
-            } else {
-                playerAction.action = PlayerActions.FIRESUPERNOVA;
-                System.out.println("Menembak Supernova");
-            }
-        }
+//         if (bot.supernovaAvailable == 1) {
+//             if (SupernovaService.isSupernovaBombExist(gameState)) {
+//                 playerAction.action = PlayerActions.DETONATESUPERNOVA;
+//                 System.out.println("Meledakkan Supernova");
+//             } else {
+//                 playerAction.action = PlayerActions.FIRESUPERNOVA;
+//                 System.out.println("Menembak Supernova");
+//             }
+//         }
+
 
         this.playerAction = playerAction;
     }
