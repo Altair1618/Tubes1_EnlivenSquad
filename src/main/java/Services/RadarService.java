@@ -9,6 +9,8 @@ import java.util.stream.*;
 public class RadarService {
 
     static public List<GameObject> getOtherPlayerList(GameState gameState, GameObject bot) {
+        // mengembalikan list player lainnya
+
         return gameState.getPlayerGameObjects()
                 .stream().filter(item -> item.getId() != bot.getId())
                 .sorted(Comparator
@@ -22,6 +24,7 @@ public class RadarService {
 
     static public List<GameObject> getOtherObjects(GameState gameState, GameObject bot, ObjectTypes objectType)
     {
+        // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
         var objectList = gameState.getGameObjects()
                 .stream().filter(item -> item.getGameObjectType() == objectType)
                 .sorted(Comparator
@@ -33,6 +36,7 @@ public class RadarService {
 
     static public List<GameObject> getOtherObjects(GameState gameState, Position position)
     {
+        // mengembalikan objek-objek lain dan diurutkan berdasarkan jarak terhadap position 
         var objectList = gameState.getGameObjects()
                 .stream()
                 .sorted(Comparator
@@ -77,7 +81,11 @@ public class RadarService {
 
     static public Position nextPosition(int heading, GameObject bot)
     {
+        // mengembalikan prediksi posisi bot pada tik berikutnya
         int speed = (int) Math.ceil(200.0f / bot.getSize());
+
+        if (Effects.getEffectList(bot.effectsCode).get(1)) speed /= 2;
+
         double rad = heading * Math.PI / 180;
         return new Position(roundToEven(bot.getPosition().x + speed * Math.cos(rad)), roundToEven(bot.getPosition().y + speed * Math.sin(rad)));
     }

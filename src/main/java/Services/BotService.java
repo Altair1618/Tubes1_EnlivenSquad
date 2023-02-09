@@ -10,12 +10,9 @@ public class BotService {
     private PlayerAction playerAction;
     private GameState gameState;
 
-    private SupernovaService supernovaService;
-
     public BotService() {
         this.playerAction = new PlayerAction();
         this.gameState = new GameState();
-        this.supernovaService = new SupernovaService();
     }
 
     public GameObject getBot() {
@@ -68,9 +65,9 @@ public class BotService {
             playerAction.heading = RadarService.getHeadingBetween(bot, nearestPlayer);
         } else {
             GameObject nearestFood = FoodServices.getNearestFood(gameState, bot);
-            // playerAction.action = PlayerActions.FORWARD;
-            // playerAction.heading = RadarService.getHeadingBetween(bot, nearestFood);
-            // System.out.println("MAKANNNNN");
+            playerAction.action = PlayerActions.FORWARD;
+            playerAction.heading = RadarService.getHeadingBetween(bot, nearestFood);
+            System.out.println("MAKANNNNN");
         }
 
         // if (!gameState.getGameObjects().isEmpty()) {

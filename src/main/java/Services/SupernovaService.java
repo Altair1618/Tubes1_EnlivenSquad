@@ -7,19 +7,19 @@ import java.util.stream.*;
 public class SupernovaService {
 
 
-    public boolean isSupernovaPickupExist(GameState gameState) {
+    static public boolean isSupernovaPickupExist(GameState gameState) {
         // Mengecek apakah terdapat supernova pickup di world
         var SupernovaPickup = gameState.getGameObjects().stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP).collect(Collectors.toList());
         return !SupernovaPickup.isEmpty();
     }
 
-    public GameObject getSupernovaPickupObject(GameState gameState) {
+    static public GameObject getSupernovaPickupObject(GameState gameState) {
         // I.S Supernova Pickup Exist
         var SupernovaPickup = gameState.getGameObjects().stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP).collect(Collectors.toList());
         return SupernovaPickup.get(0);
     }
 
-    public GameObject getNearestPlayerFromSupernovaPickup(GameState gameState) {
+    static public GameObject getNearestPlayerFromSupernovaPickup(GameState gameState) {
         // I.S Supernova Pickup Exist
         var distanceList = gameState.getPlayerGameObjects()
                 .stream()
@@ -30,13 +30,13 @@ public class SupernovaService {
         return distanceList.get(0);
     }
 
-    public boolean isSupernovaBombExist(GameState gameState) {
+    static public boolean isSupernovaBombExist(GameState gameState) {
         // Mengecek apakah terdapat bom supernova di world
         var SupernovaPickup = gameState.getGameObjects().stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB).collect(Collectors.toList());
         return !SupernovaPickup.isEmpty();
     }
 
-    public List<GameObject> getSupernovaBombs(GameState gameState) {
+    static public List<GameObject> getSupernovaBombs(GameState gameState) {
         // I.S Supernova Pickup Exist
         var bombList = gameState.getGameObjects()
                 .stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB)
