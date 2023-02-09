@@ -2,17 +2,16 @@ package Services;
 
 import Enums.*;
 import Models.*;
+import java.util.*; 
 
 public class FoodServices {
 
 
-    static public GameObject getNearestFood(GameState gameState, GameObject bot) {
+    static public List<GameObject> getFoods(GameState gameState, GameObject bot) {
 
         // mengembalikan makanan terdekat dengan player
         
-        var foodList = RadarService.getOtherObjects(gameState, bot, ObjectTypes.FOOD);
+        return RadarService.getOtherObjects(gameState, bot, ObjectTypes.FOOD);
         
-        // kalau ada >= food dengan jarak yang sama?
-        return foodList.get(0);
     }
 }

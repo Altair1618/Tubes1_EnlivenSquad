@@ -18,10 +18,6 @@ public class RadarService {
                 .collect(Collectors.toList());
     }
 
-    static public GameObject getNearestPlayer(GameState gameState, GameObject bot) {
-        return getOtherPlayerList(gameState, bot).get(0);
-    }
-
     static public List<GameObject> getOtherObjects(GameState gameState, GameObject bot, ObjectTypes objectType)
     {
         // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
