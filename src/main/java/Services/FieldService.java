@@ -89,6 +89,9 @@ public class FieldService {
         return (gameState.world.radius < RadarService.getDistanceBetween(bot, center) + bot.size);
     }
     
-    
+    static public int getCenterDirection(GameState gameState, GameObject bot)
+    {
+        return RadarService.getHeadingBetween(bot, gameState.world.centerPoint);
+    }
 
 }

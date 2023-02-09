@@ -9,10 +9,13 @@ public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
+    
+    private GameObject firedTorpedo;
 
     public BotService() {
         this.playerAction = new PlayerAction();
         this.gameState = new GameState();
+        this.firedTorpedo = null;
     }
 
 
@@ -46,6 +49,8 @@ public class BotService {
 
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
+
+
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = new Random().nextInt(360);
 
@@ -69,7 +74,12 @@ public class BotService {
 //             }
 //         }
 
+        List<GameObject> foods = FoodServices.getFoods(gameState, bot);
 
+        if (!foods.isEmpty())
+        {
+            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+        }
         this.playerAction = playerAction;
     }
 
