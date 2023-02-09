@@ -18,7 +18,6 @@ public class BotService {
         this.supernovaService = new SupernovaService();
     }
 
-
     public GameObject getBot() {
         return this.bot;
     }
@@ -52,25 +51,47 @@ public class BotService {
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = new Random().nextInt(360);
 
-        if (!gameState.getGameObjects().isEmpty()) {
-            if (supernovaService.isSupernovaPickupExist(gameState)) {
-                setHeading(RadarService.getHeadingBetween(bot, supernovaService.getSupernovaPickupObject(gameState)));
-                System.out.println("Mengejar supernova");
-            }
-//            else {
-//                setHeading(radarService.getHeadingBetween(bot, radarService.getNearestFood(gameState, bot)));
-//            }
+        // if (!gameState.getGameObjects().isEmpty()) {
+        //     var torpedo = gameState.getGameObjects()
+        //             .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD)
+        //             .sorted(Comparator
+        //                     .comparing(item -> getDistanceBetween(bot, item)))
+        //             .collect(Collectors.toList());
+
+        //     playerAction.heading = getHeadingBetween(foodList.get(0));
+        // }
+
+        if (bot.getTorpedoSalvoCount() >= 2) {
+            System.out.println("fire torpedo " + bot.getTorpedoSalvoCount());
+            GameObject nearestPlayer = RadarService.getNearestPlayer(gameState, bot); 
+            playerAction.action = PlayerActions.FIRETORPEDOES;
+            playerAction.heading = RadarService.getHeadingBetween(bot, nearestPlayer);
+        } else {
+            GameObject nearestFood = FoodServices.getNearestFood(gameState, bot);
+            // playerAction.action = PlayerActions.FORWARD;
+            // playerAction.heading = RadarService.getHeadingBetween(bot, nearestFood);
+            // System.out.println("MAKANNNNN");
         }
 
-        if (bot.supernovaAvailable == 1) {
-            if (supernovaService.isSupernovaBombExist(gameState)) {
-                playerAction.action = PlayerActions.DETONATESUPERNOVA;
-                System.out.println("Meledakkan Supernova");
-            } else {
-                playerAction.action = PlayerActions.FIRESUPERNOVA;
-                System.out.println("Menembak Supernova");
-            }
-        }
+        // if (!gameState.getGameObjects().isEmpty()) {
+        //     if (supernovaService.isSupernovaPickupExist(gameState)) {
+        //         setHeading(RadarService.getHeadingBetween(bot, supernovaService.getSupernovaPickupObject(gameState)));
+        //         System.out.println("Mengejar supernova");
+        //     }
+        // //    else {
+        // //        setHeading(radarService.getHeadingBetween(bot, radarService.getNearestFood(gameState, bot)));
+        // //    }
+        // }
+
+        // if (bot.supernovaAvailable == 1) {
+        //     if (supernovaService.isSupernovaBombExist(gameState)) {
+        //         playerAction.action = PlayerActions.DETONATESUPERNOVA;
+        //         System.out.println("Meledakkan Supernova");
+        //     } else {
+        //         playerAction.action = PlayerActions.FIRESUPERNOVA;
+        //         System.out.println("Menembak Supernova");
+        //     }
+        // }
 
         this.playerAction = playerAction;
     }
