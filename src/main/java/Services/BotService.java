@@ -9,10 +9,13 @@ public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
+    
+    private GameObject firedTorpedo;
 
     public BotService() {
         this.playerAction = new PlayerAction();
         this.gameState = new GameState();
+        this.firedTorpedo = null;
     }
 
     public GameObject getBot() {
@@ -45,26 +48,8 @@ public class BotService {
 
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
-        // playerAction.action = PlayerActions.FORWARD;
-        // playerAction.heading = new Random().nextInt(360);
-
-        // if (!gameState.getGameObjects().isEmpty()) {
-        //     var torpedo = gameState.getGameObjects()
-        //             .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD)
-        //             .sorted(Comparator
-        //                     .comparing(item -> getDistanceBetween(bot, item)))
-        //             .collect(Collectors.toList());
-
-        //     playerAction.heading = getHeadingBetween(foodList.get(0));
-        // }
-
-        // GameObject nearestPlayer = RadarService.getNearestPlayer(gameState, bot);
-
-        List<GameObject> foods = FoodServices.getFoods(gameState, bot);
-        if (!foods.isEmpty()) {
-            playerAction.action = PlayerActions.FORWARD;
-            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
-        }
+        playerAction.action = PlayerActions.FORWARD;
+        playerAction.heading = new Random().nextInt(360);
 
         List<GameObject> players = RadarService.getOtherPlayerList(gameState, bot);
         if (bot.getTorpedoSalvoCount() >= 2) {
@@ -82,16 +67,11 @@ public class BotService {
         // //    }
         // }
 
-        // if (bot.supernovaAvailable == 1) {
-        //     if (supernovaService.isSupernovaBombExist(gameState)) {
-        //         playerAction.action = PlayerActions.DETONATESUPERNOVA;
-        //         System.out.println("Meledakkan Supernova");
-        //     } else {
-        //         playerAction.action = PlayerActions.FIRESUPERNOVA;
-        //         System.out.println("Menembak Supernova");
-        //     }
-        // }
 
+        if (!foods.isEmpty())
+        {
+            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+        }
         this.playerAction = playerAction;
     }
 

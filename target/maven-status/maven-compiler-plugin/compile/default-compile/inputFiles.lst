@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 D:\STEI\Jurusan\Semester-4\STIMA\tubes\tubes-1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Enums\Effects.java
 D:\STEI\Jurusan\Semester-4\STIMA\tubes\tubes-1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Main.java
 D:\STEI\Jurusan\Semester-4\STIMA\tubes\tubes-1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\PlayerAction.java
@@ -14,3 +15,22 @@ D:\STEI\Jurusan\Semester-4\STIMA\tubes\tubes-1\starter-pack\starter-bots\Tubes1_
 D:\STEI\Jurusan\Semester-4\STIMA\tubes\tubes-1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\GameState.java
 D:\STEI\Jurusan\Semester-4\STIMA\tubes\tubes-1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Enums\ObjectTypes.java
 D:\STEI\Jurusan\Semester-4\STIMA\tubes\tubes-1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\GameStateDto.java
+=======
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Services\TeleportService.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Enums\Effects.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\GameObject.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\World.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\GameStateDto.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Services\FieldService.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\Position.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Services\RadarService.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Main.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Services\FoodServices.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Enums\PlayerActions.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\WorldVector.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Services\BotService.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\GameState.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Enums\ObjectTypes.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Models\PlayerAction.java
+D:\Arsip Semester 4\Stima\Tubes\Tubes1\starter-pack\starter-bots\Tubes1_EnlivenSquad\src\main\java\Services\SupernovaService.java
+>>>>>>> 33e3f624813ea03f878f4db67ec599a27a36aa02

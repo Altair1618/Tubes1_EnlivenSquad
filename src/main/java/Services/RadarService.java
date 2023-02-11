@@ -67,6 +67,20 @@ public class RadarService {
         return (direction + 360) % 360;
     }
 
+    static public int getHeadingBetween(GameObject bot, Position p) {
+        // mengembalikan arah (global, bukan lokal) menuju p (dalam derajat) 
+        var direction = toDegrees(Math.atan2(p.y - bot.getPosition().y,
+                p.x - bot.getPosition().x));
+        return (direction + 360) % 360;
+    }
+
+    static public int getHeadingBetween(Position p1, Position p2) {
+        // mengembalikan arah (global, bukan lokal) menuju p2 dari p1 (dalam derajat) 
+        var direction = toDegrees(Math.atan2(p2.y - p1.y,
+                p2.x - p1.x));
+        return (direction + 360) % 360;
+    }
+
     static public long getRoundedDistance(GameObject object1, GameObject object2)
     {
         // mengembalikan jarak dua objek yang dibulatkan dengan roundToEven
@@ -78,9 +92,12 @@ public class RadarService {
     static public Position nextPosition(int heading, GameObject bot)
     {
         // mengembalikan prediksi posisi bot pada tik berikutnya
-        int speed = (int) Math.ceil(200.0f / bot.getSize());
+        int speed = bot.speed;
 
-        if (Effects.getEffectList(bot.effectsCode).get(1)) speed /= 2;
+        List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
+
+        if (effectList.get(0)) speed *= 2;
+        if (effectList.get(1)) speed /= 2;
 
         double rad = heading * Math.PI / 180;
         return new Position(roundToEven(bot.getPosition().x + speed * Math.cos(rad)), roundToEven(bot.getPosition().y + speed * Math.sin(rad)));
@@ -128,6 +145,17 @@ public class RadarService {
 
         return collapsingObjects;
 
+    }
+
+    static public double vectorToDegree(WorldVector v)
+    {
+        var direction = Math.atan2(v.y, v.x) * 180 / Math.PI;
+        return (direction + 360) % 360;
+    }
+
+    static public WorldVector degreeToVector(int heading)
+    {
+        return new WorldVector(Math.cos(heading), Math.sin(heading));
     }
 
     static private int roundToEven(double v) {

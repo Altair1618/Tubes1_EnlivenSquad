@@ -48,32 +48,39 @@ public class FieldService {
         return Effects.getEffectList(bot.effectsCode).get(1);
     }
 
-    static public int getCloudHeadingEscape(GameObject bot, List<GameObject> collapsingClouds)
+    static public List<Integer> getHeadingEscape(GameObject bot, List<GameObject> collapsingObject)
     {
-        // mengembalikan arah terbaik player untuk keluar dari cloud (PENDEKATAN RATA-RATA)
+        // mengembalikan arah terbaik player untuk keluar dari cloud (PENDEKATAN PENJUMLAHAN VECTOR DENGAN BOBOT 1 / (jarak yang dibutuhkan untuk escape))
 
-        long total = 0;
+        WorldVector total = new WorldVector();
 
-        for (GameObject cloud : collapsingClouds) {
-            total += RadarService.getHeadingBetween(cloud, bot);
+        for (GameObject obj : collapsingObject) {
+
+            double weight = obj.size - RadarService.getDistanceBetween(bot, obj) + bot.size; // dipastikan weight >= 1 karena collapsing dan menggunakan perhitungan integer
+            total.add((new WorldVector(obj.position, bot.position)).toNormalize().div(weight));
         }
 
-        return (int) (total / collapsingClouds.size());
+        if (total.isZero()) 
+        {
+            if (collapsingObject.size() > 2) return new ArrayList<Integer>(bot.getHeading());
 
-    }
+            // if size == 2
 
-    static public int getAsteroidHeadingEscape(GameObject bot, List<GameObject> collapsingAsteroids)
-    {
-        // mengembalikan arah terbaik player untuk keluar dari asteroid field (PENDEKATAN RATA-RATA)
+            WorldVector line = new WorldVector(collapsingObject.get(0).position, collapsingObject.get(1).position);
+            WorldVector direction = line.getAdjacent();
+            return new ArrayList<Integer>(){
+                {
+                    add((int) RadarService.vectorToDegree(direction));
+                    add((int) RadarService.vectorToDegree(direction.mult(-1)));
+            
+                }
+            };
 
-        long total = 0;
 
-        for (GameObject ast : collapsingAsteroids) {
-            total += RadarService.getHeadingBetween(ast, bot);
+
         }
 
-        return (int) (total / collapsingAsteroids.size());
-
+        return new ArrayList<Integer>((int) RadarService.vectorToDegree(total));
     }
 
     static public Boolean isWormHoleAvailable(GameObject bot, GameObject wormHole)
@@ -87,6 +94,11 @@ public class FieldService {
         Position center = gameState.world.centerPoint;
 
         return (gameState.world.radius < RadarService.getDistanceBetween(bot, center) + bot.size);
+    }
+    
+    static public int getCenterDirection(GameState gameState, GameObject bot)
+    {
+        return RadarService.getHeadingBetween(bot, gameState.world.centerPoint);
     }
 
 }
