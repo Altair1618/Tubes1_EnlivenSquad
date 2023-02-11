@@ -21,5 +21,58 @@ public class TorpedoService {
         return bot.torpedoSalvoCount > 0 && bot.size >= sizeLimit;
     }
 
-    static public Boolean isIncomingTorpedo()
+    static public Boolean isTorpedoAvailable(GameObject bot, int sizeLimit, int salvoCountLimit)
+    {
+        // True if player can fire torpedo
+        // with bot.size >= sizeLimit
+        // and bot.torpedoSalvoCount >= salvoCountLimit
+        return bot.torpedoSalvoCount >= salvoCountLimit && bot.size >= sizeLimit;
+    }
+
+    // static private int roundUp(double v) {
+    //     // rounding up
+    //     int res = (int) Math.ceil(v);
+
+    //     return res;
+    // }
+
+    static public int angleBetween(double angle1, double angle2) {
+        // menghitung angle dari 2 sudut
+
+        return Math.abs((angle1 - angle2 + 180 + 360) % 360 - 180);
+    }
+
+    static public boolean isIncoming(GameObject bot, GameObject torpedo) {
+        // mengembalikan true jika torpedoes mengarah ke bot
+        // perhitungan dengan konsep segitiga
+
+        int torpedoHeading = torpedo.getHeading();
+        int headingBetween = RadarService.getHeadingBetween(torpedo, bot);
+        double distance = RadarService.getDistanceBetween(torpedo, bot);
+        int botRadius = bot.getSize();
+
+        double offSet = Math.asin(botRadius / distance);
+
+        if ((angleBetween(torpedoHeading, headingBetween + offSet) + angleBetween(torpedoHeading, headingBetween - offSet)) <= 2 * offSet) {
+            return true;
+        }
+        return false;
+    }
+
+    static public List<GameObject> getIncomingTorpedo(GameState gameState, GameObject bot, GameObject torpedoes) {
+        List<GameObject> incomingTorpedo = new ArrayList<GameObject>();
+        List<GameObject> torpedoesList = getOtherObjects(gameState, bot, ObjectTypes.TORPEDOSALVO);
+
+        torpedoesList.forEach((torpedo) -> {
+            if (isIncoming(bot, torpedo)) {
+                incomingTorpedo.add(torpedo);
+            }
+        });
+
+        return incomingTorpedo;
+    }
+
+    static public int nextHeadingAfterTorpedo(List<GameObject> incomingTorpedo) {
+        
+    }
 }
