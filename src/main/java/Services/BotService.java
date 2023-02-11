@@ -3,6 +3,7 @@ package Services;
 import Enums.*;
 import Models.*;
 
+import java.io.Console;
 import java.util.*;
 
 public class BotService {
@@ -48,10 +49,25 @@ public class BotService {
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = new Random().nextInt(360);
 
+        List<GameObject> foods = FoodServices.getFoods(gameState, bot);
+        if (!foods.isEmpty()) {
+            playerAction.action = PlayerActions.FORWARD;
+            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+            System.out.println("eat !!");
+        }
+        
         List<GameObject> players = RadarService.getOtherPlayerList(gameState, bot);
-        if (bot.getTorpedoSalvoCount() >= 2) {
+        if (TorpedoService.isTorpedoAvailable(bot, 15)) {
             playerAction.action = PlayerActions.FIRETORPEDOES;
             playerAction.heading = RadarService.getHeadingBetween(bot, players.get(0));
+            System.out.println("fire torpedo");
+        }
+
+        List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
+        if (incomingTorpedo.size() != 0) {
+            playerAction.action = PlayerActions.FORWARD;
+            playerAction.heading = TorpedoService.nextHeadingAfterTorpedo(bot, incomingTorpedo);
+            System.out.println("run run run run from torpedo");
         }
 
         // if (!gameState.getGameObjects().isEmpty()) {
@@ -64,25 +80,22 @@ public class BotService {
         // //    }
         // }
 
-        if (Effects.getEffectList(bot.effectsCode).get(0)) System.out.println("ON!\n");
-        System.out.println("size: ");
-        System.out.println(bot.size);
-        System.out.println("\n");
-        System.out.println("speed: ");
-        System.out.println(bot.speed);
-        System.out.println("\n");
+        // if (Effects.getEffectList(bot.effectsCode).get(0)) System.out.println("ON!\n");
+        // System.out.println("size: ");
+        // System.out.println(bot.size);
+        // System.out.println("\n");
+        // System.out.println("speed: ");
+        // System.out.println(bot.speed);
+        // System.out.println("\n");
 
-        if (bot.size >= 20 && !Effects.getEffectList(bot.effectsCode).get(0))
-        {
-            System.out.println("ON!\n");
-            playerAction.action = PlayerActions.STARTAFTERBURNER;
-            return;
+        // if (bot.size >= 20 && !Effects.getEffectList(bot.effectsCode).get(0))
+        // {
+        //     System.out.println("ON!\n");
+        //     playerAction.action = PlayerActions.STARTAFTERBURNER;
+        //     return;
             
-        }
-        if (!foods.isEmpty())
-        {
-            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
-        }
+        // }
+        
         this.playerAction = playerAction;
     }
 

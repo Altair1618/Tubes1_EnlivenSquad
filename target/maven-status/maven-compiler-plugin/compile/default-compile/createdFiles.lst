@@ -1,4 +1,5 @@
 Enums\Effects.class
+Services\FieldService$1.class
 Services\SupernovaService.class
 Services\RadarService.class
 Enums\ObjectTypes.class
@@ -10,7 +11,10 @@ Services\FoodServices.class
 Main.class
 Enums\PlayerActions.class
 Models\GameState.class
+Models\WorldVector.class
+main\java\Services\ShieldService.class
 Services\BotService.class
 Models\GameStateDto.class
+Services\TorpedoService.class
 Models\Position.class
 Models\World.class

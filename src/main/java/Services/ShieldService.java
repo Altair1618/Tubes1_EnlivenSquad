@@ -12,4 +12,10 @@ public class ShieldService {
         // default bot.size >= 40
         return bot.shieldCount > 0 && bot.size >= 40;
     }
+
+    static public Boolean isShieldAvailable(GameObject bot, int sizeLimit) {
+        // True if player can use shield
+        // with bot.size >= sizeLimit
+        return bot.shieldCount > 0 && bot.size >= sizeLimit;
+    }
 }
