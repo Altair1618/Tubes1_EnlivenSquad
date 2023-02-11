@@ -9,13 +9,10 @@ public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
-    
-    private GameObject firedTorpedo;
 
     public BotService() {
         this.playerAction = new PlayerAction();
         this.gameState = new GameState();
-        this.firedTorpedo = null;
     }
 
 
