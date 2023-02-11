@@ -45,8 +45,8 @@ public class BotService {
 
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
-        playerAction.action = PlayerActions.FORWARD;
-        playerAction.heading = new Random().nextInt(360);
+        // playerAction.action = PlayerActions.FORWARD;
+        // playerAction.heading = new Random().nextInt(360);
 
         // if (!gameState.getGameObjects().isEmpty()) {
         //     var torpedo = gameState.getGameObjects()
@@ -58,17 +58,18 @@ public class BotService {
         //     playerAction.heading = getHeadingBetween(foodList.get(0));
         // }
 
-        GameObject nearestPlayer = RadarService.getNearestPlayer(gameState, bot);
+        // GameObject nearestPlayer = RadarService.getNearestPlayer(gameState, bot);
 
-        if (bot.getTorpedoSalvoCount() >= 2) {
-            System.out.println("fire torpedo " + bot.getTorpedoSalvoCount());
-            playerAction.action = PlayerActions.FIRETORPEDOES;
-            playerAction.heading = RadarService.getHeadingBetween(bot, nearestPlayer);
-        } else {
-            // GameObject nearestFood = FoodServices.getNearestFood(gameState, bot);
+        List<GameObject> foods = FoodServices.getFoods(gameState, bot);
+        if (!foods.isEmpty()) {
             playerAction.action = PlayerActions.FORWARD;
-            playerAction.heading = RadarService.getHeadingBetween(bot, nearestPlayer);
-            System.out.println("MAKANNNNN");
+            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+        }
+
+        List<GameObject> players = RadarService.getOtherPlayerList(gameState, bot);
+        if (bot.getTorpedoSalvoCount() >= 2) {
+            playerAction.action = PlayerActions.FIRETORPEDOES;
+            playerAction.heading = RadarService.getHeadingBetween(bot, players.get(0));
         }
 
         // if (!gameState.getGameObjects().isEmpty()) {

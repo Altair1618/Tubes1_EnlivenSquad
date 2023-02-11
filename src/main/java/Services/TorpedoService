@@ -7,8 +7,19 @@ import java.util.*;
 import java.util.stream.*;
 
 public class TorpedoService {
-    public void fireTorpedos () {
-        if ()
+    static public Boolean isTorpedoAvailable(GameObject bot)
+    {
+        // True if player can fire torpedo
+        // default bot.size >= 30
+        return bot.torpedoSalvoCount > 0 && bot.size >= 30;
     }
 
+    static public Boolean isTorpedoAvailable(GameObject bot, int sizeLimit)
+    {
+        // True if player can fire torpedo
+        // with bot.size >= sizeLimit
+        return bot.torpedoSalvoCount > 0 && bot.size >= sizeLimit;
+    }
+
+    static public Boolean isIncomingTorpedo()
 }
