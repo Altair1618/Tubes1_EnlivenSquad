@@ -111,10 +111,10 @@ public class RadarService {
         // mengembalikan prediksi posisi bot pada tik berikutnya
         int speed = bot.speed;
 
-        List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
+        // List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
 
-        if (effectList.get(0)) speed *= 2;
-        if (effectList.get(1)) speed /= 2;
+        // if (effectList.get(0)) speed *= 2;
+        // if (effectList.get(1)) speed /= 2;
 
         double rad = heading * Math.PI / 180;
         return new Position(roundToEven(bot.getPosition().x + speed * Math.cos(rad)), roundToEven(bot.getPosition().y + speed * Math.sin(rad)));
