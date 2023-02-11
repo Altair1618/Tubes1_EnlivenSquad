@@ -30,6 +30,16 @@ public class RadarService {
         return objectList;
     }
 
+    static public List<GameObject> getOtherObjects(GameState gameState, ObjectTypes objectType)
+    {
+        // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
+        var objectList = gameState.getGameObjects()
+                .stream().filter(item -> item.getGameObjectType() == objectType)
+                .collect(Collectors.toList());
+
+        return objectList;
+    }
+
     static public List<GameObject> getOtherObjects(GameState gameState, Position position)
     {
         // mengembalikan objek-objek lain dan diurutkan berdasarkan jarak terhadap position 
@@ -57,6 +67,13 @@ public class RadarService {
         // mengembalikan jarak dua objek
         var triangleX = Math.abs(object.getPosition().x - p.x);
         var triangleY = Math.abs(object.getPosition().y - p.y);
+        return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
+    }
+
+    static public double getDistanceBetween(Position p1, Position p2) {
+        // mengembalikan jarak dua objek
+        var triangleX = Math.abs(p1.x - p2.x);
+        var triangleY = Math.abs(p1.y - p2.y);
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
     }
 
@@ -94,10 +111,10 @@ public class RadarService {
         // mengembalikan prediksi posisi bot pada tik berikutnya
         int speed = bot.speed;
 
-        List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
+        // List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
 
-        if (effectList.get(0)) speed *= 2;
-        if (effectList.get(1)) speed /= 2;
+        // if (effectList.get(0)) speed *= 2;
+        // if (effectList.get(1)) speed /= 2;
 
         double rad = heading * Math.PI / 180;
         return new Position(roundToEven(bot.getPosition().x + speed * Math.cos(rad)), roundToEven(bot.getPosition().y + speed * Math.sin(rad)));
@@ -130,7 +147,6 @@ public class RadarService {
         });
 
         return collapsingObjects;
-
     }
 
     static public List<GameObject> getCollapsingObjects(GameState gameState, GameObject bot, ObjectTypes type)
@@ -144,7 +160,6 @@ public class RadarService {
         });
 
         return collapsingObjects;
-
     }
 
     static public double vectorToDegree(WorldVector v)
@@ -157,6 +172,8 @@ public class RadarService {
     {
         return new WorldVector(Math.cos(heading), Math.sin(heading));
     }
+
+    
 
     static private int roundToEven(double v) {
         

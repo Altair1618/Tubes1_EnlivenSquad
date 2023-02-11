@@ -75,9 +75,6 @@ public class FieldService {
             
                 }
             };
-
-
-
         }
 
         return new ArrayList<Integer>((int) RadarService.vectorToDegree(total));
@@ -94,6 +91,13 @@ public class FieldService {
         Position center = gameState.world.centerPoint;
 
         return (gameState.world.radius < RadarService.getDistanceBetween(bot, center) + bot.size);
+    }
+
+    static public Boolean isOutsideMap(GameState gameState, Position p, int size)
+    {
+        Position center = gameState.world.centerPoint;
+
+        return (gameState.world.radius < RadarService.getDistanceBetween(p, center) + size);
     }
     
     static public int getCenterDirection(GameState gameState, GameObject bot)

@@ -9,13 +9,10 @@ public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
-    
-    private GameObject firedTorpedo;
 
     public BotService() {
         this.playerAction = new PlayerAction();
         this.gameState = new GameState();
-        this.firedTorpedo = null;
     }
 
     public GameObject getBot() {
@@ -67,7 +64,21 @@ public class BotService {
         // //    }
         // }
 
+        if (Effects.getEffectList(bot.effectsCode).get(0)) System.out.println("ON!\n");
+        System.out.println("size: ");
+        System.out.println(bot.size);
+        System.out.println("\n");
+        System.out.println("speed: ");
+        System.out.println(bot.speed);
+        System.out.println("\n");
 
+        if (bot.size >= 20 && !Effects.getEffectList(bot.effectsCode).get(0))
+        {
+            System.out.println("ON!\n");
+            playerAction.action = PlayerActions.STARTAFTERBURNER;
+            return;
+            
+        }
         if (!foods.isEmpty())
         {
             playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));

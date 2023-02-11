@@ -87,4 +87,18 @@ public class WorldVector {
         // rotate the vector 90 degrees counterclock wise
         return new WorldVector(-y, x);
     }
+
+    public void rotateBy(double angle) {
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
+        double rx = x * cos - y * sin;
+        y = x * sin + y * cos;
+        x = rx;
+    }
+
+    public WorldVector getRotatedBy(double angle) {
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
+        return new WorldVector(x * cos - y * sin, x * sin + y * cos);
+    }
 }
