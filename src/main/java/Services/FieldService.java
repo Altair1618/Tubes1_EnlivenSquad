@@ -115,11 +115,26 @@ public class FieldService {
         return (gameState.world.radius < RadarService.getDistanceBetween(bot, center) + bot.size);
     }
 
+    static public Boolean isOutsideMap(GameState gameState, GameObject bot, int offset)
+    {
+        // making world radius smaller if offset
+        Position center = gameState.world.centerPoint;
+
+        return (gameState.world.radius - offset < RadarService.getDistanceBetween(bot, center) + bot.size);
+    }
+
     static public Boolean isOutsideMap(GameState gameState, Position p, int size)
     {
         Position center = gameState.world.centerPoint;
 
         return (gameState.world.radius < RadarService.getDistanceBetween(p, center) + size);
+    }
+
+    static public Boolean isOutsideMap(GameState gameState, Position p, int size, int offset)
+    {
+        Position center = gameState.world.centerPoint;
+
+        return (gameState.world.radius - offset < RadarService.getDistanceBetween(p, center) + size);
     }
     
     static public int getCenterDirection(GameState gameState, GameObject bot)

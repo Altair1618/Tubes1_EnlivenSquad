@@ -136,12 +136,28 @@ public class RadarService {
         return (object1.size + object2.size > distance);
     }
 
+    static public boolean isCollapsing(GameObject object1, GameObject object2, int offset)
+    {
+        // mengembalikan true jika object1 dan object2 collapse
+        long distance = getRoundedDistance(object1, object2);
+
+        return (object1.size + object2.size + offset > distance);
+    }
+
     static public boolean isCollapsing(GameObject object, Position p, Integer size)
     {
         // mengembalikan true jika object1 dan object2 collapse
         long distance = roundToEven(getDistanceBetween(object, p));
 
         return (object.size + size > distance);
+    }
+
+    static public boolean isCollapsing(GameObject object, Position p, Integer size, int offset)
+    {
+        // mengembalikan true jika object1 dan object2 collapse
+        long distance = roundToEven(getDistanceBetween(object, p));
+
+        return (object.size + size + offset > distance);
     }
 
     static public List<GameObject> getCollapsingObjects(GameState gameState, Position position, Integer size)
@@ -198,7 +214,6 @@ public class RadarService {
 
         return (int) res;
     }
-
     static private int toDegrees(double v) {
         // radiant to degree
         return (int) (v * (180 / Math.PI));
