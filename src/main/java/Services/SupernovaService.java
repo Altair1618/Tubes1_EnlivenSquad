@@ -19,11 +19,19 @@ public class SupernovaService {
         return SupernovaPickup.get(0);
     }
 
-    static public GameObject getNearestPlayerFromSupernovaPickup(GameState gameState) {
+    static public boolean isBotNearestfromPickup(GameState gameState, GameObject bot) {
         // I.S Supernova Pickup Exist
-        var distanceList = new ArrayList<>(gameState.getPlayerGameObjects());
+        List<GameObject> Players = gameState.getPlayerGameObjects();
+        GameObject nearest = Players.get(0);
+        GameObject pickup = getSupernovaPickupObject(gameState);
 
-        return distanceList.get(0);
+        for (int i = 1; i < Players.size(); i++) {
+            if (RadarService.getRealDistance(Players.get(i), pickup) < RadarService.getRealDistance(nearest, pickup)) {
+                nearest = Players.get(i);
+            }
+        }
+
+        return nearest == bot;
     }
 
     static public boolean isSupernovaBombExist(GameState gameState) {
