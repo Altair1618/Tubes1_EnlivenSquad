@@ -7,17 +7,6 @@ import java.util.*;
 import java.util.stream.*;
 
 public class RadarService {
-
-    static public List<GameObject> getOtherPlayerList(GameState gameState, GameObject bot) {
-        // mengembalikan list player lainnya
-
-        return gameState.getPlayerGameObjects()
-                .stream().filter(item -> item.getId() != bot.getId())
-                .sorted(Comparator
-                        .comparing(item -> getRealDistance(bot, item)))
-                .collect(Collectors.toList());
-    }
-
     static public List<GameObject> getOtherObjects(GameState gameState, GameObject bot, ObjectTypes objectType)
     {
         // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
@@ -40,8 +29,7 @@ public class RadarService {
         return objectList;
     }
 
-    static public List<GameObject> getOtherObjects(GameState gameState, Position position)
-    {
+    static public List<GameObject> getOtherObjects(GameState gameState, Position position) {
         // mengembalikan objek-objek lain dan diurutkan berdasarkan jarak terhadap position 
         var objectList = gameState.getGameObjects()
                 .stream()
@@ -50,10 +38,6 @@ public class RadarService {
                 .collect(Collectors.toList());
 
         return objectList;
-    }
-    
-    static public int getOtherPlayerHeading(GameObject otherBot) {
-        return otherBot.getHeading();
     }
 
     static public double getRealDistance(int radius1, int radius2, Double distance)
@@ -209,11 +193,11 @@ public class RadarService {
     }
 
     static public boolean isInWorld(Position p, GameState gameState, GameObject bot) {
-        return getDistanceFromZero(p) < gameState.getWorld().getRadius() - bot.getSize();
+        return getDistanceFromZero(p) < gameState.getWorld().getRadius() - bot.getSize() - 15;
     }
 
     static public boolean isInWorld(GameObject object, GameState gameState, GameObject bot) {
-        return getDistanceFromZero(object) < gameState.getWorld().getRadius() - bot.getSize();
+        return getDistanceFromZero(object) < gameState.getWorld().getRadius() - bot.getSize() - 15;
     }
 
     static public double vectorToDegree(WorldVector v)
@@ -227,10 +211,7 @@ public class RadarService {
         return new WorldVector(Math.cos(heading), Math.sin(heading));
     }
 
-    
-
     static private int roundToEven(double v) {
-        
         // standar pembulatan engine
         // contoh : 24.5 dibulatin ke 24, 25.5 dibulatin ke 26, sedangkan yang bukan desimal 0.5 akan dibulatin seperti biasa
         long res = Math.round(v);

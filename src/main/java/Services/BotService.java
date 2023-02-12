@@ -60,7 +60,7 @@ public class BotService {
             System.out.println("eat !!");
         }
         
-        List<GameObject> players = RadarService.getOtherPlayerList(gameState, bot);
+        List<GameObject> players = PlayerService.getOtherPlayerList(gameState, bot);
         if (TorpedoService.isTorpedoAvailable(bot, 15)) {
             playerAction.action = PlayerActions.FIRETORPEDOES;
             playerAction.heading = RadarService.getHeadingBetween(bot, players.get(0));
