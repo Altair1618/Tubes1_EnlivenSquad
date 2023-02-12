@@ -14,7 +14,7 @@ public class RadarService {
         return gameState.getPlayerGameObjects()
                 .stream().filter(item -> item.getId() != bot.getId())
                 .sorted(Comparator
-                        .comparing(item -> getDistanceBetween(bot, item)))
+                        .comparing(item -> getRealDistance(bot, item)))
                 .collect(Collectors.toList());
     }
 
@@ -24,7 +24,7 @@ public class RadarService {
         var objectList = gameState.getGameObjects()
                 .stream().filter(item -> item.getGameObjectType() == objectType)
                 .sorted(Comparator
-                        .comparing(item -> getDistanceBetween(bot, item)))
+                        .comparing(item -> getRealDistance(bot, item)))
                 .collect(Collectors.toList());
 
         return objectList;
@@ -46,7 +46,7 @@ public class RadarService {
         var objectList = gameState.getGameObjects()
                 .stream()
                 .sorted(Comparator
-                        .comparing(item -> getDistanceBetween(item, position)))
+                        .comparing(item -> getRealDistance(item.size, 0, getDistanceBetween(item, position))))
                 .collect(Collectors.toList());
 
         return objectList;
@@ -54,6 +54,22 @@ public class RadarService {
     
     static public int getOtherPlayerHeading(GameObject otherBot) {
         return otherBot.getHeading();
+    }
+
+    static public double getRealDistance(int radius1, int radius2, Double distance)
+    {
+        // can return negative distance if collapsing
+        // smaller means the center is closer when collapsing
+        return distance - radius1 - radius2;
+
+    }
+
+    static public double getRealDistance(GameObject object1, GameObject object2)
+    {
+        // can return negative distance if collapsing
+        // smaller means the center is closer when collapsing
+        return getRealDistance(object1.size, object2.size, getDistanceBetween(object1, object2));
+
     }
 
     static public double getDistanceBetween(GameObject object1, GameObject object2) {
@@ -128,12 +144,28 @@ public class RadarService {
         return (object1.size + object2.size > distance);
     }
 
+    static public boolean isCollapsing(GameObject object1, GameObject object2, int offset)
+    {
+        // mengembalikan true jika object1 dan object2 collapse
+        long distance = getRoundedDistance(object1, object2);
+
+        return (object1.size + object2.size + offset > distance);
+    }
+
     static public boolean isCollapsing(GameObject object, Position p, Integer size)
     {
         // mengembalikan true jika object1 dan object2 collapse
         long distance = roundToEven(getDistanceBetween(object, p));
 
         return (object.size + size > distance);
+    }
+
+    static public boolean isCollapsing(GameObject object, Position p, Integer size, int offset)
+    {
+        // mengembalikan true jika object1 dan object2 collapse
+        long distance = roundToEven(getDistanceBetween(object, p));
+
+        return (object.size + size + offset > distance);
     }
 
     static public List<GameObject> getCollapsingObjects(GameState gameState, Position position, Integer size)
@@ -190,7 +222,6 @@ public class RadarService {
 
         return (int) res;
     }
-
     static private int toDegrees(double v) {
         // radiant to degree
         return (int) (v * (180 / Math.PI));

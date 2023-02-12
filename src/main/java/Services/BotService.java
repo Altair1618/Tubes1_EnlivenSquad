@@ -3,7 +3,6 @@ package Services;
 import Enums.*;
 import Models.*;
 
-import java.io.Console;
 import java.util.*;
 
 public class BotService {
@@ -46,6 +45,7 @@ public class BotService {
 
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
+
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = new Random().nextInt(360);
 

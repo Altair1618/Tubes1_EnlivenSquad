@@ -24,7 +24,7 @@ public class SupernovaService {
         var distanceList = gameState.getPlayerGameObjects()
                 .stream()
                 .sorted(Comparator
-                        .comparing(item -> RadarService.getDistanceBetween(getSupernovaPickupObject(gameState), item)))
+                        .comparing(item -> RadarService.getRealDistance(item.size, 0, RadarService.getDistanceBetween(getSupernovaPickupObject(gameState), item))))
                 .collect(Collectors.toList());
 
         return distanceList.get(0);
