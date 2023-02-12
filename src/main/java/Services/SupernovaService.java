@@ -45,17 +45,6 @@ public class SupernovaService {
         return bombList;
     }
 
-    static public boolean inRadius(GameObject supernova, GameObject player) {
-        // True jika di sekitar supernova ada player
-
-        double distance = RadarService.getDistanceBetween(supernova, player);
-        
-        if (distance <= 30) {
-            return true;
-        }
-        return false;
-    }
-
     static public boolean isSupernovaNearPlayer(GameState gameState, GameObject bot) {
         // Mengecek apakah sekitar supernova yang ditembak dekat player
 
@@ -69,7 +58,7 @@ public class SupernovaService {
         List<GameObject> playersNearSupernovaList = new ArrayList<GameObject>();
 
         playersList.forEach((player) -> {
-            if (inRadius(supernova.get(0), player)) {
+            if (RadarService.isCollapsing(supernova.get(0), player, 30)) {
                 playersNearSupernovaList.add(player);
             }
         });
