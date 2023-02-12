@@ -198,6 +198,7 @@ public class RadarService {
 
         return (int) res;
     }
+
     static private int toDegrees(double v) {
         // radiant to degree
         return (int) (v * (180 / Math.PI));

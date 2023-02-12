@@ -3,14 +3,13 @@ package Services;
 import Enums.*;
 import Models.*;
 
+import java.io.Console;
 import java.util.*;
 
 public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
-
-    private static Boolean stop = false;
 
     public BotService() {
         this.playerAction = new PlayerAction();
@@ -48,68 +47,57 @@ public class BotService {
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
 
+        playerAction.action = PlayerActions.FORWARD;
+        playerAction.heading = new Random().nextInt(360);
 
-//         if (!gameState.getGameObjects().isEmpty()) {
-//             if (SupernovaService.isSupernovaPickupExist(gameState)) {
-//                 setHeading(RadarService.getHeadingBetween(bot, SupernovaService.getSupernovaPickupObject(gameState)));
-//                 System.out.println("Mengejar supernova");
-//             }
-// //            else {
-// //                setHeading(radarService.getHeadingBetween(bot, radarService.getNearestFood(gameState, bot)));
-// //            }
-//         }
-
-//         if (bot.supernovaAvailable == 1) {
-//             if (SupernovaService.isSupernovaBombExist(gameState)) {
-//                 playerAction.action = PlayerActions.DETONATESUPERNOVA;
-//                 System.out.println("Meledakkan Supernova");
-//             } else {
-//                 playerAction.action = PlayerActions.FIRESUPERNOVA;
-//                 System.out.println("Menembak Supernova");
-//             }
-//         }
-        if (stop) return;
-        System.out.println(FieldService.isCloudCollapsing(bot));
-        System.out.println(bot.size);
-        if (FieldService.isCloudCollapsing(bot) && bot.size < 15) 
-        {
-            List<GameObject> clouds = FieldService.getCollapsingClouds(gameState, bot);
-            List<Integer> newHeading = FieldService.getHeadingEscape(bot, clouds);
-            System.out.println("hereeeeeeeeeeee");
-
-            if (newHeading.size() > 0)
-            {
-                playerAction.heading = newHeading.get(0);
-                playerAction.action = PlayerActions.FORWARD;
-                stop = true;
-                return;
-            }
-
-            else{
-                System.out.println("lolll");
-            }
-        }
-
-        if (bot.size > 25)
-        {
-             playerAction.heading = RadarService.getHeadingBetween(bot,RadarService.getOtherObjects(gameState, bot, ObjectTypes.GASCLOUD).get(0));
-             playerAction.action = PlayerActions.FORWARD;
-             this.playerAction = playerAction;
-             return;
-        }
-
-        if (!FieldService.isCloudCollapsing(bot))
-        {
-            List<GameObject> foods = FoodServices.getFoods(gameState, bot);
+        List<GameObject> foods = FoodServices.getFoods(gameState, bot);
+        if (!foods.isEmpty()) {
             playerAction.action = PlayerActions.FORWARD;
-            if (!foods.isEmpty())
-            {
-                playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
-            }
-            this.playerAction = playerAction;
+            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+            System.out.println("eat !!");
+        }
+        
+        List<GameObject> players = RadarService.getOtherPlayerList(gameState, bot);
+        if (TorpedoService.isTorpedoAvailable(bot, 15)) {
+            playerAction.action = PlayerActions.FIRETORPEDOES;
+            playerAction.heading = RadarService.getHeadingBetween(bot, players.get(0));
+            System.out.println("fire torpedo");
         }
 
+        List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
+        if (incomingTorpedo.size() != 0) {
+            playerAction.action = PlayerActions.FORWARD;
+            playerAction.heading = TorpedoService.nextHeadingAfterTorpedo(bot, incomingTorpedo);
+            System.out.println("run run run run from torpedo");
+        }
 
+        // if (!gameState.getGameObjects().isEmpty()) {
+        //     if (supernovaService.isSupernovaPickupExist(gameState)) {
+        //         setHeading(RadarService.getHeadingBetween(bot, supernovaService.getSupernovaPickupObject(gameState)));
+        //         System.out.println("Mengejar supernova");
+        //     }
+        // //    else {
+        // //        setHeading(radarService.getHeadingBetween(bot, radarService.getNearestFood(gameState, bot)));
+        // //    }
+        // }
+
+        // if (Effects.getEffectList(bot.effectsCode).get(0)) System.out.println("ON!\n");
+        // System.out.println("size: ");
+        // System.out.println(bot.size);
+        // System.out.println("\n");
+        // System.out.println("speed: ");
+        // System.out.println(bot.speed);
+        // System.out.println("\n");
+
+        // if (bot.size >= 20 && !Effects.getEffectList(bot.effectsCode).get(0))
+        // {
+        //     System.out.println("ON!\n");
+        //     playerAction.action = PlayerActions.STARTAFTERBURNER;
+        //     return;
+            
+        // }
+        
+        this.playerAction = playerAction;
     }
 
     public GameState getGameState() {
