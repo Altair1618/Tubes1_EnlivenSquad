@@ -50,13 +50,17 @@ public class BotService {
         playerAction.heading = new Random().nextInt(360);
 
         List<GameObject> foods = FoodServices.getFoods(gameState, bot);
+        List<GameObject> superfoods = FoodServices.getSuperFoods(gameState, bot);
+
         if (!foods.isEmpty()) {
-            playerAction.action = PlayerActions.FORWARD;
-            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+            setHeading(RadarService.getHeadingBetween(bot, foods.get(0)));
+        }
+        if (!superfoods.isEmpty()) {     playerAction.action = PlayerActions.FORWARD;
+            setHeading(RadarService.getHeadingBetween(bot, superfoods.get(0)));
             System.out.println("eat !!");
         }
         
-        List<GameObject> players = RadarService.getOtherPlayerList(gameState, bot);
+        List<GameObject> players = PlayerService.getOtherPlayerList(gameState, bot);
         if (TorpedoService.isTorpedoAvailable(bot, 15)) {
             playerAction.action = PlayerActions.FIRETORPEDOES;
             playerAction.heading = RadarService.getHeadingBetween(bot, players.get(0));
