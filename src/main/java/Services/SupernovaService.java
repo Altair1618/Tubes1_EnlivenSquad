@@ -6,6 +6,11 @@ import java.util.stream.*;
 
 public class SupernovaService {
 
+    static public boolean isSupernovaAvailable(GameObject bot) {
+        // True jika supernovaAvailable
+
+        return (bot.supernovaAvailable == 1);
+    }
 
     static public boolean isSupernovaPickupExist(GameState gameState) {
         // Mengecek apakah terdapat supernova pickup di world
@@ -59,17 +64,13 @@ public class SupernovaService {
         }
 
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
-        List<GameObject> playersNearSupernovaList = new ArrayList<GameObject>();
 
-        playersList.forEach((player) -> {
-            if (RadarService.isCollapsing(supernova.get(0), player, 30)) {
-                playersNearSupernovaList.add(player);
+        for (int i = 0; i < playersList.size(); i ++) {
+            if (RadarService.isCollapsing(supernova.get(0), playersList.get(i), 30)) {
+                return true;
             }
-        });
-
-        if (playersNearSupernovaList.size() != 0) {
-            return true;
         }
+
         return false;
     }
 }

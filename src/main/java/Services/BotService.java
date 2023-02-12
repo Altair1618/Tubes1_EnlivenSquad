@@ -9,6 +9,7 @@ public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
+    static private boolean isDetonated = false;
 
     class EscapeInfo {
         public WorldVector escapeDirection;
@@ -74,14 +75,16 @@ public class BotService {
             0.0
         };
 
-        if (false /* jika kita sudah nembak supernova dan supernova bombnya dekat musuh */)
+        if (isSupernovaNearPlayer(gameState, bot) && isDetonated)
+        /* jika kita sudah nembak supernova dan supernova bombnya dekat musuh */
         {
             playerAction.action = PlayerActions.DETONATESUPERNOVA;
+
             /* set variabel sudah nembak supernova menjadi false */
+            isDetonated = false;
 
             return;
         }
-
 
         // KASUS PINDAH 1
         if (false /* jika ada bot lebih besar yang berada di rentang radar imaginary kita */)
@@ -91,24 +94,30 @@ public class BotService {
             directionVectors.add(t);
         }
 
-        if (directionVectors.isEmpty() /* && jika torpedo di dalam danger zone kita */)
+        List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
+        if (directionVectors.isEmpty() && !incomingTorpedo.isEmpty())
+        /* jika ada torpedo yang mengarah ke kita */
         {
+            /* jika torpedo (terdekat) di dalam danger zone kita */
+            if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0)) && TorpedoService.isTorpedoAvailable(bot, 20)) {
+                playerAction.action = PlayerActions.FIRETORPEDOES;
 
-            playerAction.action = PlayerActions.FIRETORPEDOES;
-            // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
-            this.playerAction = playerAction;
-            return;
+                // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
+                playerAction.heading = RadarService.getHeadingBetween(bot, incomingTorpedo.get(0)); // ini belum predict
+                this.playerAction = playerAction;
+                return;
+            }
         }
-
 
         // KASUS PINDAH 2
 
-        if (false /* jika torpedo terdetect mengarah ke kita tetapi bukan dalam danger zone */)
+        if (!incomingTorpedo.isEmpty())
+        /* jika torpedo terdetect mengarah ke kita tetapi bukan dalam danger zone */
         {
-            temp = new WorldVector();// isi temp dengan nilai arah kabur dari torpedo */
+            temp = new WorldVector();// temp = nilai arah kabur dari torpedo */
+            temp = TorpedoService.nextHeadingAfterTorpedo(bot, incomingTorpedo);
             t = new EscapeInfo(temp, weights[1]);
             directionVectors.add(t);
-
         }
 
         // KASUS PINDAH 3
@@ -247,11 +256,25 @@ public class BotService {
         }
 
     
-        if (false /*punya supernova pickup */)
+        if (isSupernovaAvailable(bot))
+        /*punya supernova pickup */
         {
-           playerAction.action = PlayerActions.FIRESUPERNOVA;
-            // playerAction.heading = arah ke TARGET
-           this.playerAction = playerAction;
+            playerAction.action = PlayerActions.FIRESUPERNOVA;
+
+            // players sudah terurut dari terkecil
+            List<GameObject> players = getOtherPlayerList(gameState, bot);
+
+            for (int i = 0; i < players.size(); i ++) {
+                if (RadarService.isCollapsing(players.get(i), bot, 50)) {
+                    // playerAction.heading = arah ke TARGET
+                    playerAction.heading = RadarService.getHeadingBetween(bot, players.get(i));
+                    break;
+                }
+            }
+            
+            isDetonated = true;
+
+            this.playerAction = playerAction;
             return;
         }
 
