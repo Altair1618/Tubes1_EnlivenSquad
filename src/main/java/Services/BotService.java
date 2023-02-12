@@ -55,7 +55,8 @@ public class BotService {
         if (!foods.isEmpty()) {
             setHeading(RadarService.getHeadingBetween(bot, foods.get(0)));
         }
-        if (!superfoods.isEmpty()) {     playerAction.action = PlayerActions.FORWARD;
+        if (!superfoods.isEmpty()) {     
+            playerAction.action = PlayerActions.FORWARD;
             setHeading(RadarService.getHeadingBetween(bot, superfoods.get(0)));
             System.out.println("eat !!");
         }
