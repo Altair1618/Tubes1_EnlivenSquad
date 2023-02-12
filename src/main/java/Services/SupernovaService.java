@@ -55,17 +55,13 @@ public class SupernovaService {
         }
 
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
-        List<GameObject> playersNearSupernovaList = new ArrayList<GameObject>();
 
-        playersList.forEach((player) -> {
-            if (RadarService.isCollapsing(supernova.get(0), player, 30)) {
-                playersNearSupernovaList.add(player);
+        for (int i = 0; i < playersList.size(); i ++) {
+            if (RadarService.isCollapsing(supernova.get(0), playersList.get(i), 30)) {
+                return true;
             }
-        });
-
-        if (playersNearSupernovaList.size() != 0) {
-            return true;
         }
+
         return false;
     }
 }
