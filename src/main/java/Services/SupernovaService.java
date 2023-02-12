@@ -6,6 +6,11 @@ import java.util.stream.*;
 
 public class SupernovaService {
 
+    static public boolean isSupernovaAvailable(GameObject bot) {
+        // True jika supernovaAvailable
+
+        return (bot.supernovaAvailable == 1);
+    }
 
     static public boolean isSupernovaPickupExist(GameState gameState) {
         // Mengecek apakah terdapat supernova pickup di world
