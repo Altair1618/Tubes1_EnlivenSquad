@@ -21,11 +21,7 @@ public class SupernovaService {
 
     static public GameObject getNearestPlayerFromSupernovaPickup(GameState gameState) {
         // I.S Supernova Pickup Exist
-        var distanceList = gameState.getPlayerGameObjects()
-                .stream()
-                .sorted(Comparator
-                        .comparing(item -> RadarService.getRealDistance(item.size, 0, RadarService.getDistanceBetween(getSupernovaPickupObject(gameState), item))))
-                .collect(Collectors.toList());
+        var distanceList = new ArrayList<>(gameState.getPlayerGameObjects());
 
         return distanceList.get(0);
     }
@@ -43,6 +39,29 @@ public class SupernovaService {
                 .collect(Collectors.toList());
 
         return bombList;
+    }
 
+    static public boolean isSupernovaNearPlayer(GameState gameState, GameObject bot) {
+        // Mengecek apakah sekitar supernova yang ditembak dekat player
+
+        List<GameObject> supernova = getSupernovaBombs(gameState);
+
+        if (supernova.size() == 0) {
+            return false;
+        }
+
+        List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
+        List<GameObject> playersNearSupernovaList = new ArrayList<GameObject>();
+
+        playersList.forEach((player) -> {
+            if (RadarService.isCollapsing(supernova.get(0), player, 30)) {
+                playersNearSupernovaList.add(player);
+            }
+        });
+
+        if (playersNearSupernovaList.size() != 0) {
+            return true;
+        }
+        return false;
     }
 }

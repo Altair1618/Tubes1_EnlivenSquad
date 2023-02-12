@@ -7,17 +7,6 @@ import java.util.*;
 import java.util.stream.*;
 
 public class RadarService {
-
-    static public List<GameObject> getOtherPlayerList(GameState gameState, GameObject bot) {
-        // mengembalikan list player lainnya
-
-        return gameState.getPlayerGameObjects()
-                .stream().filter(item -> item.getId() != bot.getId())
-                .sorted(Comparator
-                        .comparing(item -> getRealDistance(bot, item)))
-                .collect(Collectors.toList());
-    }
-
     static public List<GameObject> getOtherObjects(GameState gameState, GameObject bot, ObjectTypes objectType)
     {
         // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
@@ -40,8 +29,7 @@ public class RadarService {
         return objectList;
     }
 
-    static public List<GameObject> getOtherObjects(GameState gameState, Position position)
-    {
+    static public List<GameObject> getOtherObjects(GameState gameState, Position position) {
         // mengembalikan objek-objek lain dan diurutkan berdasarkan jarak terhadap position 
         var objectList = gameState.getGameObjects()
                 .stream()
@@ -50,10 +38,6 @@ public class RadarService {
                 .collect(Collectors.toList());
 
         return objectList;
-    }
-    
-    static public int getOtherPlayerHeading(GameObject otherBot) {
-        return otherBot.getHeading();
     }
 
     static public double getRealDistance(int radius1, int radius2, Double distance)
@@ -194,6 +178,30 @@ public class RadarService {
         return collapsingObjects;
     }
 
+    static public double getDistanceFromZero(GameObject object, GameState gameState) {
+        // Mengembalikan Jarak Objek dari Center
+        Position center = gameState.getWorld().getCenterPoint();
+        var triangleX = Math.abs(object.getPosition().getX() - center.getX());
+        var triangleY = Math.abs(object.getPosition().getY() - center.getY());
+        return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
+    }
+
+    static public double getDistanceFromZero(Position p, GameState gameState) {
+        // Mengembalikan Jarak Objek dari Center
+        Position center = gameState.getWorld().getCenterPoint();
+        var triangleX = Math.abs(p.getX() - center.getX());
+        var triangleY = Math.abs(p.getY() - center.getY());
+        return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
+    }
+
+    static public boolean isInWorld(Position p, GameState gameState, GameObject bot, int offset) {
+        return getDistanceFromZero(p, gameState) < gameState.getWorld().getRadius() - bot.getSize() - offset;
+    }
+
+    static public boolean isInWorld(GameObject object, GameState gameState, GameObject bot, int offset) {
+        return getDistanceFromZero(object, gameState) < gameState.getWorld().getRadius() - bot.getSize() - offset;
+    }
+
     static public double vectorToDegree(WorldVector v)
     {
         var direction = Math.atan2(v.y, v.x) * 180 / Math.PI;
@@ -205,10 +213,8 @@ public class RadarService {
         return new WorldVector(Math.cos(heading), Math.sin(heading));
     }
 
-    
-
     static public int roundToEven(double v) {
-        
+
         // standar pembulatan engine
         // contoh : 24.5 dibulatin ke 24, 25.5 dibulatin ke 26, sedangkan yang bukan desimal 0.5 akan dibulatin seperti biasa
         long res = Math.round(v);
@@ -222,7 +228,7 @@ public class RadarService {
 
         return (int) res;
     }
-    static private int toDegrees(double v) {
+    static public int toDegrees(double v) {
         // radiant to degree
         return (int) (v * (180 / Math.PI));
     }

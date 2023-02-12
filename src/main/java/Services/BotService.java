@@ -93,11 +93,13 @@ public class BotService {
 
         if (directionVectors.isEmpty() /* && jika torpedo di dalam danger zone kita */)
         {
+
             playerAction.action = PlayerActions.FIRETORPEDOES;
             // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
             this.playerAction = playerAction;
             return;
         }
+
 
         // KASUS PINDAH 2
 
@@ -106,6 +108,7 @@ public class BotService {
             temp = new WorldVector();// isi temp dengan nilai arah kabur dari torpedo */
             t = new EscapeInfo(temp, weights[1]);
             directionVectors.add(t);
+
         }
 
         // KASUS PINDAH 3

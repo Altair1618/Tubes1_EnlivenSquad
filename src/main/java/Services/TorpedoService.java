@@ -38,14 +38,14 @@ public class TorpedoService {
 
         int torpedoHeading = torpedo.getHeading();
         int headingBetween = RadarService.getHeadingBetween(torpedo, bot);
-        double distance = RadarService.getDistanceBetween(torpedo, bot);
+        double distance = RadarService.getRealDistance(torpedo, bot);
         int radius = bot.getSize() + torpedo.getSize();
 
         // offset = asin(radius / jarak torpedo ke bot)
         double offSet = Math.asin(radius / distance);
 
-        if ((angleBetween(torpedoHeading, headingBetween + offSet)
-                + angleBetween(torpedoHeading, headingBetween - offSet)) <= 2 * offSet) {
+        if (((angleBetween(torpedoHeading, headingBetween + offSet)
+                + angleBetween(torpedoHeading, headingBetween - offSet)) <= 2 * offSet)) {
             return true;
         }
 
@@ -67,20 +67,25 @@ public class TorpedoService {
         return incomingTorpedo;
     }
 
-    static private int roundToEven(double v) {
+    static public boolean fireTorpedoWhenDanger(GameObject bot, GameObject nearestTorpedo) {
+        // Mendapat torpedo terdekat dan mengecek apakah berada pada danger zone
 
-        // standar pembulatan engine
-        // contoh : 24.5 dibulatin ke 24, 25.5 dibulatin ke 26, sedangkan yang bukan
-        // desimal 0.5 akan dibulatin seperti biasa
-        long res = Math.round(v);
+        int torpedoHeading = nearestTorpedo.getHeading();
+        int headingBetween = RadarService.getHeadingBetween(nearestTorpedo, bot);
+        double distance = RadarService.getRealDistance(nearestTorpedo, bot);
+        int radius = bot.getSize() + nearestTorpedo.getSize();
 
-        double des = res - v;
+        // offset = asin(radius / jarak torpedo ke bot)
+        double offSet = Math.asin(radius / distance);
 
-        if (Math.abs(des - 0.5) < Math.ulp(1.0) && res % 2 == 1) {
-            res--;
+        // angle 80% from original incoming zone
+        // distance torpedo to bot = 2 * bot.size()
+        if (((angleBetween(torpedoHeading, headingBetween + offSet)
+                + angleBetween(torpedoHeading, headingBetween - offSet)) * 0.75 <= 2 * offSet * 0.8) && (distance <= 10 * bot.getSize())) {
+            return true;
         }
 
-        return (int) res;
+        return false;
     }
 
     static public int nextHeadingAfterTorpedo(GameObject bot, List<GameObject> incomingTorpedo) {
@@ -101,12 +106,12 @@ public class TorpedoService {
             } else {
                 temp.getRotatedBy(-90);
             }
-            double distance = RadarService.getDistanceBetween(torpedo, bot);
+            double distance = RadarService.getRealDistance(torpedo, bot);
 
             // menghitung rata-rata vektor dari semua kemungkinan arah kabur
             res.add(temp.div(distance));
         });
 
-        return roundToEven(RadarService.vectorToDegree(res));
+        return RadarService.roundToEven(RadarService.vectorToDegree(res));
     }
 }
