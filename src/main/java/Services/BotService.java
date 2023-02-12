@@ -87,9 +87,11 @@ public class BotService {
         }
 
         // KASUS PINDAH 1
-        if (false /* jika ada bot lebih besar yang berada di rentang radar imaginary kita */)
+        int dangerRange = 20; // Range player gede dianggap berbahaya, ganti kalau perlu
+        List<GameObject> biggerPlayer = PlayerService.getBiggerPlayerInRange(gameState, bot, dangerRange)
+        if (!biggerPlayer.isEmpty())
         {
-            temp = new WorldVector();/*isi temp dengan nilai arah kabur dari bot besar */
+            temp = PlayerService.getEscapePlayerVector(biggerPlayer, bot); /*isi temp dengan nilai arah kabur dari bot besar */
             t = new EscapeInfo(temp, weights[0]);
             directionVectors.add(t);
         }
@@ -122,9 +124,11 @@ public class BotService {
 
         // KASUS PINDAH 3
 
-        if (false /* jika ada player kecil yang dekat utk dimakan */)
+        int offset = 10; // Minimal selisih size player
+        List<GameObject> preys = PlayerService.getPreys(gameState, bot, offset);
+        if (!preys.isEmpty())
         {
-            temp = new WorldVector();// isi temp dengan nilai arah KEJAR musuh */
+            temp = PlayerService.getChasePlayerVector(preys, bot);// isi temp dengan nilai arah KEJAR musuh */
             t = new EscapeInfo(temp, weights[2]);
             directionVectors.add(t);
         }
@@ -237,20 +241,20 @@ public class BotService {
         // KASUS SELANJUTNYA ADALAH KASUS TIDAK ADA YANG PERLU DIKEJAR ATAU DIHINDARI
 
         // CARI SUPER FOOD
-        if (false /*ada superfood */)
+        List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
+        if (!superFoods.isEmpty())
         {
-            
             playerAction.action = PlayerActions.FORWARD;
-            // playerAction.heading = arah ke superfood
+            playerAction.heading = RadarService.getHeadingBetween(bot, superFoods.get(0));
             this.playerAction = playerAction;
             return;
         }
 
    
-        if (false /* ada supernova pickup*/)
+        if (SupernovaService.isSupernovaPickupExist(gameState) && SupernovaService.isBotNearestfromPickup(gameState, bot))
         {
             playerAction.action = PlayerActions.FORWARD;
-            // playerAction.heading = arah ke supernova pickup
+            playerAction.heading = RadarService.getHeadingBetween(bot, SupernovaService.getSupernovaPickupObject(gameState));
             this.playerAction = playerAction;
             return;
         }
