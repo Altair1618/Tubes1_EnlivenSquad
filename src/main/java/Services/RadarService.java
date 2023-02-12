@@ -14,7 +14,7 @@ public class RadarService {
         return gameState.getPlayerGameObjects()
                 .stream().filter(item -> item.getId() != bot.getId())
                 .sorted(Comparator
-                        .comparing(item -> getRealDistance(bot.size, item.size, getDistanceBetween(bot, item))))
+                        .comparing(item -> getRealDistance(bot, item)))
                 .collect(Collectors.toList());
     }
 
@@ -24,7 +24,7 @@ public class RadarService {
         var objectList = gameState.getGameObjects()
                 .stream().filter(item -> item.getGameObjectType() == objectType)
                 .sorted(Comparator
-                        .comparing(item -> getRealDistance(bot.size, item.size, getDistanceBetween(bot, item))))
+                        .comparing(item -> getRealDistance(bot, item)))
                 .collect(Collectors.toList());
 
         return objectList;
@@ -61,6 +61,14 @@ public class RadarService {
         // can return negative distance if collapsing
         // smaller means the center is closer when collapsing
         return distance - radius1 - radius2;
+
+    }
+
+    static public double getRealDistance(GameObject object1, GameObject object2)
+    {
+        // can return negative distance if collapsing
+        // smaller means the center is closer when collapsing
+        return getRealDistance(object1.size, object2.size, getDistanceBetween(object1, object2));
 
     }
 
