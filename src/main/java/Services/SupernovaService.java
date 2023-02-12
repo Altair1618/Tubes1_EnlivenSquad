@@ -21,11 +21,7 @@ public class SupernovaService {
 
     static public GameObject getNearestPlayerFromSupernovaPickup(GameState gameState) {
         // I.S Supernova Pickup Exist
-        var distanceList = gameState.getPlayerGameObjects()
-                .stream()
-                .sorted(Comparator
-                        .comparing(item -> RadarService.getRealDistance(item.size, 0, RadarService.getDistanceBetween(getSupernovaPickupObject(gameState), item))))
-                .collect(Collectors.toList());
+        var distanceList = new ArrayList<>(gameState.getPlayerGameObjects());
 
         return distanceList.get(0);
     }

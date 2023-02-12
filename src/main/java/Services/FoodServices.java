@@ -16,9 +16,9 @@ public class FoodServices {
 
     static public List<GameObject> getFoods(GameState gameState, GameObject bot) {
         var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD && RadarService.isInWorld(item, gameState, bot))
+                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD && RadarService.isInWorld(item, gameState, bot, 15))
                 .sorted(Comparator
-                        .comparing(item -> RadarService.getDistanceBetween(bot, item)))
+                        .comparing(item -> RadarService.getRealDistance(bot, item)))
                 .collect(Collectors.toList());
 
         return objectList;
@@ -26,9 +26,9 @@ public class FoodServices {
 
     static public List<GameObject> getSuperFoods(GameState gameState, GameObject bot) {
         var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERFOOD && RadarService.isInWorld(item, gameState, bot))
+                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERFOOD && RadarService.isInWorld(item, gameState, bot, 15))
                 .sorted(Comparator
-                        .comparing(item -> RadarService.getDistanceBetween(bot, item)))
+                        .comparing(item -> RadarService.getRealDistance(bot, item)))
                 .collect(Collectors.toList());
 
         return objectList;
@@ -52,6 +52,5 @@ public class FoodServices {
         }
 
         return res;
-
     }
 }
