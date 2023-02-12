@@ -43,6 +43,5 @@ public class SupernovaService {
                 .collect(Collectors.toList());
 
         return bombList;
-
     }
 }

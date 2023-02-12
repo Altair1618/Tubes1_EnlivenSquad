@@ -194,6 +194,28 @@ public class RadarService {
         return collapsingObjects;
     }
 
+    static public double getDistanceFromZero(GameObject object) {
+        // mengembalikan jarak dua objek
+        var triangleX = Math.abs(object.getPosition().x);
+        var triangleY = Math.abs(object.getPosition().y);
+        return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
+    }
+
+    static public double getDistanceFromZero(Position p) {
+        // mengembalikan jarak dua objek
+        var triangleX = Math.abs(p.x);
+        var triangleY = Math.abs(p.y);
+        return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
+    }
+
+    static public boolean isInWorld(Position p, GameState gameState, GameObject bot) {
+        return getDistanceFromZero(p) < gameState.getWorld().getRadius() - bot.getSize();
+    }
+
+    static public boolean isInWorld(GameObject object, GameState gameState, GameObject bot) {
+        return getDistanceFromZero(object) < gameState.getWorld().getRadius() - bot.getSize();
+    }
+
     static public double vectorToDegree(WorldVector v)
     {
         var direction = Math.atan2(v.y, v.x) * 180 / Math.PI;
