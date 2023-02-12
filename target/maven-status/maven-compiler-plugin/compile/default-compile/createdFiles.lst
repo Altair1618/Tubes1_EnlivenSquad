@@ -12,9 +12,9 @@ Main.class
 Enums\PlayerActions.class
 Models\GameState.class
 Models\WorldVector.class
-main\java\Services\ShieldService.class
 Services\BotService.class
 Models\GameStateDto.class
+Services\ShieldService.class
 Services\TorpedoService.class
 Models\Position.class
 Models\World.class

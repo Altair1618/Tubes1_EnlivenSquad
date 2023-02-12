@@ -65,9 +65,15 @@ public class BotService {
 
         List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
         if (incomingTorpedo.size() != 0) {
-            playerAction.action = PlayerActions.FORWARD;
-            playerAction.heading = TorpedoService.nextHeadingAfterTorpedo(bot, incomingTorpedo);
-            System.out.println("run run run run from torpedo");
+            if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0)) && TorpedoService.isTorpedoAvailable(bot, 20)) {
+                playerAction.action = PlayerActions.FIRETORPEDOES;
+                playerAction.heading = RadarService.getHeadingBetween(bot, incomingTorpedo.get(0));
+                System.out.println("shoot danger torpedo");
+            } else {
+                playerAction.action = PlayerActions.FORWARD;
+                playerAction.heading = TorpedoService.nextHeadingAfterTorpedo(bot, incomingTorpedo);
+                System.out.println("RUN RUN RUN RUN from torpedo");
+            }
         }
 
         // if (!gameState.getGameObjects().isEmpty()) {

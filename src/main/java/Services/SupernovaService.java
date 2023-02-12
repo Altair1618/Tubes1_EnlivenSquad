@@ -45,5 +45,6 @@ public class SupernovaService {
         return bombList;
     }
 
-    static public isSupernovaNearPlayer()
+    // static public isSupernovaNearPlayer();
+
 }
