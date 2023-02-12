@@ -178,26 +178,28 @@ public class RadarService {
         return collapsingObjects;
     }
 
-    static public double getDistanceFromZero(GameObject object) {
-        // mengembalikan jarak dua objek
-        var triangleX = Math.abs(object.getPosition().x);
-        var triangleY = Math.abs(object.getPosition().y);
+    static public double getDistanceFromZero(GameObject object, GameState gameState) {
+        // Mengembalikan Jarak Objek dari Center
+        Position center = gameState.getWorld().getCenterPoint();
+        var triangleX = Math.abs(object.getPosition().getX() - center.getX());
+        var triangleY = Math.abs(object.getPosition().getY() - center.getY());
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
     }
 
-    static public double getDistanceFromZero(Position p) {
-        // mengembalikan jarak dua objek
-        var triangleX = Math.abs(p.x);
-        var triangleY = Math.abs(p.y);
+    static public double getDistanceFromZero(Position p, GameState gameState) {
+        // Mengembalikan Jarak Objek dari Center
+        Position center = gameState.getWorld().getCenterPoint();
+        var triangleX = Math.abs(p.getX() - center.getX());
+        var triangleY = Math.abs(p.getY() - center.getY());
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
     }
 
-    static public boolean isInWorld(Position p, GameState gameState, GameObject bot) {
-        return getDistanceFromZero(p) < gameState.getWorld().getRadius() - bot.getSize() - 15;
+    static public boolean isInWorld(Position p, GameState gameState, GameObject bot, int offset) {
+        return getDistanceFromZero(p, gameState) < gameState.getWorld().getRadius() - bot.getSize() - offset;
     }
 
-    static public boolean isInWorld(GameObject object, GameState gameState, GameObject bot) {
-        return getDistanceFromZero(object) < gameState.getWorld().getRadius() - bot.getSize() - 15;
+    static public boolean isInWorld(GameObject object, GameState gameState, GameObject bot, int offset) {
+        return getDistanceFromZero(object, gameState) < gameState.getWorld().getRadius() - bot.getSize() - offset;
     }
 
     static public double vectorToDegree(WorldVector v)
@@ -225,7 +227,7 @@ public class RadarService {
 
         return (int) res;
     }
-    static private int toDegrees(double v) {
+    static public int toDegrees(double v) {
         // radiant to degree
         return (int) (v * (180 / Math.PI));
     }
