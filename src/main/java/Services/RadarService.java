@@ -211,7 +211,7 @@ public class RadarService {
         return new WorldVector(Math.cos(heading), Math.sin(heading));
     }
 
-    static private int roundToEven(double v) {
+    static public int roundToEven(double v) {
         // standar pembulatan engine
         // contoh : 24.5 dibulatin ke 24, 25.5 dibulatin ke 26, sedangkan yang bukan desimal 0.5 akan dibulatin seperti biasa
         long res = Math.round(v);
