@@ -10,8 +10,6 @@ public class WorldVector {
     public WorldVector() {
         x = 0;
         y = 0;
-
-        if (this.isZero()) System.out.println("Vector isZero method is working!");
     }
 
     public WorldVector(Double x, Double y) {

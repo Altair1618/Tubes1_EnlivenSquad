@@ -59,6 +59,7 @@ public class BotService {
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
 
+        if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
         List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
         WorldVector temp;
         EscapeInfo t;

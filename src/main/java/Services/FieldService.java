@@ -63,7 +63,10 @@ public class FieldService {
         ArrayList<Integer> res;
         WorldVector total = new WorldVector();
         
-        if (collapsingObject.size() == 0) System.out.println("WARNING in FieldService.getHeadingEscape method: collapsingObjects passed has zero size!");
+        if (collapsingObject.size() == 0) {
+            System.out.println("WARNING in FieldService.getHeadingEscape method: collapsingObjects passed has zero size!");
+            return new ArrayList<Integer>();
+        }
 
         for (GameObject obj : collapsingObject) {
 
