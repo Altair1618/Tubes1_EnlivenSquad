@@ -19,6 +19,19 @@ public class RadarService {
         return objectList;
     }
 
+    static public List<GameObject> getOtherObjects(GameState gameState, GameObject bot, ObjectTypes objectType, int radarRadius)
+    {
+        // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
+        
+        var objectList = gameState.getGameObjects()
+                .stream().filter(item -> item.getGameObjectType() == objectType && RadarService.getRealDistance(bot, item) < radarRadius)
+                .sorted(Comparator
+                        .comparing(item -> RadarService.getRealDistance(bot, item)))
+                .collect(Collectors.toList());
+
+        return objectList;
+    }
+
     static public List<GameObject> getOtherObjects(GameState gameState, ObjectTypes objectType)
     {
         // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
@@ -225,7 +238,8 @@ public class RadarService {
 
     static public WorldVector degreeToVector(int heading)
     {
-        return new WorldVector(Math.cos(heading), Math.sin(heading));
+        double rad = toRadians(heading);
+        return new WorldVector(Math.cos(rad), Math.sin(rad));
     }
 
     static public int roundToEven(double v) {
@@ -246,5 +260,10 @@ public class RadarService {
     static public int toDegrees(double v) {
         // radiant to degree
         return (int) (v * (180 / Math.PI));
+    }
+
+    static public double toRadians(double v) {
+        // radiant to degree
+        return (v * (Math.PI / 180));
     }
 }

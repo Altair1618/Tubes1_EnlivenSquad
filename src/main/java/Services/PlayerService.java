@@ -81,10 +81,12 @@ public class PlayerService {
             WorldVector temp = RadarService.degreeToVector(RadarService.getHeadingBetween(player, bot));
             double distance = RadarService.getRealDistance(player, bot);
 
-            if (Math.abs(distance) < Double.MIN_VALUE) distance = 0.001  * (distance < 0? -1 : 1);
-            else distance = RadarService.roundToEven(distance);
+            double weight = distance;
+            
+            if (Math.abs(RadarService.roundToEven(weight)) < Double.MIN_VALUE) weight = 10e-3;
+         
             // Menghitung Rata-Rata Vektor dari Semua Arah Kemungkinan Kabur
-            res.add(temp.div(distance));
+            res.add(temp.div(weight));
         });
 
         return res.toNormalize();
