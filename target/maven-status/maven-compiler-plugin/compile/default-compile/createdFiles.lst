@@ -16,5 +16,6 @@ Services\BotService.class
 Models\GameStateDto.class
 Services\ShieldService.class
 Services\TorpedoService.class
+Services\BotService$EscapeInfo.class
 Models\Position.class
 Models\World.class
