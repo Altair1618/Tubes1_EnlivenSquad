@@ -54,7 +54,7 @@ public class FieldService {
 
             double weight = 0.;
             double distance = RadarService.getDistanceBetween(bot, obj);
-            weight = obj.size - distance + bot.size; // dipastikan weight >= 1 karena collapsing dan menggunakan perhitungan integer
+            weight = RadarService.roundToEven(obj.size - distance + bot.size); // dipastikan weight >= 1 karena collapsing dan menggunakan perhitungan integer
             
             if (Math.abs(RadarService.roundToEven(weight)) < Double.MIN_VALUE) weight = 10e-3 * (weight < 0? -1 : 1);
             else weight = RadarService.roundToEven(weight);

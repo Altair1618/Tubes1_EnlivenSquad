@@ -16,7 +16,7 @@ public class FoodServices {
 
     static public List<GameObject> getFoods(GameState gameState, GameObject bot) {
 
-        int radarRadius = 50;
+        int radarRadius = gameState.world.getRadius();
 
         return getFoods(gameState, bot, radarRadius);
     }
