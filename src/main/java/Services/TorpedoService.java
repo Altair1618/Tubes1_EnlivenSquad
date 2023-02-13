@@ -26,19 +26,13 @@ public class TorpedoService {
         return bot.torpedoSalvoCount >= salvoCountLimit && bot.size >= sizeLimit;
     }
 
-    static public double angleBetween(double angle1, double angle2) {
-        // Menghitung angle dari 2 sudut
-
-        return Math.abs((angle1 - angle2 + 180 + 360) % 360 - 180);
-    }
-
     static public boolean isIncoming(GameObject bot, GameObject torpedo) {
         // Mengembalikan true jika torpedo mengarah ke bot
         // perhitungan dengan konsep segitiga
 
         int torpedoHeading = torpedo.getHeading();
         int headingBetween = RadarService.getHeadingBetween(torpedo, bot);
-        double distance = RadarService.getRealDistance(torpedo, bot);
+        int distance = RadarService.getRealDistance(torpedo, bot);
         int radius = bot.getSize() + torpedo.getSize();
 
         // offset = asin(radius / jarak torpedo ke bot)
@@ -72,7 +66,7 @@ public class TorpedoService {
 
         int torpedoHeading = nearestTorpedo.getHeading();
         int headingBetween = RadarService.getHeadingBetween(nearestTorpedo, bot);
-        double distance = RadarService.getRealDistance(nearestTorpedo, bot);
+        int distance = RadarService.getRealDistance(nearestTorpedo, bot);
         int radius = bot.getSize() + nearestTorpedo.getSize();
 
         // offset = asin(radius / jarak torpedo ke bot)
@@ -106,12 +100,18 @@ public class TorpedoService {
             } else {
                 temp.getRotatedBy(-90);
             }
-            double distance = RadarService.getRealDistance(torpedo, bot);
+            int distance = RadarService.getRealDistance(torpedo, bot);
 
             // menghitung rata-rata vektor dari semua kemungkinan arah kabur
             res.add(temp.div(distance));
         });
 
         return res;
+    }
+
+    static private double angleBetween(double angle1, double angle2) {
+        // Menghitung angle dari 2 sudut
+
+        return Math.abs((angle1 - angle2 + 180 + 360) % 360 - 180);
     }
 }

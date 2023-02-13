@@ -15,6 +15,30 @@ public class PlayerService {
                 .collect(Collectors.toList());
     }
 
+    static public List<GameObject> getNearestPlayers(GameState gameState, GameObject bot)
+    {
+        List<GameObject> players = getOtherPlayerList(gameState, bot);
+        List<GameObject> res = new ArrayList<GameObject>();
+
+        if (players.isEmpty()) return res;
+
+        res.add(players.get(0));
+
+        int i = 1;
+        int distance = RadarService.getRealDistance(bot, players.get(0));
+
+        while (i < players.size() && RadarService.getRealDistance(bot, players.get(i)) == distance)
+        {
+            res.add(players.get(i));
+        }
+
+        return res.stream()
+            .sorted(Comparator
+                    .comparing(item -> item.id))
+            .collect(Collectors.toList());
+
+    }
+
     static public int getOtherPlayerHeading(GameObject other) {
         // Mengembalikan Heading Player Lain
         return other.getHeading();
@@ -55,7 +79,7 @@ public class PlayerService {
 
         others.forEach((player) -> {
             WorldVector temp = RadarService.degreeToVector(RadarService.getHeadingBetween(player, bot));
-            double distance = RadarService.getRealDistance(player, bot);
+            int distance = RadarService.getRealDistance(player, bot);
 
             // Menghitung Rata-Rata Vektor dari Semua Arah Kemungkinan Kabur
             res.add(temp.div(distance));
@@ -70,7 +94,7 @@ public class PlayerService {
 
         preys.forEach((prey) -> {
             WorldVector temp = RadarService.degreeToVector(RadarService.getHeadingBetween(bot, prey));
-            double distance = RadarService.getRealDistance(prey, bot);
+            int distance = RadarService.getRealDistance(prey, bot);
 
             // Menghitung Rata-Rata Vektor dari Semua Arah Kemungkinan Kabur
             res.add(temp.div(distance));

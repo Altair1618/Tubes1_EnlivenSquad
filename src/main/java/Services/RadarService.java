@@ -40,6 +40,29 @@ public class RadarService {
         return objectList;
     }
 
+    static public List<GameObject> getNearestOtherObjects(GameState gameState, GameObject bot, ObjectTypes type)
+    {
+        List<GameObject> objects = getOtherObjects(gameState, bot, type);
+        List<GameObject> res = new ArrayList<GameObject>();
+
+        if (objects.isEmpty()) return res;
+
+        res.add(objects.get(0));
+
+        int i = 1;
+        int distance = RadarService.getRealDistance(bot, objects.get(0));
+
+        while (i < objects.size() && RadarService.getRealDistance(bot, objects.get(i)) == distance)
+        {
+            res.add(objects.get(i));
+        }
+
+        return res.stream()
+            .sorted(Comparator
+                    .comparing(item -> item.id))
+            .collect(Collectors.toList());
+    }
+
     static public int getRealDistance(int radius1, int radius2, int distance)
     {
         // can return negative distance if collapsing
