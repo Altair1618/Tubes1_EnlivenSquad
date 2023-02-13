@@ -120,16 +120,8 @@ public class BotService {
             directionVectors.add(t);
         }
 
-        // KASUS PINDAH 4
 
-        if (false /* jika berada di luar radius world */)
-        {
-            temp = new WorldVector(); // isi dengan nilai arah KEJAR musuh */
-            t = new EscapeInfo(temp, weights[3]);
-            directionVectors.add(t);
-        }
-
-        // KASUS  PINDAH 5
+        // KASUS  PINDAH 4
 
         // jika keluar map
         if (FieldService.isOutsideMap(gameState, bot, 5))
@@ -140,7 +132,7 @@ public class BotService {
             directionVectors.add(t);
         }
 
-        // KASUS PINDAH 6
+        // KASUS PINDAH 5
         if (false /*ada supernova bomb mengarah ke kita */)
         {
             temp = new WorldVector(); // isi dengan nilai arah kabur dari supernova bomb */
@@ -150,17 +142,17 @@ public class BotService {
         }
 
         
-        if (false /* tembak gascloud kalo kita kena gascloud dan size gascloud <= limit ???*/)
-        {
-            // pilih gascloud yg mau ditembak
-            if (false /*cek apakah nembak tidak bakal bunuh diri serta cloud yg dipilih emang bisa ditembak (tidak terhalang*/)
-            {
-                playerAction.action = PlayerActions.FIRETORPEDOES;
-                // PlayerAction.heading = arah ke cloud yg mw ditembak
-            }
-        }
+        // if (false /* tembak gascloud kalo kita kena gascloud dan size gascloud <= limit ???*/)
+        // {
+        //     // pilih gascloud yg mau ditembak
+        //     if (false /*cek apakah nembak tidak bakal bunuh diri serta cloud yg dipilih emang bisa ditembak (tidak terhalang*/)
+        //     {
+        //         playerAction.action = PlayerActions.FIRETORPEDOES;
+        //         // PlayerAction.heading = arah ke cloud yg mw ditembak
+        //     }
+        // }
 
-        // KASUS PINDAH 7
+        // KASUS PINDAH 6
         // jika masuk cloud
         if (FieldService.isCloudCollapsing(bot))
         {
@@ -176,7 +168,7 @@ public class BotService {
             }
         }
 
-        // KASUS PINDAH 8
+        // KASUS PINDAH 7
         // jika masuk asteroid
         if (FieldService.isAsteroidCollapsing(bot))
         {
@@ -192,7 +184,7 @@ public class BotService {
             }
         }
 
-        // KASUS PINDAH 9   
+        // KASUS PINDAH 8   
         // jika punya superfood
         if (effectList.get(3))
         {
@@ -207,7 +199,7 @@ public class BotService {
         }
 
         // PERHITUNGAN PERPINDAHAN BERDASARKAN TIAP WEIGHT
-        if (directionVectors.size() > 0)
+        if (!directionVectors.isEmpty())
         {
             WorldVector res = new WorldVector();
 

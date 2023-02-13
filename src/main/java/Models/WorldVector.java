@@ -101,4 +101,17 @@ public class WorldVector {
         double sin = Math.sin(angle);
         return new WorldVector(x * cos - y * sin, x * sin + y * cos);
     }
+
+    public Double magnitude()
+    {
+        return Math.sqrt(x * x + y * y);
+    }
+    public Double dot(WorldVector other)
+    {
+        return x * other.x + y * other.y;
+    }
+    public Double getAngleTo(WorldVector other)
+    {
+        return this.dot(other) / (this.magnitude() * other.magnitude());
+    }
 }
