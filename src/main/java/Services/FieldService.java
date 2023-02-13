@@ -70,9 +70,10 @@ public class FieldService {
 
         for (GameObject obj : collapsingObject) {
 
-            double weight = obj.size - RadarService.roundToEven(RadarService.getDistanceBetween(bot, obj)) + bot.size; // dipastikan weight >= 1 karena collapsing dan menggunakan perhitungan integer
+            double weight = obj.size - (RadarService.getDistanceBetween(bot, obj)) + bot.size; // dipastikan weight >= 1 karena collapsing dan menggunakan perhitungan integer
 
-            if (Math.abs(weight) < Double.MIN_VALUE) weight = 10e-3;
+            if (Math.abs(RadarService.roundToEven(weight)) < Double.MIN_VALUE) weight = 10e-3 * (weight < 0? -1 : 1);
+            else weight = RadarService.roundToEven(weight);
             total.add((new WorldVector(obj.position, bot.position)).toNormalize().div(weight));
         }
 

@@ -174,35 +174,35 @@ public class BotService {
 
         // KASUS PINDAH 6
         // jika masuk cloud
-        if (FieldService.isCloudCollapsing(bot))
-        {
-            List<GameObject> collapsingClouds = FieldService.getCollapsingClouds(gameState, bot);
+        // if (FieldService.isCloudCollapsing(bot))
+        // {
+        //     List<GameObject> collapsingClouds = FieldService.getCollapsingClouds(gameState, bot);
 
-            List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingClouds);
+        //     List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingClouds);
 
-            if (tempDirection.size() > 0)
-            {
-                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingClouds).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
-                t = new EscapeInfo(temp, weights[6]);
-                directionVectors.add(t);
-            }
-        }
+        //     if (tempDirection.size() > 0)
+        //     {
+        //         temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingClouds).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
+        //         t = new EscapeInfo(temp, weights[6]);
+        //         directionVectors.add(t);
+        //     }
+        // }
 
-        // KASUS PINDAH 7
-        // jika masuk asteroid
-        if (FieldService.isAsteroidCollapsing(bot))
-        {
-            List<GameObject> collapsingAsteroids = FieldService.getCollapsingAsteroids(gameState, bot);
+        // // KASUS PINDAH 7
+        // // jika masuk asteroid
+        // if (FieldService.isAsteroidCollapsing(bot))
+        // {
+        //     List<GameObject> collapsingAsteroids = FieldService.getCollapsingAsteroids(gameState, bot);
 
-            List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingAsteroids);
+        //     List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingAsteroids);
 
-            if (tempDirection.size() > 0)
-            {
-                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingAsteroids).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
-                t = new EscapeInfo(temp, weights[6]);
-                directionVectors.add(t);
-            }
-        }
+        //     if (tempDirection.size() > 0)
+        //     {
+        //         temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingAsteroids).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
+        //         t = new EscapeInfo(temp, weights[6]);
+        //         directionVectors.add(t);
+        //     }
+        // }
 
         // KASUS PINDAH 8   
         // jika punya superfood
