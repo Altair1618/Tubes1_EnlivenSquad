@@ -9,6 +9,7 @@ public class BotService {
     private GameObject bot;
     private PlayerAction playerAction;
     private GameState gameState;
+    static private boolean isDetonated = false;
 
     class EscapeInfo {
         public WorldVector escapeDirection;
@@ -74,48 +75,60 @@ public class BotService {
             0.0
         };
 
-        if (false /* jika kita sudah nembak supernova dan supernova bombnya dekat musuh */)
+        if (isSupernovaNearPlayer(gameState, bot) && isDetonated)
+        /* jika kita sudah nembak supernova dan supernova bombnya dekat musuh */
         {
             playerAction.action = PlayerActions.DETONATESUPERNOVA;
+
             /* set variabel sudah nembak supernova menjadi false */
+            isDetonated = false;
 
             return;
         }
 
-
         // KASUS PINDAH 1
-        if (false /* jika ada bot lebih besar yang berada di rentang radar imaginary kita */)
+        int dangerRange = 20; // Range player gede dianggap berbahaya, ganti kalau perlu
+        List<GameObject> biggerPlayer = PlayerService.getBiggerPlayerInRange(gameState, bot, dangerRange)
+        if (!biggerPlayer.isEmpty())
         {
-            temp = new WorldVector();/*isi temp dengan nilai arah kabur dari bot besar */
+            temp = PlayerService.getEscapePlayerVector(biggerPlayer, bot); /*isi temp dengan nilai arah kabur dari bot besar */
             t = new EscapeInfo(temp, weights[0]);
             directionVectors.add(t);
         }
 
-        if (directionVectors.isEmpty() /* && jika torpedo di dalam danger zone kita */)
+        List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
+        if (directionVectors.isEmpty() && !incomingTorpedo.isEmpty())
+        /* jika ada torpedo yang mengarah ke kita */
         {
+            /* jika torpedo (terdekat) di dalam danger zone kita */
+            if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0)) && TorpedoService.isTorpedoAvailable(bot, 20)) {
+                playerAction.action = PlayerActions.FIRETORPEDOES;
 
-            playerAction.action = PlayerActions.FIRETORPEDOES;
-            // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
-            this.playerAction = playerAction;
-            return;
+                // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
+                playerAction.heading = RadarService.getHeadingBetween(bot, incomingTorpedo.get(0)); // ini belum predict
+                this.playerAction = playerAction;
+                return;
+            }
         }
-
 
         // KASUS PINDAH 2
 
-        if (false /* jika torpedo terdetect mengarah ke kita tetapi bukan dalam danger zone */)
+        if (!incomingTorpedo.isEmpty())
+        /* jika torpedo terdetect mengarah ke kita tetapi bukan dalam danger zone */
         {
-            temp = new WorldVector();// isi temp dengan nilai arah kabur dari torpedo */
+            temp = new WorldVector();// temp = nilai arah kabur dari torpedo */
+            temp = TorpedoService.nextHeadingAfterTorpedo(bot, incomingTorpedo);
             t = new EscapeInfo(temp, weights[1]);
             directionVectors.add(t);
-
         }
 
         // KASUS PINDAH 3
 
-        if (false /* jika ada player kecil yang dekat utk dimakan */)
+        int offset = 10; // Minimal selisih size player
+        List<GameObject> preys = PlayerService.getPreys(gameState, bot, offset);
+        if (!preys.isEmpty())
         {
-            temp = new WorldVector();// isi temp dengan nilai arah KEJAR musuh */
+            temp = PlayerService.getChasePlayerVector(preys, bot);// isi temp dengan nilai arah KEJAR musuh */
             t = new EscapeInfo(temp, weights[2]);
             directionVectors.add(t);
         }
@@ -220,30 +233,44 @@ public class BotService {
         // KASUS SELANJUTNYA ADALAH KASUS TIDAK ADA YANG PERLU DIKEJAR ATAU DIHINDARI
 
         // CARI SUPER FOOD
-        if (false /*ada superfood */)
+        List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
+        if (!superFoods.isEmpty())
         {
-            
             playerAction.action = PlayerActions.FORWARD;
-            // playerAction.heading = arah ke superfood
+            playerAction.heading = RadarService.getHeadingBetween(bot, superFoods.get(0));
             this.playerAction = playerAction;
             return;
         }
 
    
-        if (false /* ada supernova pickup*/)
+        if (SupernovaService.isSupernovaPickupExist(gameState) && SupernovaService.isBotNearestfromPickup(gameState, bot))
         {
             playerAction.action = PlayerActions.FORWARD;
-            // playerAction.heading = arah ke supernova pickup
+            playerAction.heading = RadarService.getHeadingBetween(bot, SupernovaService.getSupernovaPickupObject(gameState));
             this.playerAction = playerAction;
             return;
         }
 
     
-        if (false /*punya supernova pickup */)
+        if (isSupernovaAvailable(bot))
+        /*punya supernova pickup */
         {
-           playerAction.action = PlayerActions.FIRESUPERNOVA;
-            // playerAction.heading = arah ke TARGET
-           this.playerAction = playerAction;
+            playerAction.action = PlayerActions.FIRESUPERNOVA;
+
+            // players sudah terurut dari terkecil
+            List<GameObject> players = getOtherPlayerList(gameState, bot);
+
+            for (int i = 0; i < players.size(); i ++) {
+                if (RadarService.isCollapsing(players.get(i), bot, 50)) {
+                    // playerAction.heading = arah ke TARGET
+                    playerAction.heading = RadarService.getHeadingBetween(bot, players.get(i));
+                    break;
+                }
+            }
+            
+            isDetonated = true;
+
+            this.playerAction = playerAction;
             return;
         }
 

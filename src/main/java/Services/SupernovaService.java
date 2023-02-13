@@ -6,6 +6,11 @@ import java.util.stream.*;
 
 public class SupernovaService {
 
+    static public boolean isSupernovaAvailable(GameObject bot) {
+        // True jika supernovaAvailable
+
+        return (bot.supernovaAvailable == 1);
+    }
 
     static public boolean isSupernovaPickupExist(GameState gameState) {
         // Mengecek apakah terdapat supernova pickup di world
@@ -19,11 +24,19 @@ public class SupernovaService {
         return SupernovaPickup.get(0);
     }
 
-    static public GameObject getNearestPlayerFromSupernovaPickup(GameState gameState) {
+    static public boolean isBotNearestfromPickup(GameState gameState, GameObject bot) {
         // I.S Supernova Pickup Exist
-        var distanceList = new ArrayList<>(gameState.getPlayerGameObjects());
+        List<GameObject> Players = gameState.getPlayerGameObjects();
+        GameObject nearest = Players.get(0);
+        GameObject pickup = getSupernovaPickupObject(gameState);
 
-        return distanceList.get(0);
+        for (int i = 1; i < Players.size(); i++) {
+            if (RadarService.getRealDistance(Players.get(i), pickup) < RadarService.getRealDistance(nearest, pickup)) {
+                nearest = Players.get(i);
+            }
+        }
+
+        return nearest == bot;
     }
 
     static public boolean isSupernovaBombExist(GameState gameState) {
@@ -51,17 +64,13 @@ public class SupernovaService {
         }
 
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
-        List<GameObject> playersNearSupernovaList = new ArrayList<GameObject>();
 
-        playersList.forEach((player) -> {
-            if (RadarService.isCollapsing(supernova.get(0), player, 30)) {
-                playersNearSupernovaList.add(player);
+        for (int i = 0; i < playersList.size(); i ++) {
+            if (RadarService.isCollapsing(supernova.get(0), playersList.get(i), 30)) {
+                return true;
             }
-        });
-
-        if (playersNearSupernovaList.size() != 0) {
-            return true;
         }
+
         return false;
     }
 }

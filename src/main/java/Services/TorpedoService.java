@@ -88,7 +88,7 @@ public class TorpedoService {
         return false;
     }
 
-    static public int nextHeadingAfterTorpedo(GameObject bot, List<GameObject> incomingTorpedo) {
+    static public WorldVector nextHeadingAfterTorpedo(GameObject bot, List<GameObject> incomingTorpedo) {
         // Mendapat angle heading terbaik mempertimbangkan
         // torpedo yang menuju ke bot dengan menggunakan vector
         
@@ -112,6 +112,6 @@ public class TorpedoService {
             res.add(temp.div(distance));
         });
 
-        return RadarService.roundToEven(RadarService.vectorToDegree(res));
+        return res;
     }
 }
