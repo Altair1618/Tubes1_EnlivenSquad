@@ -36,7 +36,7 @@ public class TorpedoService {
         int radius = bot.getSize() + torpedo.getSize();
 
         // offset = asin(radius / jarak torpedo ke bot)
-        double offSet = Math.asin(radius / distance);
+        double offSet = RadarService.toDegrees(Math.asin(radius / distance));
 
         if (((angleBetween(torpedoHeading, headingBetween + offSet)
                 + angleBetween(torpedoHeading, headingBetween - offSet)) <= 2 * offSet)) {
@@ -70,7 +70,7 @@ public class TorpedoService {
         int radius = bot.getSize() + nearestTorpedo.getSize();
 
         // offset = asin(radius / jarak torpedo ke bot)
-        double offSet = Math.asin(radius / distance);
+        double offSet = RadarService.(Math.asin(radius / distance));
 
         // angle 80% from original incoming zone
         // distance torpedo to bot = 2 * bot.size()
