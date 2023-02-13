@@ -25,9 +25,9 @@ public class PlayerService {
         res.add(players.get(0));
 
         int i = 1;
-        int distance = RadarService.getRealDistance(bot, players.get(0));
+        double distance = RadarService.getRealDistance(bot, players.get(0));
 
-        while (i < players.size() && RadarService.getRealDistance(bot, players.get(i)) == distance)
+        while (i < players.size() && Math.abs(RadarService.getRealDistance(bot, players.get(i)) - distance) < Double.MIN_VALUE)
         {
             res.add(players.get(i));
         }
@@ -79,8 +79,9 @@ public class PlayerService {
 
         others.forEach((player) -> {
             WorldVector temp = RadarService.degreeToVector(RadarService.getHeadingBetween(player, bot));
-            int distance = RadarService.getRealDistance(player, bot);
+            double distance = (int)RadarService.getRealDistance(player, bot);
 
+            if (Math.abs(distance) < Double.MIN_VALUE) distance = 0.001;
             // Menghitung Rata-Rata Vektor dari Semua Arah Kemungkinan Kabur
             res.add(temp.div(distance));
         });
@@ -94,8 +95,8 @@ public class PlayerService {
 
         preys.forEach((prey) -> {
             WorldVector temp = RadarService.degreeToVector(RadarService.getHeadingBetween(bot, prey));
-            int distance = RadarService.getRealDistance(prey, bot);
-
+            double distance = (int)RadarService.getRealDistance(prey, bot);
+            if (Math.abs(distance) < Double.MIN_VALUE) distance = 0.001;
             // Menghitung Rata-Rata Vektor dari Semua Arah Kemungkinan Kabur
             res.add(temp.div(distance));
         });

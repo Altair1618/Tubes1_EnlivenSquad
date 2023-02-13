@@ -213,7 +213,7 @@ public class BotService {
             if (foods.size() > 0)
             {
                 temp = RadarService.degreeToVector(RadarService.getHeadingBetween(bot, foods.get(0))); // isi dengan nilai arah kabur dari supernova bomb */
-                t = new EscapeInfo(temp, weights[8]);
+                t = new EscapeInfo(temp, weights[7]);
                 directionVectors.add(t);
             }
         }

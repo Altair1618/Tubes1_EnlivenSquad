@@ -34,7 +34,7 @@ public class RadarService {
         var objectList = gameState.getGameObjects()
                 .stream()
                 .sorted(Comparator
-                        .comparing(item -> getRealDistance(item.size, 0, roundToEven(getDistanceBetween(item, position)))))
+                        .comparing(item -> getRealDistance(item.size, 0, (getDistanceBetween(item, position)))))
                 .collect(Collectors.toList());
 
         return objectList;
@@ -50,7 +50,7 @@ public class RadarService {
         res.add(objects.get(0));
 
         int i = 1;
-        int distance = RadarService.getRealDistance(bot, objects.get(0));
+        double distance = RadarService.getRealDistance(bot, objects.get(0));
 
         while (i < objects.size() && RadarService.getRealDistance(bot, objects.get(i)) == distance)
         {
@@ -63,7 +63,7 @@ public class RadarService {
             .collect(Collectors.toList());
     }
 
-    static public int getRealDistance(int radius1, int radius2, int distance)
+    static public double getRealDistance(int radius1, int radius2, double distance)
     {
         // can return negative distance if collapsing
         // smaller means the center is closer when collapsing
@@ -71,11 +71,11 @@ public class RadarService {
 
     }
 
-    static public int getRealDistance(GameObject object1, GameObject object2)
+    static public double getRealDistance(GameObject object1, GameObject object2)
     {
         // can return negative distance if collapsing
         // smaller means the center is closer when collapsing
-        return getRealDistance(object1.size, object2.size, roundToEven(getDistanceBetween(object1, object2)));
+        return getRealDistance(object1.size, object2.size, getDistanceBetween(object1, object2));
 
     }
 

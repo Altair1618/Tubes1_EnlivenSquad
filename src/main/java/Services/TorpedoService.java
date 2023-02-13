@@ -32,7 +32,7 @@ public class TorpedoService {
 
         int torpedoHeading = torpedo.getHeading();
         int headingBetween = RadarService.getHeadingBetween(torpedo, bot);
-        int distance = RadarService.getRealDistance(torpedo, bot);
+        double distance = RadarService.getRealDistance(torpedo, bot);
         int radius = bot.getSize() + torpedo.getSize();
 
         // offset = asin(radius / jarak torpedo ke bot)
@@ -66,7 +66,7 @@ public class TorpedoService {
 
         int torpedoHeading = nearestTorpedo.getHeading();
         int headingBetween = RadarService.getHeadingBetween(nearestTorpedo, bot);
-        int distance = RadarService.getRealDistance(nearestTorpedo, bot);
+        double distance = RadarService.getRealDistance(nearestTorpedo, bot);
         int radius = bot.getSize() + nearestTorpedo.getSize();
 
         // offset = asin(radius / jarak torpedo ke bot)
@@ -100,7 +100,7 @@ public class TorpedoService {
             } else {
                 temp.getRotatedBy(-90);
             }
-            int distance = RadarService.getRealDistance(torpedo, bot);
+            double distance = RadarService.getRealDistance(torpedo, bot);
 
             // menghitung rata-rata vektor dari semua kemungkinan arah kabur
             res.add(temp.div(distance));
