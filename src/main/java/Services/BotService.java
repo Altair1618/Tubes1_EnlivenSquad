@@ -59,8 +59,8 @@ public class BotService {
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
 
-        computeNextPlayerAction2(playerAction);
-        if (true) return;
+        // computeNextPlayerAction2(playerAction);
+        // if (true) return;
 
         if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
         List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
@@ -68,7 +68,7 @@ public class BotService {
         EscapeInfo t;
         List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
         Double headingOffset = 1.;
-        int fieldRadarRadius = 20;
+        int fieldRadarRadius = 50;
 
         // weight untuk setiap kasus kabur/ngejar
         Double[] weights = {
@@ -111,12 +111,13 @@ public class BotService {
         /* jika ada torpedo yang mengarah ke kita */
         {
             /* jika torpedo (terdekat) di dalam danger zone kita */
-            if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0)) && TorpedoService.isTorpedoAvailable(bot, 20)) {
+            if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0)) && TorpedoService.isTorpedoAvailable(bot, 25)) {
                 playerAction.action = PlayerActions.FIRETORPEDOES;
 
                 // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
                 playerAction.heading = RadarService.getHeadingBetween(bot, incomingTorpedo.get(0)); // ini belum predict
                 this.playerAction = playerAction;
+                
                 return;
             }
         }
@@ -147,7 +148,7 @@ public class BotService {
         // KASUS  PINDAH 4
 
         // jika keluar map
-        if (FieldService.isOutsideMap(gameState, bot, 5))
+        if (FieldService.isOutsideMap(gameState, bot, 50))
         {
             temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
             t = new EscapeInfo(temp, weights[4]);
@@ -284,12 +285,14 @@ public class BotService {
         var foods = FoodServices.getNearestFoods(gameState, bot);
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = bot.getHeading();
+
         // playerAction.heading = arah ke TARGET
 
         if (foods.size() > 0)
         {
             playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
         }
+
         this.playerAction = playerAction;
     }
 
@@ -394,6 +397,7 @@ public class BotService {
         {
             playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
         }
+
         this.playerAction = playerAction;
     }
 
