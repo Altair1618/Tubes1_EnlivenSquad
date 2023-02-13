@@ -1,6 +1,8 @@
 package Services;
 import Models.*;
 import Enums.*;
+
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.*;
 
@@ -72,5 +74,10 @@ public class SupernovaService {
         }
 
         return false;
+    }
+
+    static public boolean isSuperNovaOutsideMap(GameState gameState, GameObject superNovaBomb, int offset)
+    {
+        return FieldService.isOutsideMap(gameState, superNovaBomb, offset);
     }
 }
