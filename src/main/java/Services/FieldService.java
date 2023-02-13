@@ -67,7 +67,7 @@ public class FieldService {
 
         for (GameObject obj : collapsingObject) {
 
-            double weight = obj.size - RadarService.getDistanceBetween(bot, obj) + bot.size; // dipastikan weight >= 1 karena collapsing dan menggunakan perhitungan integer
+            double weight = obj.size - RadarService.roundToEven(RadarService.getDistanceBetween(bot, obj)) + bot.size; // dipastikan weight >= 1 karena collapsing dan menggunakan perhitungan integer
 
             if (Math.abs(weight) < Double.MIN_VALUE) weight = 10e-3;
             total.add((new WorldVector(obj.position, bot.position)).toNormalize().div(weight));
@@ -112,7 +112,7 @@ public class FieldService {
     {
         Position center = gameState.world.centerPoint;
 
-        return (gameState.world.radius < RadarService.getDistanceBetween(bot, center) + bot.size);
+        return (gameState.world.radius < RadarService.roundToEven(RadarService.getDistanceBetween(bot, center)) + bot.size);
     }
 
     static public Boolean isOutsideMap(GameState gameState, GameObject bot, int offset)
@@ -120,21 +120,21 @@ public class FieldService {
         // making world radius smaller if offset
         Position center = gameState.world.centerPoint;
 
-        return (gameState.world.radius - offset < RadarService.getDistanceBetween(bot, center) + bot.size);
+        return (gameState.world.radius - offset < RadarService.roundToEven(RadarService.getDistanceBetween(bot, center)) + bot.size);
     }
 
     static public Boolean isOutsideMap(GameState gameState, Position p, int size)
     {
         Position center = gameState.world.centerPoint;
 
-        return (gameState.world.radius < RadarService.getDistanceBetween(p, center) + size);
+        return (gameState.world.radius < RadarService.roundToEven(RadarService.getDistanceBetween(p, center)) + size);
     }
 
     static public Boolean isOutsideMap(GameState gameState, Position p, int size, int offset)
     {
         Position center = gameState.world.centerPoint;
 
-        return (gameState.world.radius - offset < RadarService.getDistanceBetween(p, center) + size);
+        return (gameState.world.radius - offset < RadarService.roundToEven(RadarService.getDistanceBetween(p, center)) + size);
     }
     
     static public int getCenterDirection(GameState gameState, GameObject bot)

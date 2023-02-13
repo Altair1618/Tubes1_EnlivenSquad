@@ -18,6 +18,8 @@ public class BotService {
         EscapeInfo(WorldVector escapeDirection, Double weight) {
             this.escapeDirection = escapeDirection;
             this.weight = weight; 
+
+            this.escapeDirection.normalize();
         }
     }
 
@@ -61,21 +63,22 @@ public class BotService {
         WorldVector temp;
         EscapeInfo t;
         List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
+        Double headingOffset = 1.;
+        
 
         // weight untuk setiap kasus kabur/ngejar
         Double[] weights = {
-            0.0, 
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0
+            0.6, // menghindar dari bot besar
+            0.1, // ada torpedo mengarah ke kita dan berada di danger zone kita
+            0.1, // mengejar bot kecil
+            0.05, // masuk kembali ke map
+            0.05, // menghindar dari supernova bomb yang ke arah kita
+            0.03, // menghindar keluar cloud
+            0.01, // menghindar keluar asteroid field
+            0.01, // mengejar food jika punya super food
         };
 
-        if (isSupernovaNearPlayer(gameState, bot) && isDetonated)
+        if (SupernovaService.isSupernovaNearPlayer(gameState, bot) && isDetonated)
         /* jika kita sudah nembak supernova dan supernova bombnya dekat musuh */
         {
             playerAction.action = PlayerActions.DETONATESUPERNOVA;
@@ -88,7 +91,7 @@ public class BotService {
 
         // KASUS PINDAH 1
         int dangerRange = 20; // Range player gede dianggap berbahaya, ganti kalau perlu
-        List<GameObject> biggerPlayer = PlayerService.getBiggerPlayerInRange(gameState, bot, dangerRange)
+        List<GameObject> biggerPlayer = PlayerService.getBiggerPlayerInRange(gameState, bot, dangerRange);
         if (!biggerPlayer.isEmpty())
         {
             temp = PlayerService.getEscapePlayerVector(biggerPlayer, bot); /*isi temp dengan nilai arah kabur dari bot besar */
@@ -97,7 +100,10 @@ public class BotService {
         }
 
         List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
-        if (directionVectors.isEmpty() && !incomingTorpedo.isEmpty())
+
+        temp = calculateResult(directionVectors);
+        Double offsetAngle = Math.abs(temp.getAngleTo(RadarService.degreeToVector(bot.getHeading())));
+        if ((temp.isZero() || offsetAngle < headingOffset) && !incomingTorpedo.isEmpty())
         /* jika ada torpedo yang mengarah ke kita */
         {
             /* jika torpedo (terdekat) di dalam danger zone kita */
@@ -214,12 +220,7 @@ public class BotService {
         // PERHITUNGAN PERPINDAHAN BERDASARKAN TIAP WEIGHT
         if (!directionVectors.isEmpty())
         {
-            WorldVector res = new WorldVector();
-
-            for (EscapeInfo v : directionVectors)
-            {
-                res.add(v.escapeDirection.mult(v.weight));
-            }
+            WorldVector res = calculateResult(directionVectors);
 
             if (!res.isZero())
             {
@@ -252,13 +253,13 @@ public class BotService {
         }
 
     
-        if (isSupernovaAvailable(bot))
+        if (SupernovaService.isSupernovaAvailable(bot))
         /*punya supernova pickup */
         {
             playerAction.action = PlayerActions.FIRESUPERNOVA;
 
             // players sudah terurut dari terkecil
-            List<GameObject> players = getOtherPlayerList(gameState, bot);
+            List<GameObject> players = PlayerService.getOtherPlayerList(gameState, bot);
 
             for (int i = 0; i < players.size(); i ++) {
                 if (RadarService.isCollapsing(players.get(i), bot, 50)) {
@@ -286,6 +287,7 @@ public class BotService {
         this.playerAction = playerAction;
     }
 
+
     public GameState getGameState() {
         return this.gameState;
     }
@@ -298,6 +300,18 @@ public class BotService {
     private void updateSelfState() {
         Optional<GameObject> optionalBot = gameState.getPlayerGameObjects().stream().filter(gameObject -> gameObject.id.equals(bot.id)).findAny();
         optionalBot.ifPresent(bot -> this.bot = bot);
+    }
+
+    private WorldVector calculateResult(List<EscapeInfo> directionVectors)
+    {
+        WorldVector res = new WorldVector();
+
+        for (EscapeInfo v : directionVectors)
+        {
+            res.add(v.escapeDirection.mult(v.weight));
+        }
+
+        return res;
     }
 
 

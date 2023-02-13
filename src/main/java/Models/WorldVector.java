@@ -1,5 +1,6 @@
 package Models;
 
+import Services.RadarService;
 
 public class WorldVector {
 
@@ -9,6 +10,8 @@ public class WorldVector {
     public WorldVector() {
         x = 0;
         y = 0;
+
+        if (this.isZero()) System.out.println("Vector isZero method is working!");
     }
 
     public WorldVector(Double x, Double y) {
@@ -112,6 +115,6 @@ public class WorldVector {
     }
     public Double getAngleTo(WorldVector other)
     {
-        return this.dot(other) / (this.magnitude() * other.magnitude());
+        return (this.dot(other) / (this.magnitude() * other.magnitude())) * 180 / Math.PI;
     }
 }

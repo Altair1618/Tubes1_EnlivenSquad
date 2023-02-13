@@ -9,7 +9,7 @@ import java.util.stream.*;
 public class RadarService {
     static public List<GameObject> getOtherObjects(GameState gameState, GameObject bot, ObjectTypes objectType)
     {
-        // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
+        // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot
         var objectList = gameState.getGameObjects()
                 .stream().filter(item -> item.getGameObjectType() == objectType)
                 .sorted(Comparator
@@ -34,13 +34,13 @@ public class RadarService {
         var objectList = gameState.getGameObjects()
                 .stream()
                 .sorted(Comparator
-                        .comparing(item -> getRealDistance(item.size, 0, getDistanceBetween(item, position))))
+                        .comparing(item -> getRealDistance(item.size, 0, roundToEven(getDistanceBetween(item, position)))))
                 .collect(Collectors.toList());
 
         return objectList;
     }
 
-    static public double getRealDistance(int radius1, int radius2, Double distance)
+    static public int getRealDistance(int radius1, int radius2, int distance)
     {
         // can return negative distance if collapsing
         // smaller means the center is closer when collapsing
@@ -48,11 +48,11 @@ public class RadarService {
 
     }
 
-    static public double getRealDistance(GameObject object1, GameObject object2)
+    static public int getRealDistance(GameObject object1, GameObject object2)
     {
         // can return negative distance if collapsing
         // smaller means the center is closer when collapsing
-        return getRealDistance(object1.size, object2.size, getDistanceBetween(object1, object2));
+        return getRealDistance(object1.size, object2.size, roundToEven(getDistanceBetween(object1, object2)));
 
     }
 
@@ -98,14 +98,6 @@ public class RadarService {
         return (direction + 360) % 360;
     }
 
-    static public long getRoundedDistance(GameObject object1, GameObject object2)
-    {
-        // mengembalikan jarak dua objek yang dibulatkan dengan roundToEven
-        double res = getDistanceBetween(object1, object2);
-
-        return roundToEven(res);
-    }
-
     static public Position nextPosition(int heading, GameObject bot)
     {
         // mengembalikan prediksi posisi bot pada tik berikutnya
@@ -123,7 +115,7 @@ public class RadarService {
     static public boolean isCollapsing(GameObject object1, GameObject object2)
     {
         // mengembalikan true jika object1 dan object2 collapse
-        long distance = getRoundedDistance(object1, object2);
+        long distance = roundToEven(getDistanceBetween(object1, object2));
 
         return (object1.size + object2.size > distance);
     }
@@ -131,7 +123,7 @@ public class RadarService {
     static public boolean isCollapsing(GameObject object1, GameObject object2, int offset)
     {
         // mengembalikan true jika object1 dan object2 collapse
-        long distance = getRoundedDistance(object1, object2);
+        long distance = roundToEven(getDistanceBetween(object1, object2));
 
         return (object1.size + object2.size + offset > distance);
     }
