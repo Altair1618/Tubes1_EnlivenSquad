@@ -73,13 +73,13 @@ public class BotService {
 
         // weight untuk setiap kasus kabur/ngejar
         Double[] weights = {
-            0.6, // menghindar dari bot besar
-            0.1, // ada torpedo mengarah ke kita dan berada di danger zone kita
+            0.45, // menghindar dari bot besar
+            0.08, // ada torpedo mengarah ke kita dan berada di danger zone kita
             0.1, // mengejar bot kecil
-            0.05, // masuk kembali ke map
+            0.17, // masuk kembali ke map
             0.05, // menghindar dari supernova bomb yang ke arah kita
-            0.03, // menghindar keluar cloud
-            0.01, // menghindar keluar asteroid field
+            0.1, // menghindar keluar cloud
+            0.04, // menghindar keluar asteroid field
             0.01, // mengejar food jika punya super food
         };
 
@@ -97,8 +97,9 @@ public class BotService {
         }
 
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
-        if (RadarService.getRealDistance(bot, playersList.get(0)) <= 400 && TorpedoService.isTorpedoAvailable(bot)) {
+        if (RadarService.getRealDistance(bot, playersList.get(0)) <= 500 && TorpedoService.isTorpedoAvailable(bot, 35)) {
             playerAction.action = PlayerActions.FIRETORPEDOES;
+            
             playerAction.heading = RadarService.getHeadingBetween(bot, playersList.get(0));
 
             this.playerAction = playerAction;
@@ -107,7 +108,7 @@ public class BotService {
         }
 
         // KASUS PINDAH 1
-        int dangerRange = 20; // Range player gede dianggap berbahaya, ganti kalau perlu
+        int dangerRange = 100; // Range player gede dianggap berbahaya, ganti kalau perlu
         List<GameObject> biggerPlayer = PlayerService.getBiggerPlayerInRange(gameState, bot, dangerRange);
         if (!biggerPlayer.isEmpty())
         {
@@ -166,7 +167,7 @@ public class BotService {
         // KASUS  PINDAH 4
 
         // jika keluar map
-        if (FieldService.isOutsideMap(gameState, bot, 50))
+        if (FieldService.isOutsideMap(gameState, bot, gameState.world.getRadius() / 3))
         {
             temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
             t = new EscapeInfo(temp, weights[4]);
