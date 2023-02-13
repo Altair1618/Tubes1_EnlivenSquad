@@ -6,25 +6,19 @@ import java.util.*;
 
 public class FieldService {
 
-    static public List<GameObject> getCollapsingClouds(GameState gameState, GameObject bot)
+    static public List<GameObject> getCollapsingClouds(GameState gameState, GameObject bot, int radarRadius)
     {
         // mengembalikan semua cloud yang collapse dengan player
-        List<GameObject> res = RadarService.getCollapsingObjects(gameState, bot, ObjectTypes.GASCLOUD);
-
-        if (res.size() == 0 && isCloudCollapsing(bot)) System.out.println("BUG in FieldService.getCollapsingClouds method: GASCLOUD effect is detected but the cloud object is not!");
-
-
-        return res;
+        return RadarService.getOtherObjects(gameState, bot, ObjectTypes.GASCLOUD, radarRadius);
     }
 
-    static public List<GameObject> getCollapsingAsteroids(GameState gameState, GameObject bot)
+    static public List<GameObject> getCollapsingAsteroids(GameState gameState, GameObject bot, int radarRadius)
     {
         // mengembalikan semua asteroid field yang collapse dengan player
-        List<GameObject> res = RadarService.getCollapsingObjects(gameState, bot, ObjectTypes.ASTEROIDFIELD);
 
-        if (res.size() == 0 && isCloudCollapsing(bot)) System.out.println("BUG in FieldService.getCollapsingAsteroids method: ASTEROIDFIELD effect is detected but the field object is not!");
-        return res;
+        return RadarService.getOtherObjects(gameState, bot, ObjectTypes.ASTEROIDFIELD, radarRadius);
     }
+
 
     static public List<GameObject> getWormHoles(GameState gameState, GameObject bot)
     {
@@ -44,37 +38,30 @@ public class FieldService {
         return res;
     }
 
-    static public boolean isCloudCollapsing(GameObject bot)
-    {
-        // memeriksa apakah bot sedang di dalam cloud
-        return Effects.getEffectList(bot.effectsCode).get(2);
-    }
-
-    static public boolean isAsteroidCollapsing(GameObject bot)
-    {
-        // memerika apakah bot sedang di dalam asteroid field
-        return Effects.getEffectList(bot.effectsCode).get(1);
-    }
-
     static public List<Integer> getHeadingEscape(GameObject bot, List<GameObject> collapsingObject)
     {
         // mengembalikan arah terbaik player untuk keluar dari cloud (PENDEKATAN PENJUMLAHAN VECTOR DENGAN BOBOT 1 / (jarak yang dibutuhkan untuk escape))
 
-        ArrayList<Integer> res;
+        ArrayList<Integer> res = new ArrayList<Integer>();
         WorldVector total = new WorldVector();
         
         if (collapsingObject.size() == 0) {
             System.out.println("WARNING in FieldService.getHeadingEscape method: collapsingObjects passed has zero size!");
-            return new ArrayList<Integer>();
+            return res;
         }
 
         for (GameObject obj : collapsingObject) {
 
-            double weight = obj.size - (RadarService.getDistanceBetween(bot, obj)) + bot.size; // dipastikan weight >= 1 karena collapsing dan menggunakan perhitungan integer
-
+            double weight = 0.;
+            double distance = RadarService.getDistanceBetween(bot, obj);
+            weight = obj.size - distance + bot.size; // dipastikan weight >= 1 karena collapsing dan menggunakan perhitungan integer
+            
             if (Math.abs(RadarService.roundToEven(weight)) < Double.MIN_VALUE) weight = 10e-3 * (weight < 0? -1 : 1);
             else weight = RadarService.roundToEven(weight);
-            total.add((new WorldVector(obj.position, bot.position)).toNormalize().div(weight));
+
+            if (weight > 0) weight = 1 / weight;
+            else weight = Math.abs(weight);
+            total.add((new WorldVector(obj.position, bot.position)).toNormalize().mult(weight));
         }
 
         if (total.isZero()) 
@@ -86,17 +73,14 @@ public class FieldService {
             {
                 WorldVector line = new WorldVector(collapsingObject.get(0).position, collapsingObject.get(1).position);
                 WorldVector direction = line.getAdjacent();
-                res = new ArrayList<Integer>(){
-                    {
-                        add((int) RadarService.vectorToDegree(direction));
-                        add((int) RadarService.vectorToDegree(direction.mult(-1)));
-                
-                    }
-                };
+        
+                res.add(RadarService.roundToEven(RadarService.vectorToDegree(direction)));
+                res.add(RadarService.roundToEven(RadarService.vectorToDegree(direction.mult(-1))));
+        
             }
         }
 
-        else res = new ArrayList<Integer>((int) RadarService.vectorToDegree(total));
+        else res.add(RadarService.roundToEven(RadarService.vectorToDegree(total)));
 
         if (res.size() == 0)
         {

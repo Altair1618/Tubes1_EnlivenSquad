@@ -15,8 +15,15 @@ public class FoodServices {
     // }
 
     static public List<GameObject> getFoods(GameState gameState, GameObject bot) {
+
+        int radarRadius = 50;
+
+        return getFoods(gameState, bot, radarRadius);
+    }
+
+    static public List<GameObject> getFoods(GameState gameState, GameObject bot, int radarRadius) {
         var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD && RadarService.isInWorld(item, gameState, bot, 15))
+                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD && RadarService.isInWorld(item, gameState, bot, 15) && RadarService.getRealDistance(bot, item) < radarRadius)
                 .sorted(Comparator
                         .comparing(item -> RadarService.getRealDistance(bot, item)))
                 .collect(Collectors.toList());
@@ -25,8 +32,16 @@ public class FoodServices {
     }
 
     static public List<GameObject> getSuperFoods(GameState gameState, GameObject bot) {
+        int radarRadius = 50;
+        return getSuperFoods(gameState, bot, radarRadius);
+        
+    }
+
+    static public List<GameObject> getSuperFoods(GameState gameState, GameObject bot, int radarRadius) {
+        
+
         var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERFOOD && RadarService.isInWorld(item, gameState, bot, 15))
+                .stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERFOOD && RadarService.isInWorld(item, gameState, bot, 15) && RadarService.getRealDistance(bot, item) < radarRadius)
                 .sorted(Comparator
                         .comparing(item -> RadarService.getRealDistance(bot, item)))
                 .collect(Collectors.toList());

@@ -59,13 +59,16 @@ public class BotService {
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
 
+        computeNextPlayerAction2(playerAction);
+        if (true) return;
+
         if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
         List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
         WorldVector temp;
         EscapeInfo t;
         List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
         Double headingOffset = 1.;
-        
+        int fieldRadarRadius = 20;
 
         // weight untuk setiap kasus kabur/ngejar
         Double[] weights = {
@@ -131,7 +134,7 @@ public class BotService {
 
         // KASUS PINDAH 3
 
-        int offset = 10; // Minimal selisih size player
+        int offset = 40; // Minimal selisih size player
         List<GameObject> preys = PlayerService.getPreys(gameState, bot, offset);
         if (!preys.isEmpty())
         {
@@ -174,35 +177,37 @@ public class BotService {
 
         // KASUS PINDAH 6
         // jika masuk cloud
-        // if (FieldService.isCloudCollapsing(bot))
-        // {
-        //     List<GameObject> collapsingClouds = FieldService.getCollapsingClouds(gameState, bot);
 
-        //     List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingClouds);
+        List<GameObject> collapsingClouds = FieldService.getCollapsingClouds(gameState, bot, fieldRadarRadius);
 
-        //     if (tempDirection.size() > 0)
-        //     {
-        //         temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingClouds).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
-        //         t = new EscapeInfo(temp, weights[6]);
-        //         directionVectors.add(t);
-        //     }
-        // }
+        if (!collapsingClouds.isEmpty())
+        {
+            
+            List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingClouds);
 
-        // // KASUS PINDAH 7
-        // // jika masuk asteroid
-        // if (FieldService.isAsteroidCollapsing(bot))
-        // {
-        //     List<GameObject> collapsingAsteroids = FieldService.getCollapsingAsteroids(gameState, bot);
+            if (tempDirection.size() > 0)
+            {
+                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingClouds).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
+                t = new EscapeInfo(temp, weights[6]);
+                directionVectors.add(t);
+            }
+        }
 
-        //     List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingAsteroids);
+        // KASUS PINDAH 7
+        // jika masuk asteroid
+        List<GameObject> collapsingAsteroids = FieldService.getCollapsingAsteroids(gameState, bot, fieldRadarRadius);
+        if (!collapsingAsteroids.isEmpty())
+        {
 
-        //     if (tempDirection.size() > 0)
-        //     {
-        //         temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingAsteroids).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
-        //         t = new EscapeInfo(temp, weights[6]);
-        //         directionVectors.add(t);
-        //     }
-        // }
+            List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingAsteroids);
+
+            if (tempDirection.size() > 0)
+            {
+                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingAsteroids).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
+                t = new EscapeInfo(temp, weights[6]);
+                directionVectors.add(t);
+            }
+        }
 
         // KASUS PINDAH 8   
         // jika punya superfood
@@ -275,6 +280,110 @@ public class BotService {
             this.playerAction = playerAction;
             return;
         }
+
+        var foods = FoodServices.getNearestFoods(gameState, bot);
+        playerAction.action = PlayerActions.FORWARD;
+        playerAction.heading = bot.getHeading();
+        // playerAction.heading = arah ke TARGET
+
+        if (foods.size() > 0)
+        {
+            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+        }
+        this.playerAction = playerAction;
+    }
+
+    static int con = 1;
+    public void computeNextPlayerAction2(PlayerAction playerAction) {
+
+        if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
+        List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
+        WorldVector temp;
+        EscapeInfo t;
+        List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
+        Double headingOffset = 1.;
+        int fieldRadarRadius = 20;
+
+        // weight untuk setiap kasus kabur/ngejar
+        Double[] weights = {
+            0.6, // menghindar dari bot besar
+            0.1, // ada torpedo mengarah ke kita dan berada di danger zone kita
+            0.1, // mengejar bot kecil
+            0.05, // masuk kembali ke map
+            0.05, // menghindar dari supernova bomb yang ke arah kita
+            0.03, // menghindar keluar cloud
+            0.01, // menghindar keluar asteroid field
+            0.01, // mengejar food jika punya super food
+        };
+
+        // KASUS  PINDAH 4
+        System.out.println(con);
+        // jika keluar map
+        if (FieldService.isOutsideMap(gameState, bot,  300))
+        {
+
+            temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
+            t = new EscapeInfo(temp, weights[4]);
+            t = new EscapeInfo(temp, weights[4]);
+
+            directionVectors.add(t);
+        }
+        // PERHITUNGAN PERPINDAHAN BERDASARKAN TIAP WEIGHT
+        if (!directionVectors.isEmpty())
+        {
+            WorldVector res = calculateResult(directionVectors);
+
+            if (!res.isZero())
+            {
+                playerAction.action = PlayerActions.FORWARD;
+                playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(res));
+                this.playerAction = playerAction;
+                con = playerAction.heading;
+                return;
+            }
+        }
+
+        else{
+            playerAction.action = PlayerActions.FORWARD;
+            playerAction.heading = con;
+            this.playerAction = playerAction;
+            return;
+        }
+
+        // KASUS PINDAH 6
+        // jika masuk cloud
+
+        List<GameObject> collapsingClouds = FieldService.getCollapsingClouds(gameState, bot, fieldRadarRadius);
+
+        if (!collapsingClouds.isEmpty())
+        {
+            
+            List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingClouds);
+
+            if (tempDirection.size() > 0)
+            {
+                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingClouds).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
+                t = new EscapeInfo(temp, weights[6]);
+                directionVectors.add(t);
+            }
+        }
+
+        // KASUS PINDAH 7
+        // jika masuk asteroid
+        List<GameObject> collapsingAsteroids = FieldService.getCollapsingAsteroids(gameState, bot, fieldRadarRadius);
+        if (!collapsingAsteroids.isEmpty())
+        {
+
+            List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingAsteroids);
+
+            if (tempDirection.size() > 0)
+            {
+                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingAsteroids).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
+                t = new EscapeInfo(temp, weights[6]);
+                directionVectors.add(t);
+            }
+        }
+
 
         var foods = FoodServices.getNearestFoods(gameState, bot);
         playerAction.action = PlayerActions.FORWARD;

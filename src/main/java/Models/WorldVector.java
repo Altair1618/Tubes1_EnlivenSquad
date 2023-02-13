@@ -1,7 +1,5 @@
 package Models;
 
-import Services.RadarService;
-
 public class WorldVector {
 
     public double x;
