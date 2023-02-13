@@ -2,6 +2,7 @@ package Services;
 
 import Enums.*;
 import Models.*;
+import Services.RadarService;
 
 import java.util.*;
 
@@ -70,7 +71,7 @@ public class TorpedoService {
         int radius = bot.getSize() + nearestTorpedo.getSize();
 
         // offset = asin(radius / jarak torpedo ke bot)
-        double offSet = RadarService.(Math.asin(radius / distance));
+        double offSet = RadarService.toDegrees(Math.asin(radius / distance));
 
         // angle 80% from original incoming zone
         // distance torpedo to bot = 2 * bot.size()
