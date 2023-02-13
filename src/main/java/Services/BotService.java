@@ -59,10 +59,10 @@ public class BotService {
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
 
-        // computeNextPlayerAction2(playerAction);
-        // if (true) return;
-
         if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
+//        computeNextPlayerAction2(playerAction);
+//        if (true) return;
+
         List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
         WorldVector temp;
         EscapeInfo t;
@@ -296,7 +296,7 @@ public class BotService {
         this.playerAction = playerAction;
     }
 
-    static int con = 1;
+    static int con = 0;
     public void computeNextPlayerAction2(PlayerAction playerAction) {
 
         if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
@@ -305,7 +305,7 @@ public class BotService {
         EscapeInfo t;
         List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
         Double headingOffset = 1.;
-        int fieldRadarRadius = 20;
+        int fieldRadarRadius = 20 + bot.size;
 
         // weight untuk setiap kasus kabur/ngejar
         Double[] weights = {
@@ -320,59 +320,45 @@ public class BotService {
         };
 
         // KASUS  PINDAH 4
-        System.out.println(con);
-        // jika keluar map
-        if (FieldService.isOutsideMap(gameState, bot,  300))
+            System.out.println(gameState.world.radius);
+//         jika keluar map
+        if (FieldService.isOutsideMap(gameState, bot,  gameState.world.radius / 3 + bot.size))
         {
-
-            temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
-            t = new EscapeInfo(temp, weights[4]);
-            t = new EscapeInfo(temp, weights[4]);
-
-            directionVectors.add(t);
-        }
-        // PERHITUNGAN PERPINDAHAN BERDASARKAN TIAP WEIGHT
-        if (!directionVectors.isEmpty())
-        {
-            WorldVector res = calculateResult(directionVectors);
-
-            if (!res.isZero())
-            {
-                playerAction.action = PlayerActions.FORWARD;
-                playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(res));
-                this.playerAction = playerAction;
-                con = playerAction.heading;
-                return;
-            }
-        }
-
-        else{
             playerAction.action = PlayerActions.FORWARD;
-            playerAction.heading = con;
+            playerAction.heading = RadarService.roundToEven(FieldService.getCenterDirection(gameState, bot));
             this.playerAction = playerAction;
             return;
+//            temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
+//            t = new EscapeInfo(temp, weights[4]);
+//
+//            directionVectors.add(t);
         }
+        // PERHITUNGAN PERPINDAHAN BERDASARKAN TIAP WEIGHT
+
 
         // KASUS PINDAH 6
         // jika masuk cloud
 
         List<GameObject> collapsingClouds = FieldService.getCollapsingClouds(gameState, bot, fieldRadarRadius);
-
+//
         if (!collapsingClouds.isEmpty())
         {
-            
+
             List<Integer> tempDirection = FieldService.getHeadingEscape(bot, collapsingClouds);
 
             if (tempDirection.size() > 0)
             {
-                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingClouds).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
-                t = new EscapeInfo(temp, weights[6]);
-                directionVectors.add(t);
+                playerAction.action = PlayerActions.FORWARD;
+                playerAction.heading = RadarService.roundToEven(tempDirection.get(0));
+                this.playerAction = playerAction;
+                return;
+//                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingClouds).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
+//                t = new EscapeInfo(temp, weights[5]);
+//                directionVectors.add(t);
             }
         }
-
-        // KASUS PINDAH 7
-        // jika masuk asteroid
+//        // KASUS PINDAH 7
+////         jika masuk asteroid
         List<GameObject> collapsingAsteroids = FieldService.getCollapsingAsteroids(gameState, bot, fieldRadarRadius);
         if (!collapsingAsteroids.isEmpty())
         {
@@ -381,23 +367,35 @@ public class BotService {
 
             if (tempDirection.size() > 0)
             {
-                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingAsteroids).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
-                t = new EscapeInfo(temp, weights[6]);
-                directionVectors.add(t);
+                playerAction.action = PlayerActions.FORWARD;
+                playerAction.heading = RadarService.roundToEven(tempDirection.get(0));
+                this.playerAction = playerAction;
+                return;
+//                temp = RadarService.degreeToVector(RadarService.roundToEven(FieldService.getHeadingEscape(bot, collapsingAsteroids).get(0))); // isi dengan nilai arah kabur dari supernova bomb */
+//                t = new EscapeInfo(temp, weights[6]);
+//                directionVectors.add(t);
             }
         }
+//        if (!directionVectors.isEmpty())
+//        {
+//            WorldVector res = calculateResult(directionVectors);
+//
+//            if (!res.isZero())
+//            {
+//                playerAction.action = PlayerActions.FORWARD;
+//                playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(res));
+//                this.playerAction = playerAction;
+//                return;
+//            }
+//        }
 
-
-        var foods = FoodServices.getNearestFoods(gameState, bot);
-        playerAction.action = PlayerActions.FORWARD;
-        playerAction.heading = bot.getHeading();
-        // playerAction.heading = arah ke TARGET
-
-        if (foods.size() > 0)
+        if (con == 0)
         {
-            playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+            playerAction.action = PlayerActions.FORWARD;
+            playerAction.heading = bot.getHeading();
+            this.playerAction = playerAction;
+            con = 1;
         }
-
         this.playerAction = playerAction;
     }
 
