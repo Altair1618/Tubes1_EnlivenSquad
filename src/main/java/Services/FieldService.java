@@ -26,17 +26,19 @@ public class FieldService {
         return RadarService.getOtherObjects(gameState, bot, ObjectTypes.WORMHOLE);
     }
 
-    static public List<GameObject> getCollapsingObjectsAfterWormHole(GameState gameState, GameObject bot, List<GameObject> otherWormHoles)
+    static public List<GameObject> getCollapsingObjectsAfterWormHole(GameState gameState, GameObject bot, List<GameObject> otherWormHoles, int sizeOffset)
     {
         // mengembalikan semua objek yang akan collapse dengan player setelah memasuki wormhole (pair wormhole tidak diketahui sehingga perlu ditinjau semua untuk kasus terburuk)
         List<GameObject> res = new ArrayList<GameObject>();
         for(GameObject wh : otherWormHoles)
         {
-            res.addAll(RadarService.getCollapsingObjects(gameState, wh.position, bot.size));
+            res.addAll(RadarService.getCollapsingObjects(gameState, wh.position, bot.size + sizeOffset));
         }
 
         return res;
     }
+
+    
 
     static public List<Integer> getHeadingEscape(GameObject bot, List<GameObject> collapsingObject)
     {

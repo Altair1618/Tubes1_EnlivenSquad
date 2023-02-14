@@ -11,7 +11,6 @@ public class BotService {
     private GameState gameState;
     static private boolean isDetonated = false;
     static private boolean isFired = false;
-
     static private double tickTimer = 0;
 
     class EscapeInfo {
@@ -59,13 +58,10 @@ public class BotService {
         playerAction.heading = heading;
     }
 
-
     public void computeNextPlayerAction(PlayerAction playerAction) {
 
         if (tickTimer > 0) tickTimer--;
         if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
-//        computeNextPlayerAction2(playerAction);
-//        if (true) return;
 
         List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
         WorldVector temp;
@@ -168,11 +164,10 @@ public class BotService {
             System.out.println("5");
         }
 
-
         // KASUS  PINDAH 4
 
         // jika keluar map
-        if (FieldService.isOutsideMap(gameState, bot, 50))
+        if (FieldService.isOutsideMap(gameState, bot, gameState.world.radius / 3))
         {
             temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
             t = new EscapeInfo(temp, weights[4]);
