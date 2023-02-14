@@ -98,11 +98,12 @@ public class BotService {
         /* jika kita sudah nembak supernova dan supernova bombnya dekat musuh atau akan keluar map (menghindari error) */
         {
             playerAction.action = PlayerActions.DETONATESUPERNOVA;
-
+            this.playerAction = playerAction;
             /* set variabel sudah nembak supernova menjadi false */
             isDetonated = true;
             isFired = false;
             System.out.println("1");
+
 
             return;
         }
@@ -328,15 +329,19 @@ public class BotService {
         }
 
         var foods = FoodServices.getNearestFoods(gameState, bot);
-        playerAction.action = PlayerActions.FORWARD;
-        playerAction.heading = bot.getHeading();
 
         // playerAction.heading = arah ke TARGET
 
         if (foods.size() > 0 && foods != null)
         {
             System.out.println("15");
+            playerAction.action = PlayerActions.FORWARD;
             playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+        }
+
+        else
+        {
+            playerAction.action = PlayerActions.STOP;
         }
 
         this.playerAction = playerAction;
