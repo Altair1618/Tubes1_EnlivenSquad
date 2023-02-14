@@ -196,16 +196,19 @@ public class BotService {
         }
 
         // KASUS PINDAH 5
-        if (false /*ada supernova bomb mengarah ke kita */)
+        
+        List<GameObject> incomingSupernova = SupernovaService.getIncomingSupernova(gameState, bot);
+
+        if (!incomingSupernova.isEmpty() && incomingSupernova != null)
+        /*ada supernova bomb mengarah ke kita */
         {
             temp = new WorldVector(); // isi dengan nilai arah kabur dari supernova bomb */
+            temp = SupernovaService.nextHeadingAfterSupernova(bot, incomingSupernova.get(0));
             t = new EscapeInfo(temp, weights[5]);
 
             directionVectors.add(t);
             System.out.println("7");
-
         }
-
         
         // if (false /* tembak gascloud kalo kita kena gascloud dan size gascloud <= limit ???*/)
         // {
