@@ -7,11 +7,14 @@ import java.util.*;
 import java.util.stream.*;
 
 public class RadarService {
+
+    static public int worldRadiusOffset = 50; // batas jarak kita ke pinggir world
+
     static public List<GameObject> getOtherObjects(GameState gameState, GameObject bot, ObjectTypes objectType)
     {
         // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot
         var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == objectType)
+                .stream().filter(item -> item.getGameObjectType() == objectType && !FieldService.isOutsideMap(gameState, item, worldRadiusOffset - 2 * item.size))
                 .sorted(Comparator
                         .comparing(item -> getRealDistance(bot, item)))
                 .collect(Collectors.toList());
@@ -24,7 +27,7 @@ public class RadarService {
         // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
         
         var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == objectType && RadarService.getRealDistance(bot, item) < radarRadius)
+                .stream().filter(item -> item.getGameObjectType() == objectType && !FieldService.isOutsideMap(gameState, item, worldRadiusOffset - 2 * item.size) && RadarService.getRealDistance(bot, item) < radarRadius)
                 .sorted(Comparator
                         .comparing(item -> RadarService.getRealDistance(bot, item)))
                 .collect(Collectors.toList());
@@ -36,7 +39,7 @@ public class RadarService {
     {
         // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
         var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == objectType)
+                .stream().filter(item -> item.getGameObjectType() == objectType && !FieldService.isOutsideMap(gameState, item, worldRadiusOffset - 2 * item.size))
                 .collect(Collectors.toList());
 
         return objectList;
@@ -46,6 +49,7 @@ public class RadarService {
         // mengembalikan objek-objek lain dan diurutkan berdasarkan jarak terhadap position 
         var objectList = gameState.getGameObjects()
                 .stream()
+                .filter(item -> !FieldService.isOutsideMap(gameState, item, worldRadiusOffset - 2 * item.size))
                 .sorted(Comparator
                         .comparing(item -> getRealDistance(item.size, 0, (getDistanceBetween(item, position)))))
                 .collect(Collectors.toList());

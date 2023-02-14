@@ -8,11 +8,12 @@ import Enums.ObjectTypes;
 public class TeleportService {
     
     static UUID firedTeleportId = null;
+    static public int teleportSizeLimit = 25;
 
     static public Boolean isTeleportAvailable(GameObject bot)
     {
         // mengembalikan true jika player dapat menggunakan teleport
-        return bot.teleporterCount > 0 && bot.size >= 25;
+        return bot.teleporterCount > 0 && bot.size >= teleportSizeLimit;
     }
 
     static public Boolean isTeleportAvailable(GameObject bot, int sizeLimit)
