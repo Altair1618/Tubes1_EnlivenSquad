@@ -126,6 +126,13 @@ public class BotService {
 
         List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
 
+        // if (!incomingTorpedo.isEmpty() && ShieldService.isShieldAvailable(bot, 30)) {
+        //     playerAction.action = PlayerActions.ACTIVATESHIELD;
+
+        //     this.playerAction = playerAction;
+        //     return;
+        // }
+
         temp = calculateResult(directionVectors);
         Double offsetAngle = Math.abs(temp.getAngleTo(RadarService.degreeToVector(bot.getHeading())));
         if ((temp.isZero() || offsetAngle < headingOffset) && !incomingTorpedo.isEmpty())
