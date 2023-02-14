@@ -112,6 +112,7 @@ public class BotService {
 
         if (!playersList.isEmpty() && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius && TorpedoService.isTorpedoAvailable(bot)) {
             playerAction.action = PlayerActions.FIRETORPEDOES;
+            
             playerAction.heading = RadarService.getHeadingBetween(bot, playersList.get(0));
 
             this.playerAction = playerAction;
@@ -131,6 +132,13 @@ public class BotService {
         }
 
         List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
+
+        // if (!incomingTorpedo.isEmpty() && ShieldService.isShieldAvailable(bot, 30)) {
+        //     playerAction.action = PlayerActions.ACTIVATESHIELD;
+
+        //     this.playerAction = playerAction;
+        //     return;
+        // }
 
         temp = calculateResult(directionVectors);
         Double offsetAngle = Math.abs(temp.getAngleTo(RadarService.degreeToVector(bot.getHeading())));
@@ -177,7 +185,7 @@ public class BotService {
         // KASUS  PINDAH 4
 
         // jika keluar map
-        if (FieldService.isOutsideMap(gameState, bot, bot.size + RadarService.worldRadiusOffset))
+        if (FieldService.isOutsideMap(gameState, bot, 50))
         {
             temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
             t = new EscapeInfo(temp, weights[4]);
@@ -188,16 +196,19 @@ public class BotService {
         }
 
         // KASUS PINDAH 5
-        if (false /*ada supernova bomb mengarah ke kita */)
+        
+        List<GameObject> incomingSupernova = SupernovaService.getIncomingSupernova(gameState, bot);
+
+        if (!incomingSupernova.isEmpty() && incomingSupernova != null)
+        /*ada supernova bomb mengarah ke kita */
         {
             temp = new WorldVector(); // isi dengan nilai arah kabur dari supernova bomb */
+            temp = SupernovaService.nextHeadingAfterSupernova(bot, incomingSupernova.get(0));
             t = new EscapeInfo(temp, weights[5]);
 
             directionVectors.add(t);
             System.out.println("7");
-
         }
-
         
         // if (false /* tembak gascloud kalo kita kena gascloud dan size gascloud <= limit ???*/)
         // {

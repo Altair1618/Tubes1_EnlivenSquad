@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.stream.*;
 
 public class SupernovaService {
+    static private int superNovaSize = 100; // asumsi besar ledakan supernova
 
     static public boolean isSupernovaAvailable(GameObject bot) {
         // True jika supernovaAvailable
@@ -67,7 +68,7 @@ public class SupernovaService {
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
 
         for (int i = 0; i < playersList.size(); i ++) {
-            if (RadarService.isCollapsing(supernova.get(0), playersList.get(i), 30)) {
+            if (RadarService.isCollapsing(supernova.get(0), playersList.get(i), 50)) {
                 return true;
             }
         }
@@ -78,5 +79,67 @@ public class SupernovaService {
     static public boolean isSuperNovaOutsideMap(GameState gameState, GameObject superNovaBomb, int offset)
     {
         return FieldService.isOutsideMap(gameState, superNovaBomb, offset);
+    }
+
+    static public boolean isIncoming(GameObject bot, GameObject supernova) {
+        // Mengembalikan true jika supernova mengarah ke bot
+        // perhitungan dengan konsep segitiga
+
+        int supernovaHeading = supernova.getHeading();
+        int headingBetween = RadarService.getHeadingBetween(supernova, bot);
+        double distance = RadarService.getRealDistance(supernova, bot);
+        
+        // 100 = radius ledakan supernova
+        int radius = bot.getSize() + superNovaSize;
+
+        // offset = asin(radius / jarak supernova ke bot)
+        double offSet = RadarService.toDegrees(Math.asin(radius / distance));
+
+        if (((angleBetween(supernovaHeading, headingBetween + offSet)
+                + angleBetween(supernovaHeading, headingBetween - offSet)) <= 2 * offSet)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    static public List<GameObject> getIncomingSupernova(GameState gameState, GameObject bot) {
+        // Mendapat supernova yang incoming to bot
+
+        List<GameObject> incomingSupernova = new ArrayList<GameObject>();
+        List<GameObject> supernovaList = RadarService.getOtherObjects(gameState, bot, ObjectTypes.SUPERNOVABOMB);
+
+        // jika ada supernova di map
+        if (!supernovaList.isEmpty()) {
+            if (isIncoming(bot, supernovaList.get(0))) {
+                incomingSupernova.add(supernovaList.get(0));
+            }
+        }
+
+        return incomingSupernova;
+    }
+
+    static public WorldVector nextHeadingAfterSupernova(GameObject bot, GameObject incomingSupernova) {
+        // Mendapat angle heading terbaik mempertimbangkan
+        // supernova yang menuju ke bot dengan menggunakan vector
+
+        WorldVector res = RadarService.degreeToVector(incomingSupernova.getHeading());
+
+        // random
+        int tmp = (int) (Math.random() * 1) + 1;
+
+        if (tmp == 1) {
+            res.getRotatedBy(90);
+        } else {
+            res.getRotatedBy(-90);
+        }
+
+        return res;
+    }
+    
+    static private double angleBetween(double angle1, double angle2) {
+        // Menghitung angle dari 2 sudut
+
+        return Math.abs((angle1 - angle2 + 180 + 360) % 360 - 180);
     }
 }
