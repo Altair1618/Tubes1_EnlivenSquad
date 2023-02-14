@@ -2,16 +2,15 @@ package Services;
 
 import Enums.*;
 import Models.*;
-import Services.RadarService;
-
 import java.util.*;
 
 public class TorpedoService {
 
+    static public int torpedoSizeLimit = 30;
     static public boolean isTorpedoAvailable(GameObject bot) {
         // True if player can fire torpedo
         // default bot.size >= 30
-        return bot.torpedoSalvoCount > 0 && bot.size >= 30;
+        return bot.torpedoSalvoCount > 0 && bot.size >= torpedoSizeLimit;
     }
 
     static public boolean isTorpedoAvailable(GameObject bot, int sizeLimit) {

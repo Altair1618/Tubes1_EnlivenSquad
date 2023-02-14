@@ -38,8 +38,6 @@ public class FieldService {
         return res;
     }
 
-    
-
     static public List<Integer> getHeadingEscape(GameObject bot, List<GameObject> collapsingObject)
     {
         // mengembalikan arah terbaik player untuk keluar dari cloud (PENDEKATAN PENJUMLAHAN VECTOR DENGAN BOBOT 1 / (jarak yang dibutuhkan untuk escape))

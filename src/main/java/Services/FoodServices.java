@@ -14,6 +14,8 @@ public class FoodServices {
     //     return RadarService.getOtherObjects(gameState, bot, ObjectTypes.SUPERFOOD);
     // }
 
+    static public int foodRadarRadius;
+
     static public List<GameObject> getFoods(GameState gameState, GameObject bot) {
 
         int radarRadius = gameState.world.getRadius();
@@ -32,8 +34,8 @@ public class FoodServices {
     }
 
     static public List<GameObject> getSuperFoods(GameState gameState, GameObject bot) {
-        int radarRadius = 50;
-        return getSuperFoods(gameState, bot, radarRadius);
+   
+        return getSuperFoods(gameState, bot, foodRadarRadius);
         
     }
 
