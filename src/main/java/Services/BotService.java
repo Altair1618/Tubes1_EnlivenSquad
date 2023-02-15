@@ -16,9 +16,10 @@ public class BotService {
     static private int superNovaSize = 100; // asumsi besar ledakan supernova
     static private int playerRadarRadius = 400; // radius jarak deteksi player
     static private Double headingOffset = 1.; // offset sudut untuk mengamsumsikan arah saat ini sudah sesuai tujuan
-    static private int fieldRadarRadius = 50; // radius jarak deteksi cloud dan asteroid
-    static private int sizeDifferenceOffset = 40; // Minimal selisih size player yang dikejar
+    static private int fieldRadarRadius = 25; // radius jarak deteksi cloud dan asteroid
+    static private int sizeDifferenceOffset = 10; // Minimal selisih size player yang dikejar
     static private int playerDangerRange = 20; // Range player gede dianggap berbahaya
+    static private int huntingRange = 100;
 
     // weight untuk setiap kasus kabur/ngejar
     static private Double[] weights = {
@@ -166,7 +167,7 @@ public class BotService {
         /* jika torpedo terdetect mengarah ke kita tetapi bukan dalam danger zone */
         {
             temp = new WorldVector();// temp = nilai arah kabur dari torpedo */
-            temp = TorpedoService.nextHeadingAfterTorpedo(bot, incomingTorpedo);
+            temp = TorpedoService.nextHeadingAfterProjectiles(bot, incomingTorpedo);
             t = new EscapeInfo(temp, weights[1]);
             directionVectors.add(t);
             System.out.println("4");
@@ -174,7 +175,7 @@ public class BotService {
 
         // KASUS PINDAH 3
 
-        List<GameObject> preys = PlayerService.getPreys(gameState, bot, sizeDifferenceOffset);
+        List<GameObject> preys = PlayerService.getPreys(gameState, bot, sizeDifferenceOffset, huntingRange);
         if (!preys.isEmpty())
         {
             temp = PlayerService.getChasePlayerVector(preys, bot);// isi temp dengan nilai arah KEJAR musuh */
@@ -205,23 +206,13 @@ public class BotService {
         /*ada supernova bomb mengarah ke kita */
         {
             temp = new WorldVector(); // isi dengan nilai arah kabur dari supernova bomb */
-            temp = SupernovaService.nextHeadingAfterSupernova(bot, incomingSupernova.get(0));
+            temp = SupernovaService.nextHeadingAfterProjectile(bot, incomingSupernova.get(0));
             t = new EscapeInfo(temp, weights[5]);
 
             directionVectors.add(t);
             System.out.println("7");
         }
         
-        // if (false /* tembak gascloud kalo kita kena gascloud dan size gascloud <= limit ???*/)
-        // {
-        //     // pilih gascloud yg mau ditembak
-        //     if (false /*cek apakah nembak tidak bakal bunuh diri serta cloud yg dipilih emang bisa ditembak (tidak terhalang*/)
-        //     {
-        //         playerAction.action = PlayerActions.FIRETORPEDOES;
-        //         // PlayerAction.heading = arah ke cloud yg mw ditembak
-        //     }
-        // }
-
         // KASUS PINDAH 6
         // jika masuk cloud
 
@@ -320,7 +311,7 @@ public class BotService {
             // players sudah terurut dari terkecil
             List<GameObject> players = PlayerService.getOtherPlayerList(gameState, bot);
 
-            for (int i = 0; i < players.size(); i ++) {
+            for (int i = 0; i < players.size(); i++) {
                 if (RadarService.isCollapsing(players.get(i), bot, 50)) {
                     // playerAction.heading = arah ke TARGET
                     playerAction.heading = RadarService.getHeadingBetween(bot, players.get(i));
