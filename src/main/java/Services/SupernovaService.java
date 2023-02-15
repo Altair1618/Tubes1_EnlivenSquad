@@ -106,17 +106,8 @@ public class SupernovaService {
     static public List<GameObject> getIncomingSupernova(GameState gameState, GameObject bot) {
         // Mendapat supernova yang incoming to bot
 
-        List<GameObject> incomingSupernova = new ArrayList<GameObject>();
-        List<GameObject> supernovaList = RadarService.getOtherObjects(gameState, bot, ObjectTypes.SUPERNOVABOMB);
+        return RadarService.getOtherObjects(ObjectTypes.SUPERNOVABOMB).stream().filter(item -> isIncoming(bot, item)).toList();
 
-        // jika ada supernova di map
-        if (!supernovaList.isEmpty()) {
-            if (isIncoming(bot, supernovaList.get(0))) {
-                incomingSupernova.add(supernovaList.get(0));
-            }
-        }
-
-        return incomingSupernova;
     }
 
     static public WorldVector nextHeadingAfterSupernova(GameObject bot, GameObject incomingSupernova) {

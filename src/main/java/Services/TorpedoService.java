@@ -49,16 +49,8 @@ public class TorpedoService {
     static public List<GameObject> getIncomingTorpedo(GameState gameState, GameObject bot) {
         // Mendapat list torpedo yang incoming to bot
         
-        List<GameObject> incomingTorpedo = new ArrayList<GameObject>();
-        List<GameObject> torpedoesList = RadarService.getOtherObjects(gameState, bot, ObjectTypes.TORPEDOSALVO);
+        return RadarService.getOtherObjects(ObjectTypes.TORPEDOSALVO).stream().filter(torpedo -> isIncoming(bot, torpedo)).toList();
 
-        torpedoesList.forEach((torpedo) -> {
-            if (isIncoming(bot, torpedo)) {
-                incomingTorpedo.add(torpedo);
-            }
-        });
-
-        return incomingTorpedo;
     }
 
     static public boolean fireTorpedoWhenDanger(GameObject bot, GameObject nearestTorpedo) {

@@ -9,78 +9,78 @@ import java.util.stream.*;
 public class RadarService {
 
     static public int worldRadiusOffset = 50; // batas jarak kita ke pinggir world
+    static public List<GameObject> allObjects = new ArrayList<GameObject>();
+    static public HashMap<ObjectTypes, List<GameObject>> objects = new HashMap<ObjectTypes, List<GameObject>>();
+    static public List<GameObject> players = new ArrayList<GameObject>();
 
-    static public List<GameObject> getOtherObjects(GameState gameState, GameObject bot, ObjectTypes objectType)
+    static public void updateAttributes(GameState gameState, GameObject bot)
     {
-        // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot
-        var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == objectType && !FieldService.isOutsideMap(gameState, item, worldRadiusOffset - 2 * item.size))
-                .sorted(Comparator
-                        .comparing(item -> getRealDistance(bot, item)))
-                .collect(Collectors.toList());
+        allObjects.clear();
+        objects.clear();
+        players.clear();
 
-        return objectList;
-    }
+        allObjects = gameState.getGameObjects()
+            .stream()
+            .sorted(Comparator
+                    .comparing(item -> getRealDistance(bot, item)))
+            .collect(Collectors.toList());
 
-    static public List<GameObject> getOtherObjects(GameState gameState, GameObject bot, ObjectTypes objectType, int radarRadius)
-    {
-        // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
-        
-        var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == objectType && !FieldService.isOutsideMap(gameState, item, worldRadiusOffset - 2 * item.size) && RadarService.getRealDistance(bot, item) < radarRadius)
-                .sorted(Comparator
-                        .comparing(item -> RadarService.getRealDistance(bot, item)))
-                .collect(Collectors.toList());
-
-        return objectList;
-    }
-
-    static public List<GameObject> getOtherObjects(GameState gameState, ObjectTypes objectType)
-    {
-        // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot 
-        var objectList = gameState.getGameObjects()
-                .stream().filter(item -> item.getGameObjectType() == objectType && !FieldService.isOutsideMap(gameState, item, worldRadiusOffset - 2 * item.size))
-                .collect(Collectors.toList());
-
-        return objectList;
-    }
-
-    static public List<GameObject> getOtherObjects(GameState gameState, Position position) {
-        // mengembalikan objek-objek lain dan diurutkan berdasarkan jarak terhadap position 
-        var objectList = gameState.getGameObjects()
-                .stream()
-                .filter(item -> !FieldService.isOutsideMap(gameState, item, worldRadiusOffset - 2 * item.size))
-                .sorted(Comparator
-                        .comparing(item -> getRealDistance(item.size, 0, (getDistanceBetween(item, position)))))
-                .collect(Collectors.toList());
-
-        return objectList;
-    }
-
-    static public List<GameObject> getNearestOtherObjects(GameState gameState, GameObject bot, ObjectTypes type)
-    {
-        List<GameObject> objects = getOtherObjects(gameState, bot, type);
-        List<GameObject> res = new ArrayList<GameObject>();
-
-        if (objects.isEmpty()) return res;
-
-        res.add(objects.get(0));
-
-        int i = 1;
-        double distance = RadarService.getRealDistance(bot, objects.get(0));
-
-        while (i < objects.size() && RadarService.getRealDistance(bot, objects.get(i)) == distance)
+        for (GameObject obj : allObjects)
         {
-            res.add(objects.get(i));
+            if (FieldService.isOutsideMap(gameState, obj, worldRadiusOffset - 2 * obj.size))
+            {
+                continue;
+            }
+
+            objects.get(obj.getGameObjectType()).add(obj);
+            
         }
 
-        return res.stream()
-            .sorted(Comparator
-                    .comparing(item -> item.id))
-            .collect(Collectors.toList());
+        players = gameState.getPlayerGameObjects()
+        .stream()
+        .filter(item -> item.getId() != bot.getId())
+        .sorted(Comparator
+                .comparing(item -> getRealDistance(bot, item)))
+        .collect(Collectors.toList());
     }
 
-    static public double getRealDistance(int radius1, int radius2, double distance)
+    static public List<GameObject> getOtherObjects(ObjectTypes objectType)
+    {
+        // mengembalikan objek-objek lain bertipe tertentu dan diurutkan berdasarkan jarak terhadap bot
+
+        return objects.get(objectType);
+    }
+
+    static public List<GameObject> getOtherObjects(ObjectTypes objectType, GameObject bot, int radarRadius)
+    {
+        // mengembalikan objek-objek lain bertipe tertentu yang berada di dalam rentang radar dan diurutkan berdasarkan jarak terhadap bot 
+        
+        return objects.get(objectType)
+                .stream().filter(item -> RadarService.getRealDistance(bot, item) < radarRadius)
+                .collect(Collectors.toList());
+    }
+
+    static public List<GameObject> getOtherObjects(Position position) {
+        // mengembalikan objek-objek lain dan diurutkan berdasarkan jarak terhadap position 
+        return allObjects
+                .stream()
+                .sorted(Comparator
+                        .comparing(item -> getRealDistance(item.size, 0, getDistanceBetween(item, position))))
+                .collect(Collectors.toList());
+    }
+
+    static public List<GameObject> getNearestOtherObjects(GameObject bot, ObjectTypes type)
+    {
+
+
+        if (objects.get(type).isEmpty()) return new ArrayList<GameObject>();
+
+        Double distance = RadarService.getRealDistance(bot, objects.get(type).get(0));
+        
+        return objects.get(type).stream().filter(item -> RadarService.getRealDistance(bot, item).equals(distance)).toList();
+    }
+
+    static public Double getRealDistance(int radius1, int radius2, double distance)
     {
         // can return negative distance if collapsing
         // smaller means the center is closer when collapsing
@@ -88,7 +88,7 @@ public class RadarService {
 
     }
 
-    static public double getRealDistance(GameObject object1, GameObject object2)
+    static public Double getRealDistance(GameObject object1, GameObject object2)
     {
         // can return negative distance if collapsing
         // smaller means the center is closer when collapsing
@@ -96,21 +96,21 @@ public class RadarService {
 
     }
 
-    static public double getDistanceBetween(GameObject object1, GameObject object2) {
+    static public Double getDistanceBetween(GameObject object1, GameObject object2) {
         // mengembalikan jarak dua objek
         var triangleX = Math.abs(object1.getPosition().x - object2.getPosition().x);
         var triangleY = Math.abs(object1.getPosition().y - object2.getPosition().y);
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
     }
 
-    static public double getDistanceBetween(GameObject object, Position p) {
+    static public Double getDistanceBetween(GameObject object, Position p) {
         // mengembalikan jarak dua objek
         var triangleX = Math.abs(object.getPosition().x - p.x);
         var triangleY = Math.abs(object.getPosition().y - p.y);
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
     }
 
-    static public double getDistanceBetween(Position p1, Position p2) {
+    static public Double getDistanceBetween(Position p1, Position p2) {
         // mengembalikan jarak dua objek
         var triangleX = Math.abs(p1.x - p2.x);
         var triangleY = Math.abs(p1.y - p2.y);
@@ -187,7 +187,7 @@ public class RadarService {
     static public List<GameObject> getCollapsingObjects(GameState gameState, Position position, Integer size)
     {
         // mengembalikan objek-objek bertipe tertentu yang sedang collapse dengan bot 
-        List<GameObject> objectList = getOtherObjects(gameState, position);
+        List<GameObject> objectList = getOtherObjects(position);
         List<GameObject> collapsingObjects = new ArrayList<GameObject>();
 
         objectList.forEach((obj) -> {
@@ -200,17 +200,12 @@ public class RadarService {
     static public List<GameObject> getCollapsingObjects(GameState gameState, GameObject bot, ObjectTypes type)
     {
         // mengembalikan objek-objek bertipe tertentu yang sedang collapse dengan bot 
-        List<GameObject> objectList = getOtherObjects(gameState, bot, type);
-        List<GameObject> collapsingObjects = new ArrayList<GameObject>();
-
-        objectList.forEach((obj) -> {
-            if (isCollapsing(obj, bot)) collapsingObjects.add(obj);
-        });
-
-        return collapsingObjects;
+        
+        return getOtherObjects(type).stream().filter(obj -> isCollapsing(obj, bot)).toList();
+   
     }
 
-    static public double getDistanceFromZero(GameObject object, GameState gameState) {
+    static public Double getDistanceFromZero(GameObject object, GameState gameState) {
         // Mengembalikan Jarak Objek dari Center
         Position center = gameState.getWorld().getCenterPoint();
         var triangleX = Math.abs(object.getPosition().getX() - center.getX());
@@ -218,7 +213,7 @@ public class RadarService {
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
     }
 
-    static public double getDistanceFromZero(Position p, GameState gameState) {
+    static public Double getDistanceFromZero(Position p, GameState gameState) {
         // Mengembalikan Jarak Objek dari Center
         Position center = gameState.getWorld().getCenterPoint();
         var triangleX = Math.abs(p.getX() - center.getX());
@@ -234,7 +229,7 @@ public class RadarService {
         return getDistanceFromZero(object, gameState) < gameState.getWorld().getRadius() - bot.getSize() - offset;
     }
 
-    static public double vectorToDegree(WorldVector v)
+    static public Double vectorToDegree(WorldVector v)
     {
         var direction = Math.atan2(v.y, v.x) * 180 / Math.PI;
         return (direction + 360) % 360;
@@ -242,32 +237,33 @@ public class RadarService {
 
     static public WorldVector degreeToVector(int heading)
     {
-        double rad = toRadians(heading);
+        Double rad = toRadians((double) heading);
         return new WorldVector(Math.cos(rad), Math.sin(rad));
     }
 
-    static public int roundToEven(double v) {
+    static public int roundToEven(Double v) {
 
         // standar pembulatan engine
         // contoh : 24.5 dibulatin ke 24, 25.5 dibulatin ke 26, sedangkan yang bukan desimal 0.5 akan dibulatin seperti biasa
         long res = Math.round(v);
 
-        double des = res - v;
+        Double des = res - v;
 
-        if (Math.abs(des - 0.5) < Math.ulp(1.0) && res % 2 == 1)
+        if (des.equals(0.5) && res % 2 == 1)
         {
             res--;
         }
 
         return (int) res;
     }
-    static public int toDegrees(double v) {
+    static public int toDegrees(Double v) {
         // radiant to degree
         return (int) (v * (180 / Math.PI));
     }
 
-    static public double toRadians(double v) {
+    static public Double toRadians(Double v) {
         // radiant to degree
         return (v * (Math.PI / 180));
     }
+
 }

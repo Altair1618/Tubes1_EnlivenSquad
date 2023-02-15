@@ -6,24 +6,24 @@ import java.util.*;
 
 public class FieldService {
 
-    static public List<GameObject> getCollapsingClouds(GameState gameState, GameObject bot, int radarRadius)
+    static public List<GameObject> getCollapsingClouds(GameObject bot, int radarRadius)
     {
         // mengembalikan semua cloud yang collapse dengan player
-        return RadarService.getOtherObjects(gameState, bot, ObjectTypes.GASCLOUD, radarRadius);
+        return RadarService.getOtherObjects(ObjectTypes.GASCLOUD, bot, radarRadius);
     }
 
-    static public List<GameObject> getCollapsingAsteroids(GameState gameState, GameObject bot, int radarRadius)
+    static public List<GameObject> getCollapsingAsteroids(GameObject bot, int radarRadius)
     {
         // mengembalikan semua asteroid field yang collapse dengan player
 
-        return RadarService.getOtherObjects(gameState, bot, ObjectTypes.ASTEROIDFIELD, radarRadius);
+        return RadarService.getOtherObjects(ObjectTypes.ASTEROIDFIELD, bot, radarRadius);
     }
 
 
-    static public List<GameObject> getWormHoles(GameState gameState, GameObject bot)
+    static public List<GameObject> getWormHoles(GameObject bot, int radarRadius)
     {
         // mengembalikan semua wormhole di map
-        return RadarService.getOtherObjects(gameState, bot, ObjectTypes.WORMHOLE);
+        return RadarService.getOtherObjects(ObjectTypes.WORMHOLE, bot, radarRadius);
     }
 
     static public List<GameObject> getCollapsingObjectsAfterWormHole(GameState gameState, GameObject bot, List<GameObject> otherWormHoles, int sizeOffset)
@@ -38,16 +38,15 @@ public class FieldService {
         return res;
     }
 
-    static public List<Integer> getHeadingEscape(GameObject bot, List<GameObject> collapsingObject)
+    static public WorldVector getHeadingEscape(GameObject bot, List<GameObject> collapsingObject)
     {
         // mengembalikan arah terbaik player untuk keluar dari cloud (PENDEKATAN PENJUMLAHAN VECTOR DENGAN BOBOT 1 / (jarak yang dibutuhkan untuk escape))
 
-        ArrayList<Integer> res = new ArrayList<Integer>();
         WorldVector total = new WorldVector();
         
         if (collapsingObject.size() == 0) {
             System.out.println("WARNING in FieldService.getHeadingEscape method: collapsingObjects passed has zero size!");
-            return res;
+            return total;
         }
 
         for (GameObject obj : collapsingObject) {
@@ -64,29 +63,19 @@ public class FieldService {
             total.add((new WorldVector(obj.position, bot.position)).toNormalize().mult(weight));
         }
 
-        if (total.isZero()) 
+        if (total.isZero() && collapsingObject.size() == 2) 
         {
-            if (collapsingObject.size() > 2) res = new ArrayList<Integer>(bot.getHeading());
+        
 
-            // if size == 2
-            else
-            {
-                WorldVector line = new WorldVector(collapsingObject.get(0).position, collapsingObject.get(1).position);
-                WorldVector direction = line.getAdjacent();
-        
-                res.add(RadarService.roundToEven(RadarService.vectorToDegree(direction)));
-                res.add(RadarService.roundToEven(RadarService.vectorToDegree(direction.mult(-1))));
-        
-            }
+            WorldVector line = new WorldVector(collapsingObject.get(0).position, collapsingObject.get(1).position);
+            WorldVector direction = line.getAdjacent();
+            
+            if (direction.dot(RadarService.degreeToVector(bot.getHeading())) > 0) total = direction;
+            else total = direction.mult(-1);
+            
         }
 
-        else res.add(RadarService.roundToEven(RadarService.vectorToDegree(total)));
-
-        if (res.size() == 0)
-        {
-            System.out.println("BUG in FieldService.getHeadingEscape method: ArrayList<Integer> res size is zero!");
-        }
-        return res;
+        return total;
         
     }
 

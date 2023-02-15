@@ -29,7 +29,7 @@ public class TeleportService {
 
     static public GameObject getFiredTeleport(GameState gameState, GameObject bot)
     {
-        List<GameObject> temp = RadarService.getOtherObjects(gameState, ObjectTypes.TELEPORTER);
+        List<GameObject> temp = RadarService.getOtherObjects(ObjectTypes.TELEPORTER);
         
         for (GameObject teleporter : temp) {
             if (teleporter.id == firedTeleportId)
