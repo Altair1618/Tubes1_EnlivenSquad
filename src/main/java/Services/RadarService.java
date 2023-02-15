@@ -205,17 +205,21 @@ public class RadarService {
         return (object.size + size + offset > distance);
     }
 
+    static public List<GameObject> getCollapsingPlayers(GameState gameState, Position position, Integer size)
+    {
+        // mengembalikan objek-objek bertipe tertentu yang sedang collapse dengan bot pada posisi dan size tertentu
+
+        return players
+                .stream()
+                .filter(item -> isCollapsing(item, position, size)).collect(Collectors.toList());
+
+    }
     static public List<GameObject> getCollapsingObjects(GameState gameState, Position position, Integer size)
     {
-        // mengembalikan objek-objek bertipe tertentu yang sedang collapse dengan bot 
-        List<GameObject> objectList = getOtherObjects(position);
-        List<GameObject> collapsingObjects = new ArrayList<GameObject>();
+        // mengembalikan objek-objek bertipe tertentu yang sedang collapse dengan bot pada posisi dan size tertentu
 
-        objectList.forEach((obj) -> {
-            if (isCollapsing(obj, position, size)) collapsingObjects.add(obj);
-        });
+        return getOtherObjects(position).stream().filter(item -> isCollapsing(item, position, size)).collect(Collectors.toList());
 
-        return collapsingObjects;
     }
 
     static public List<GameObject> getCollapsingObjects(GameState gameState, GameObject bot, ObjectTypes type)
