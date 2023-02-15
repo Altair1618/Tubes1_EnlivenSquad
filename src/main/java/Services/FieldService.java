@@ -38,7 +38,7 @@ public class FieldService {
         return res;
     }
 
-    static public WorldVector getHeadingEscape(GameObject bot, List<GameObject> collapsingObject)
+    static public WorldVector getHeadingEscape(GameState gameState, GameObject bot, List<GameObject> collapsingObject)
     {
         // mengembalikan arah terbaik player untuk keluar dari cloud (PENDEKATAN PENJUMLAHAN VECTOR DENGAN BOBOT 1 / (jarak yang dibutuhkan untuk escape))
 
@@ -70,7 +70,7 @@ public class FieldService {
             WorldVector line = new WorldVector(collapsingObject.get(0).position, collapsingObject.get(1).position);
             WorldVector direction = line.getAdjacent();
             
-            if (direction.dot(RadarService.degreeToVector(bot.getHeading())) > 0) total = direction;
+            if (direction.dot(new WorldVector(bot.getPosition(), gameState.world.centerPoint)) > 0) total = direction;
             else total = direction.mult(-1);
             
         }
