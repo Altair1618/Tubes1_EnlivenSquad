@@ -19,6 +19,8 @@ public class RadarService {
         objects.clear();
         players.clear();
 
+        objects = new HashMap<ObjectTypes, List<GameObject>>();
+
         allObjects = gameState.getGameObjects()
             .stream()
             .sorted(Comparator
