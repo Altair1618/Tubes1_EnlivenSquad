@@ -16,7 +16,7 @@ public class BotService {
     static private int superNovaSize = 100; // asumsi besar ledakan supernova
     static private int playerRadarRadius = 400; // radius jarak deteksi player
     static private Double headingOffset = 1.; // offset sudut untuk mengamsumsikan arah saat ini sudah sesuai tujuan
-    static private int fieldRadarRadius = 25; // radius jarak deteksi cloud dan asteroid
+    static private int fieldRadarRadius = 50; // radius jarak deteksi cloud dan asteroid
     static private int sizeDifferenceOffset = 10; // Minimal selisih size player yang dikejar
     static private int playerDangerRange = 20; // Range player gede dianggap berbahaya
     static private int huntingRange = 100;
@@ -25,7 +25,7 @@ public class BotService {
     static private Double[] weights = {
         0.45, // menghindar dari bot besar
         0.08, // ada torpedo mengarah ke kita dan berada di danger zone kita
-        0.1, // mengejar bot keci
+        0.1, // mengejar bot kecil
         0.17, // masuk kembali ke map
         0.05, // menghindar dari supernova bomb yang ke arah kita
         0.1, // menghindar keluar cloud
@@ -112,9 +112,14 @@ public class BotService {
 
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
 
-        if (!playersList.isEmpty() && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius && TorpedoService.isTorpedoAvailable(bot, 40)) {
+        if (!playersList.isEmpty()
+            && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius 
+            && TorpedoService.isTorpedoAvailable(bot, 40) 
+            && ProjectileService.isPriorHit(bot, playersList.get(0))
+            ) {
+            /* menembak */
+
             playerAction.action = PlayerActions.FIRETORPEDOES;
-            
             playerAction.heading = RadarService.getHeadingBetween(bot, playersList.get(0));
 
             this.playerAction = playerAction;
@@ -154,13 +159,19 @@ public class BotService {
                     return;
                 } else {
                     /* 
+                    SHIELD USE
                     2 torpedo = 20, shield = 20
                     jika ada >= 2 torpedo datang && jaraknya sudah lumayan dekat
                     saat di state ini prioritas lebih rendah dari defend with shooting
                     */
-                    if (incomingTorpedo.size() >= 2 && ShieldService.isShieldAvailable(bot, 40) && 
-                        RadarService.isCollapsing(incomingTorpedo.get(0), bot, 60)) {
+
+                    if (
+                        incomingTorpedo.size() >= 2 
+                        && ShieldService.isShieldAvailable(bot, 40) 
+                        && RadarService.isCollapsing(bot, incomingTorpedo.get(0), 60)) {
                         playerAction.action = PlayerActions.ACTIVATESHIELD;
+
+                        System.out.println("SHIELD SHIELD " + incomingTorpedo.size());
 
                         this.playerAction = playerAction;
                         return;
@@ -199,7 +210,7 @@ public class BotService {
         if (FieldService.isOutsideMap(gameState, bot, 50))
         {
             temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
-            t = new EscapeInfo(temp, weights[4]);
+            t = new EscapeInfo(temp, weights[3]);
 
             directionVectors.add(t);
             System.out.println("6");
@@ -286,16 +297,16 @@ public class BotService {
         // KASUS SELANJUTNYA ADALAH KASUS TIDAK ADA YANG PERLU DIKEJAR ATAU DIHINDARI
 
         // CARI SUPER FOOD
-        List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
-        if (!superFoods.isEmpty())
-        {
-            playerAction.action = PlayerActions.FORWARD;
-            playerAction.heading = RadarService.getHeadingBetween(bot, superFoods.get(0));
-            this.playerAction = playerAction;
-            System.out.println("12");
+        // List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
+        // if (!superFoods.isEmpty())
+        // {
+        //     playerAction.action = PlayerActions.FORWARD;
+        //     playerAction.heading = RadarService.getHeadingBetween(bot, superFoods.get(0));
+        //     this.playerAction = playerAction;
+        //     System.out.println("12");
 
-            return;
-        }
+        //     return;
+        // }
 
    
         if (SupernovaService.isSupernovaPickupExist(gameState) && SupernovaService.isBotNearestfromPickup(gameState, bot))

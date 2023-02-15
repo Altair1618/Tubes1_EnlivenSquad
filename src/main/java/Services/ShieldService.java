@@ -4,7 +4,7 @@ import Models.*;
 
 public class ShieldService {
 
-    static public int shieldSizeLimit = 30;
+    static public int shieldSizeLimit = 40;
     static public Boolean isShieldAvailable(GameObject bot) {
         // True if player can use shield
         // default bot.size >= 40

@@ -8,13 +8,13 @@ import java.util.stream.*;
 public class TorpedoService extends ProjectileService {
 
     static public Double dangerZonePercentage = 0.8;
-    static public Double dangerZoneRadiusFactor = 10.0;
+    static public Double dangerZoneRadiusFactor = 5.0;
 
     static public int torpedoSizeLimit = 50;
 
     static public boolean isTorpedoAvailable(GameObject bot) {
         // True if player can fire torpedo
-        // default bot.size >= 30
+        // default bot.size >= 50
         return bot.torpedoSalvoCount > 0 && bot.size >= torpedoSizeLimit;
     }
 
@@ -30,7 +30,6 @@ public class TorpedoService extends ProjectileService {
         // and bot.torpedoSalvoCount >= salvoCountLimit
         return bot.torpedoSalvoCount >= salvoCountLimit && bot.size >= sizeLimit;
     }
-
 
     static public List<GameObject> getIncomingTorpedo(GameState gameState, GameObject bot) {
         // Mendapat list torpedo yang incoming to bot
