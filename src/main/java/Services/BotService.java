@@ -18,7 +18,7 @@ public class BotService {
     static private Double headingOffset = 1.; // offset sudut untuk mengamsumsikan arah saat ini sudah sesuai tujuan
     static private int fieldRadarRadius = 25; // radius jarak deteksi cloud dan asteroid
     static private int playerDangerRange = 20; // Range player gede dianggap berbahaya
-    static private int huntingRange = 100;
+    static private int huntingRange = 200;
 
     // weight untuk setiap kasus kabur/ngejar
     static private Double[] weights = {
@@ -138,6 +138,53 @@ public class BotService {
             System.out.println("2");
         }
 
+        /* AFTERBURNER */
+
+        double distance = RadarService.getRealDistance(bot, preys.get(0));
+        double tick = distance / (bot.getSpeed() * 2);
+
+        /* Kalau belum nyala */
+        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange - 100);
+        if (!preys.isEmpty() && directionVectors.isEmpty() && !Effects.getEffectList(bot.effectsCode).get(0)) {
+            if (bot.getSize() - 2 * tick > preys.get(0).getSize() + PlayerService.sizeDifferenceOffset) {
+                playerAction.action = PlayerActions.STARTAFTERBURNER;
+                playerAction.heading = RadarService.getHeadingBetween(bot, preys.get(0));
+
+                this.playerAction = playerAction;
+
+                return;
+            }
+        }
+
+        /* Kalau ternyata ada prioritas yang lebih tinggi */
+        if ((!directionVectors.isEmpty() && Effects.getEffectList(bot.effectsCode).get(0)) ||
+            bot.getSize() - 2 * tick > preys.get(0).getSize() + PlayerService.sizeDifferenceOffset) {
+            
+            playerAction.action = PlayerActions.STOPAFTERBURNER;
+            this.playerAction = playerAction;
+
+            return;
+        }
+
+        /* Kalau sedang nyala */
+        if (!preys.isEmpty() && directionVectors.isEmpty() && Effects.getEffectList(bot.effectsCode).get(0)) {
+            if (bot.getHeading() == RadarService.getHeadingBetween(bot, preys.get(0))) {
+                playerAction.action = PlayerActions.FIRETORPEDOES;
+                playerAction.heading = bot.getHeading();
+
+                this.playerAction = playerAction;
+
+                return;
+            } else {
+                playerAction.action = PlayerActions.FORWARD;
+                playerAction.heading = RadarService.getHeadingBetween(bot, preys.get(0));
+
+                this.playerAction = playerAction;
+
+                return;
+            }
+        }
+
         List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
 
         temp = calculateResult(directionVectors);
@@ -194,7 +241,7 @@ public class BotService {
 
         // KASUS PINDAH 3
 
-        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange);
+        // List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange);
         if (!preys.isEmpty())
         {
             temp = PlayerService.getChasePlayerVector(preys, bot);// isi temp dengan nilai arah KEJAR musuh */
