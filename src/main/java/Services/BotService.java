@@ -21,7 +21,7 @@ public class BotService {
     static private Double[] weights = {
         0.45, // menghindar dari bot besar
         0.08, // ada torpedo mengarah ke kita dan berada di danger zone kita
-        0.1, // mengejar bot keci
+        0.1, // mengejar bot kecil
         0.17, // masuk kembali ke map
         0.05, // menghindar dari supernova bomb yang ke arah kita
         0.1, // menghindar keluar cloud
@@ -108,9 +108,15 @@ public class BotService {
 
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
 
-        if (!playersList.isEmpty() && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius && TorpedoService.isTorpedoAvailable(bot)) {
+        if (!playersList.isEmpty()
+            && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius 
+            && TorpedoService.isTorpedoAvailable(bot, 40) 
+            && ProjectileService.isPriorHit(bot, playersList.get(0))
+            && !ShieldService.isPlayerShielded(playersList.get(0))
+            ) {
+            /* menembak */
+
             playerAction.action = PlayerActions.FIRETORPEDOES;
-            
             playerAction.heading = RadarService.getHeadingBetween(bot, playersList.get(0));
 
             this.playerAction = playerAction;
@@ -131,28 +137,43 @@ public class BotService {
 
         List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
 
-        // if (!incomingTorpedo.isEmpty() && ShieldService.isShieldAvailable(bot, 30)) {
-        //     playerAction.action = PlayerActions.ACTIVATESHIELD;
-
-        //     this.playerAction = playerAction;
-        //     return;
-        // }
-
         temp = calculateResult(directionVectors);
         Double offsetAngle = Math.abs(temp.getAngleTo(RadarService.degreeToVector(bot.getHeading())));
         if ((temp.isZero() || offsetAngle < headingOffset) && !incomingTorpedo.isEmpty())
         /* jika ada torpedo yang mengarah ke kita */
         {
             /* jika torpedo (terdekat) di dalam danger zone kita */
-            if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0)) && TorpedoService.isTorpedoAvailable(bot, 25)) {
-                playerAction.action = PlayerActions.FIRETORPEDOES;
+            if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0))) {
+                if (TorpedoService.isTorpedoAvailable(bot, 25)) {
+                    /* defend with shooting */
+                    playerAction.action = PlayerActions.FIRETORPEDOES;
 
-                // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
-                playerAction.heading = RadarService.getHeadingBetween(bot, incomingTorpedo.get(0)); // ini belum predict
-                this.playerAction = playerAction;
+                    // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
+                    playerAction.heading = RadarService.getHeadingBetween(bot, incomingTorpedo.get(0));
+                    this.playerAction = playerAction;
 
-                System.out.println("3");
-                return;
+                    System.out.println("3");
+                    return;
+                } else {
+                    /* 
+                    SHIELD USE
+                    2 torpedo = 20, shield = 20
+                    jika ada >= 2 torpedo datang && jaraknya sudah lumayan dekat
+                    saat di state ini prioritas lebih rendah dari defend with shooting
+                    */
+
+                    if (
+                        incomingTorpedo.size() >= 2 
+                        && ShieldService.isShieldAvailable(bot, 40) 
+                        && RadarService.isCollapsing(bot, incomingTorpedo.get(0), 60)) {
+                        playerAction.action = PlayerActions.ACTIVATESHIELD;
+
+                        System.out.println("SHIELD SHIELD " + incomingTorpedo.size());
+
+                        this.playerAction = playerAction;
+                        return;
+                    }
+                }
             }
         }
 
@@ -186,7 +207,7 @@ public class BotService {
         if (FieldService.isOutsideMap(gameState, bot, 50))
         {
             temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
-            t = new EscapeInfo(temp, weights[4]);
+            t = new EscapeInfo(temp, weights[3]);
 
             directionVectors.add(t);
             System.out.println("6");
@@ -287,6 +308,19 @@ public class BotService {
             }
         }
 
+        // CARI SUPER FOOD
+        // List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
+        // if (!superFoods.isEmpty())
+        // {
+        //     playerAction.action = PlayerActions.FORWARD;
+        //     playerAction.heading = RadarService.getHeadingBetween(bot, superFoods.get(0));
+        //     this.playerAction = playerAction;
+        //     System.out.println("12");
+
+        //     return;
+        // }
+
+
         if (TeleportService.isFired)
         {
             GameObject teleporter = TeleportService.getFiredTeleport(gameState, bot);
@@ -339,7 +373,7 @@ public class BotService {
         {
             playerAction.action = PlayerActions.FIRESUPERNOVA;
 
-            // players sudah terurut dari terkecil
+            // players sudah terurut dari terdekat
             List<GameObject> players = PlayerService.getOtherPlayerList(gameState, bot);
 
             for (int i = 0; i < players.size(); i++) {
