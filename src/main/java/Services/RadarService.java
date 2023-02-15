@@ -12,11 +12,13 @@ public class RadarService {
     static public List<GameObject> allObjects = new ArrayList<GameObject>();
     static public HashMap<ObjectTypes, List<GameObject>> objects = new HashMap<ObjectTypes, List<GameObject>>();
     static public List<GameObject> players = new ArrayList<GameObject>();
+    static public List<GameObject> allFoods = new ArrayList<GameObject>();
 
     static public void updateAttributes(GameState gameState, GameObject bot)
     {
         allObjects.clear();
         players.clear();
+        allFoods.clear();
 
         for (int i = 1; i <= 11; i++)
         {
@@ -47,6 +49,11 @@ public class RadarService {
             }
 
             objects.get(obj.getGameObjectType()).add(obj);
+
+            if (obj.getGameObjectType() == ObjectTypes.FOOD || obj.getGameObjectType() == ObjectTypes.SUPERFOOD)
+            {
+                allFoods.add(obj);
+            }
             
         }
 

@@ -6,6 +6,9 @@ import java.util.*;
 import java.util.stream.*;
 
 public class PlayerService {
+
+    static public int sizeDifferenceOffset = 10; // Minimal selisih size player yang dikejar
+
     static public List<GameObject> getOtherPlayerList(GameState gameState, GameObject bot) {
         // Mengembalikan List Player Lainnya
 
