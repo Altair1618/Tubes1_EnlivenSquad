@@ -4,6 +4,8 @@ import Models.*;
 import java.util.*;
 
 public class ProjectileService {
+    static public int missilesSpeed = 60;  // torpedo or supernova
+    static public int missilesSize = 10; // torpedo or supernova
 
     static public boolean isIncoming(GameObject bot, GameObject projectile) {
         // Mengembalikan true jika torpedo mengarah ke bot
@@ -73,6 +75,17 @@ public class ProjectileService {
         });
         
         return res.toNormalize();
+    }
+
+    static public boolean isPriorHit(GameObject bot, GameObject enemy) {
+        /* 
+            true jika missiles yang ditembak
+            keburu untuk kena musuhnya
+         */
+        double tick_1 = RadarService.getRealDistance(bot, enemy) / missilesSpeed;
+        double tick_2 = (enemy.getSize() + missilesSize) / enemy.getSpeed();
+        
+        return (tick_1 < tick_2);
     }
 
     static protected double angleBetween(double angle1, double angle2) {
