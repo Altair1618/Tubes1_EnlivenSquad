@@ -77,7 +77,7 @@ public class RadarService {
 
         Double distance = RadarService.getRealDistance(bot, objects.get(type).get(0));
         
-        return objects.get(type).stream().filter(item -> RadarService.getRealDistance(bot, item).equals(distance)).toList();
+        return objects.get(type).stream().filter(item -> RadarService.getRealDistance(bot, item).equals(distance)).collect(Collectors.toList());
     }
 
     static public Double getRealDistance(int radius1, int radius2, double distance)
@@ -201,7 +201,7 @@ public class RadarService {
     {
         // mengembalikan objek-objek bertipe tertentu yang sedang collapse dengan bot 
         
-        return getOtherObjects(type).stream().filter(obj -> isCollapsing(obj, bot)).toList();
+        return getOtherObjects(type).stream().filter(obj -> isCollapsing(obj, bot)).collect(Collectors.toList());
    
     }
 

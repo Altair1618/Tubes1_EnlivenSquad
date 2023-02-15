@@ -106,7 +106,7 @@ public class SupernovaService {
     static public List<GameObject> getIncomingSupernova(GameState gameState, GameObject bot) {
         // Mendapat supernova yang incoming to bot
 
-        return RadarService.getOtherObjects(ObjectTypes.SUPERNOVABOMB).stream().filter(item -> isIncoming(bot, item)).toList();
+        return RadarService.getOtherObjects(ObjectTypes.SUPERNOVABOMB).stream().filter(item -> isIncoming(bot, item)).collect(Collectors.toList());
 
     }
 

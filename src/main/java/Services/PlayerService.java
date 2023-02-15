@@ -3,6 +3,7 @@ package Services;
 import Models.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 public class PlayerService {
     static public List<GameObject> getOtherPlayerList(GameState gameState, GameObject bot) {
@@ -50,14 +51,14 @@ public class PlayerService {
     static public List<GameObject> getBiggerPlayerInRange(GameState gameState, GameObject bot, int range) {
         // Mengembalikan List Player yang lebih besar dari bot
 
-        return RadarService.players.stream().filter(item -> !isBotBigger(bot, item) && RadarService.getRealDistance(bot, item) <= range).toList();
+        return RadarService.players.stream().filter(item -> !isBotBigger(bot, item) && RadarService.getRealDistance(bot, item) <= range).collect(Collectors.toList());
 
     }
 
     static public List<GameObject> getPreys(GameState gameState, GameObject bot, int offset) {
         // Mengembalikan List Player yang lebih besar dari bot
 
-        return RadarService.players.stream().filter(item -> isBotBigger(bot, item, offset)).toList();
+        return RadarService.players.stream().filter(item -> isBotBigger(bot, item, offset)).collect(Collectors.toList());
     }
 
     static public WorldVector getEscapePlayerVector(List<GameObject> others, GameObject bot) {

@@ -3,6 +3,7 @@ package Services;
 import Enums.*;
 import Models.*;
 import java.util.*;
+import java.util.stream.*;
 
 public class TorpedoService {
 
@@ -49,7 +50,7 @@ public class TorpedoService {
     static public List<GameObject> getIncomingTorpedo(GameState gameState, GameObject bot) {
         // Mendapat list torpedo yang incoming to bot
         
-        return RadarService.getOtherObjects(ObjectTypes.TORPEDOSALVO).stream().filter(torpedo -> isIncoming(bot, torpedo)).toList();
+        return RadarService.getOtherObjects(ObjectTypes.TORPEDOSALVO).stream().filter(torpedo -> isIncoming(bot, torpedo)).collect(Collectors.toList());
 
     }
 
