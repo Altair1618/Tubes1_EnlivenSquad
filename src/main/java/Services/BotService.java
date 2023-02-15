@@ -15,7 +15,7 @@ public class BotService {
     static private Double headingOffset = 1.; // offset sudut untuk mengamsumsikan arah saat ini sudah sesuai tujuan
     static private int fieldRadarRadius = 25; // radius jarak deteksi cloud dan asteroid
     static private int playerDangerRange = 20; // Range player gede dianggap berbahaya
-    static private int huntingRange = 100;
+    static private int huntingRange = 200;
 
     // weight untuk setiap kasus kabur/ngejar
     static private Double[] weights = {
@@ -194,7 +194,7 @@ public class BotService {
         List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange);
         if (!preys.isEmpty())
         {
-            temp = PlayerService.getChasePlayerVector(gameState, preys, bot);// isi temp dengan nilai arah KEJAR musuh */
+            temp = PlayerService.getChasePlayerVector(preys, bot);// isi temp dengan nilai arah KEJAR musuh */
             t = new EscapeInfo(temp, weights[2]);
             directionVectors.add(t);
 

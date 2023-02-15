@@ -85,7 +85,7 @@ public class TeleportService extends ProjectileService {
 
         for (GameObject player : players)
         {
-            if (player.size + PlayerService.sizeDifferenceOffset - 20 <= bot.size && currentTargetSize < player.size)
+            if (player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20 && currentTargetSize < player.size)
             {
                 target = player;
                 currentTargetSize = player.size;

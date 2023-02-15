@@ -109,12 +109,11 @@ public class PlayerService {
         
     }
 
-    static public WorldVector getChasePlayerVector(GameState gameState, List<GameObject> preys, GameObject bot) {
+    static public WorldVector getChasePlayerVector(List<GameObject> preys, GameObject bot) {
         // Mengembalikan Vektor mengejar player lebih kecil
 
-        return FieldService.getHeadingEscape(gameState, bot, preys);
-        // WorldVector res = new WorldVector();
+        if (preys.isEmpty()) return new WorldVector();
 
-        // int count = 0;
+        return new WorldVector(bot.position, preys.get(0).position);
     }
 }
