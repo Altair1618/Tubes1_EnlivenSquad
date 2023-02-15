@@ -106,13 +106,12 @@ public class BotService {
             isFired = false;
             System.out.println("1");
 
-
             return;
         }
 
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
 
-        if (!playersList.isEmpty() && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius && TorpedoService.isTorpedoAvailable(bot)) {
+        if (!playersList.isEmpty() && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius && TorpedoService.isTorpedoAvailable(bot, 40)) {
             playerAction.action = PlayerActions.FIRETORPEDOES;
             
             playerAction.heading = RadarService.getHeadingBetween(bot, playersList.get(0));
@@ -135,28 +134,37 @@ public class BotService {
 
         List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
 
-        // if (!incomingTorpedo.isEmpty() && ShieldService.isShieldAvailable(bot, 30)) {
-        //     playerAction.action = PlayerActions.ACTIVATESHIELD;
-
-        //     this.playerAction = playerAction;
-        //     return;
-        // }
-
         temp = calculateResult(directionVectors);
         Double offsetAngle = Math.abs(temp.getAngleTo(RadarService.degreeToVector(bot.getHeading())));
         if ((temp.isZero() || offsetAngle < headingOffset) && !incomingTorpedo.isEmpty())
         /* jika ada torpedo yang mengarah ke kita */
         {
             /* jika torpedo (terdekat) di dalam danger zone kita */
-            if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0)) && TorpedoService.isTorpedoAvailable(bot, 25)) {
-                playerAction.action = PlayerActions.FIRETORPEDOES;
+            if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0))) {
+                if (TorpedoService.isTorpedoAvailable(bot, 25)) {
+                    /* defend with shooting */
+                    playerAction.action = PlayerActions.FIRETORPEDOES;
 
-                // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
-                playerAction.heading = RadarService.getHeadingBetween(bot, incomingTorpedo.get(0)); // ini belum predict
-                this.playerAction = playerAction;
+                    // playerAction.heading = titik temu torpedo kita dengan torpedo musuh
+                    playerAction.heading = RadarService.getHeadingBetween(bot, incomingTorpedo.get(0));
+                    this.playerAction = playerAction;
 
-                System.out.println("3");
-                return;
+                    System.out.println("3");
+                    return;
+                } else {
+                    /* 
+                    2 torpedo = 20, shield = 20
+                    jika ada >= 2 torpedo datang && jaraknya sudah lumayan dekat
+                    saat di state ini prioritas lebih rendah dari defend with shooting
+                    */
+                    if (incomingTorpedo.size() >= 2 && ShieldService.isShieldAvailable(bot, 40) && 
+                        RadarService.isCollapsing(incomingTorpedo.get(0), bot, 60)) {
+                        playerAction.action = PlayerActions.ACTIVATESHIELD;
+
+                        this.playerAction = playerAction;
+                        return;
+                    }
+                }
             }
         }
 
@@ -317,7 +325,7 @@ public class BotService {
         {
             playerAction.action = PlayerActions.FIRESUPERNOVA;
 
-            // players sudah terurut dari terkecil
+            // players sudah terurut dari terdekat
             List<GameObject> players = PlayerService.getOtherPlayerList(gameState, bot);
 
             for (int i = 0; i < players.size(); i ++) {
