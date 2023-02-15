@@ -17,7 +17,6 @@ public class BotService {
     static private int playerRadarRadius = 400; // radius jarak deteksi player
     static private Double headingOffset = 1.; // offset sudut untuk mengamsumsikan arah saat ini sudah sesuai tujuan
     static private int fieldRadarRadius = 25; // radius jarak deteksi cloud dan asteroid
-    static private int sizeDifferenceOffset = 10; // Minimal selisih size player yang dikejar
     static private int playerDangerRange = 20; // Range player gede dianggap berbahaya
     static private int huntingRange = 100;
 
@@ -167,7 +166,7 @@ public class BotService {
         /* jika torpedo terdetect mengarah ke kita tetapi bukan dalam danger zone */
         {
             temp = new WorldVector();// temp = nilai arah kabur dari torpedo */
-            temp = TorpedoService.nextHeadingAfterProjectiles(bot, incomingTorpedo);
+            temp = TorpedoService.nextHeadingAfterProjectiles(gameState, bot, incomingTorpedo);
             t = new EscapeInfo(temp, weights[1]);
             directionVectors.add(t);
             System.out.println("4");
@@ -175,7 +174,7 @@ public class BotService {
 
         // KASUS PINDAH 3
 
-        List<GameObject> preys = PlayerService.getPreys(gameState, bot, sizeDifferenceOffset, huntingRange);
+        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange);
         if (!preys.isEmpty())
         {
             temp = PlayerService.getChasePlayerVector(preys, bot);// isi temp dengan nilai arah KEJAR musuh */
@@ -206,7 +205,7 @@ public class BotService {
         /*ada supernova bomb mengarah ke kita */
         {
             temp = new WorldVector(); // isi dengan nilai arah kabur dari supernova bomb */
-            temp = SupernovaService.nextHeadingAfterProjectile(bot, incomingSupernova.get(0));
+            temp = SupernovaService.nextHeadingAfterProjectile(gameState, bot, incomingSupernova.get(0));
             t = new EscapeInfo(temp, weights[5]);
 
             directionVectors.add(t);
@@ -247,7 +246,7 @@ public class BotService {
         // jika punya superfood
         if (effectList.get(3))
         {
-            var foods = FoodServices.getNearestFoods(gameState, bot);
+            var foods = FoodServices.getNearestFoods(bot);
 
             if (foods.size() > 0)
             {
@@ -326,7 +325,7 @@ public class BotService {
             return;
         }
 
-        var foods = FoodServices.getNearestFoods(gameState, bot);
+        var foods = FoodServices.getAllFoods(gameState, bot);
 
         // playerAction.heading = arah ke TARGET
 

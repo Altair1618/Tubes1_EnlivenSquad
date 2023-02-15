@@ -75,8 +75,7 @@ public class FieldService {
             
         }
 
-        return total;
-        
+        return total;        
     }
 
     static public Boolean isWormHoleAvailable(GameObject bot, GameObject wormHole)

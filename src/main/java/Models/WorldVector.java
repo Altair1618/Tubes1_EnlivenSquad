@@ -43,9 +43,9 @@ public class WorldVector {
         y += v.y;
     }
 
-    public WorldVector add(WorldVector v1, WorldVector v2)
+    public WorldVector getAdd( WorldVector v)
     {
-        return new WorldVector(v1.x + v2.x, v1.y + v2.y);
+        return new WorldVector(x + v.x, y + v.y);
     }
 
     public void normalize()

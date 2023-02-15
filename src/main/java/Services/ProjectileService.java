@@ -32,7 +32,7 @@ public class ProjectileService {
         return false;
     }
 
-    static public WorldVector nextHeadingAfterProjectile(GameObject bot, GameObject incomingProjectile) {
+    static public WorldVector nextHeadingAfterProjectile(GameState gameState, GameObject bot, GameObject incomingProjectile) {
         // Mendapat angle heading terbaik mempertimbangkan
         // supernova yang menuju ke bot dengan menggunakan vector
 
@@ -42,7 +42,8 @@ public class ProjectileService {
         WorldVector tmp = temp.getAdjacent();
 
         // random untuk arah tegak lurus dari projectile datangnya torpedo untuk kabur
-        if (tmp.dot(RadarService.degreeToVector(bot.getHeading())) > 0) {
+    
+        if (tmp.dot(new WorldVector(bot.getPosition(), gameState.world.centerPoint)) > 0) {
             temp = tmp;
         } else {
             temp = tmp.mult(-1);
@@ -51,7 +52,7 @@ public class ProjectileService {
         return temp;
     }
 
-    static public WorldVector nextHeadingAfterProjectiles(GameObject bot, List<GameObject> incomingProjectiles) {
+    static public WorldVector nextHeadingAfterProjectiles(GameState gameState, GameObject bot, List<GameObject> incomingProjectiles) {
         // Mendapat angle heading terbaik mempertimbangkan
         // torpedo yang menuju ke bot dengan menggunakan vector
         
@@ -59,7 +60,7 @@ public class ProjectileService {
 
         incomingProjectiles.forEach((projectile) -> {
            
-            WorldVector temp = nextHeadingAfterProjectile(bot, projectile);
+            WorldVector temp = nextHeadingAfterProjectile(gameState, bot, projectile);
 
             Double distance = Math.min(0, RadarService.getRealDistance(projectile, bot));
             Double weight = distance;
