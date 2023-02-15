@@ -55,10 +55,10 @@ public class PlayerService {
 
     }
 
-    static public List<GameObject> getPreys(GameState gameState, GameObject bot, int offset) {
+    static public List<GameObject> getPreys(GameState gameState, GameObject bot, int offset, int range) {
         // Mengembalikan List Player yang lebih besar dari bot
 
-        return RadarService.players.stream().filter(item -> isBotBigger(bot, item, offset)).collect(Collectors.toList());
+        return RadarService.players.stream().filter(item -> isBotBigger(bot, item, offset) && RadarService.getRealDistance(bot, item) <= range).collect(Collectors.toList());
     }
 
     static public WorldVector getEscapePlayerVector(List<GameObject> others, GameObject bot) {
@@ -66,6 +66,45 @@ public class PlayerService {
         // Others diisi dengan bigger players bukan other players
 
         return FieldService.getHeadingEscape(bot, others);
+    }
+
+    static public WorldVector getEscapePlayerVector(GameObject bot, List<GameObject> others)
+    {
+        // mengembalikan arah terbaik player untuk keluar dari cloud (PENDEKATAN PENJUMLAHAN VECTOR DENGAN BOBOT 1 / (jarak yang dibutuhkan untuk escape))
+
+        WorldVector total = new WorldVector();
+
+        if (others.size() == 0) {
+            System.out.println("WARNING in PlayerService.getEscapePlayerVector method: collapsingObjects passed has zero size!");
+            return total;
+        }
+
+        for (GameObject obj : others) {
+
+
+            Double distance = Math.min(0, RadarService.getRealDistance(obj, bot));
+            Double weight = distance;
+            
+            if (weight.equals(0.0)) weight = 10e-3;
+            else weight = (double) RadarService.roundToEven(weight);
+
+            if (weight > 0) weight = 1 / weight;
+            else weight = Math.abs(weight);
+            total.add((new WorldVector(obj.position, bot.position)).toNormalize().mult(weight));
+        }
+
+        if (total.isZero() && others.size() == 2) 
+        {
+            WorldVector line = new WorldVector(others.get(0).position, others.get(1).position);
+            WorldVector direction = line.getAdjacent();
+            
+            if (direction.dot(RadarService.degreeToVector(bot.getHeading())) > 0) total = direction;
+            else total = direction.mult(-1);
+            
+        }
+
+        return total;
+        
     }
 
     static public WorldVector getChasePlayerVector(List<GameObject> preys, GameObject bot) {

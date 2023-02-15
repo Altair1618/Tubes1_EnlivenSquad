@@ -16,10 +16,22 @@ public class RadarService {
     static public void updateAttributes(GameState gameState, GameObject bot)
     {
         allObjects.clear();
-        objects.clear();
         players.clear();
 
-        objects = new HashMap<ObjectTypes, List<GameObject>>();
+        for (int i = 1; i <= 11; i++)
+        {
+            if (!objects.containsKey(ObjectTypes.valueOf(i)))
+            {
+                objects.put(ObjectTypes.valueOf(i), new ArrayList<GameObject>());
+            }
+
+            else
+            {
+                objects.get(ObjectTypes.valueOf(i)).clear();
+            }
+        }
+
+        
 
         allObjects = gameState.getGameObjects()
             .stream()
