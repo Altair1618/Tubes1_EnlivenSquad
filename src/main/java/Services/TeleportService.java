@@ -4,15 +4,18 @@ import Models.*;
 import java.util.*;
 
 import Enums.ObjectTypes;
+import java.util.stream.*;
 
 public class TeleportService extends ProjectileService {
     
     static public UUID firedTeleportId = null;
     static public int heading = 0;
     static public boolean isFired = false;
-    static public int teleportSizeLimit = 25;
+    static public int teleportSizeLimit = 30;
     static public int profitLimit = 0;
     static public boolean hasFound = false;
+
+    static public int teleporterSpeed = 20;
 
     static public void shoot(int angle)
     {
@@ -28,6 +31,7 @@ public class TeleportService extends ProjectileService {
         isFired = false;
         heading = 0;
         hasFound = false;
+        firedTeleportId = null;
     }
 
     static public Boolean isTeleportAvailable(GameObject bot)
@@ -46,7 +50,7 @@ public class TeleportService extends ProjectileService {
         List<GameObject> temp = RadarService.getOtherObjects(ObjectTypes.TELEPORTER);
         
         for (GameObject teleporter : temp) {
-            if (teleporter.getHeading() == heading)
+            if ((!hasFound && teleporter.getHeading() == heading) || (hasFound && firedTeleportId.equals(teleporter.id)))
             {
                 if (FieldService.isOutsideMap(gameState, teleporter.position, bot.size))
                 {
@@ -57,7 +61,11 @@ public class TeleportService extends ProjectileService {
 
                 else
                 {
-                    hasFound = true;
+                    if (!hasFound)
+                    {
+                        hasFound = true;
+                        firedTeleportId = teleporter.id;
+                    }
                     return teleporter;
                 }
             }  
@@ -65,6 +73,21 @@ public class TeleportService extends ProjectileService {
 
         if (hasFound) teleport();
         return null;
+    }
+
+
+    static public List<GameObject> getIncomingTeleporter(GameObject bot, int biggestEnemySize)
+    {
+        return RadarService.getOtherObjects(ObjectTypes.TELEPORTER)
+            .stream()
+            .filter(teleporter -> RadarService.isCollapsing(bot, teleporter.position, biggestEnemySize + PlayerService.playerDangerRange))
+            .collect(Collectors.toList());
+    }
+
+    static public boolean isTeleportDangerous(GameObject bot)
+    {
+    
+        return false;
     }
 
     static public List<GameObject> getCollapsingObjectsAfterTeleport(GameState gameState, GameObject bot, GameObject teleporter, int sizeOffset)
@@ -86,18 +109,21 @@ public class TeleportService extends ProjectileService {
     {
         List<GameObject> players = RadarService.players;
         GameObject target = null;
-        int currentTargetSize = 0;
+        int currentTargetDistance = 0;
 
         for (GameObject player : players)
         {
-            if (player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20 && currentTargetSize < player.size)
+            int tempDistance = RadarService.roundToEven(RadarService.getRealDistance(bot, player));
+            if (player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20
+                    && (target == null || currentTargetDistance > tempDistance)
+            )
             {
                 target = player;
-                currentTargetSize = player.size;
+                currentTargetDistance = tempDistance;
             }
         }
 
-        if (currentTargetSize != 0)
+        if (target != null)
         {
             return new WorldVector(bot.position, target.position);
         }
@@ -120,16 +146,15 @@ public class TeleportService extends ProjectileService {
         int maxPreySize = 0;
         int totalTorpedoDamage = 0;
         boolean cloudFlag = false;
-        boolean asteroidField = false;
 
         for (GameObject player: collapsingPlayers)
         {
             System.out.println("Player near teleporter!");
-            if (RadarService.isCollapsing(player, teleporter.position, bot.size + 20))
+            if (RadarService.isCollapsing(player, teleporter.position, bot.size))
             {
-                if (bot.size > player.size + PlayerService.sizeDifferenceOffset)
-                {
 
+                if (bot.size > player.size)
+                {
                     totalPreySize += player.size;
 
                     if (maxPreySize < player.size) maxPreySize = player.size;
@@ -138,7 +163,7 @@ public class TeleportService extends ProjectileService {
                 else return false; 
             }
 
-            else if (bot.size <= player.size + PlayerService.sizeDifferenceOffset)
+            else if (bot.size <= player.size)
             {
                 return false;
             }
@@ -149,14 +174,9 @@ public class TeleportService extends ProjectileService {
 
             ObjectTypes type = obj.gameObjectType;
 
-           if (type == ObjectTypes.GASCLOUD)
+           if (type == ObjectTypes.GASCLOUD && !cloudFlag)
            {
                cloudFlag = true;
-           }
-
-           else if (type == ObjectTypes.ASTEROIDFIELD)
-           {
-               asteroidField = true;
            }
 
             else if (type == ObjectTypes.TORPEDOSALVO)
@@ -179,17 +199,12 @@ public class TeleportService extends ProjectileService {
         }
 
        
-        if (totalPreySize <= totalTorpedoDamage + (isAttacking? profitLimit : 0))
+        if (totalPreySize <= totalTorpedoDamage)
         {
-            if (totalPreySize > totalTorpedoDamage) return !cloudFlag && (isAttacking? maxPreySize > 0 : !asteroidField);
-
-
-            else return false;
+            return false;
         }
 
-        if (isAttacking && maxPreySize == 0) return false;
-
-        return true;
+        return(isAttacking? maxPreySize > 0 : !cloudFlag);
 
     }
 

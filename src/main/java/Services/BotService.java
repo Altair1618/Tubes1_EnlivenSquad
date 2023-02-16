@@ -13,8 +13,7 @@ public class BotService {
     static private int tickTimer = 0; // timer tick, > 0 jika timer hidup
     static private int playerRadarRadius = 400; // radius jarak deteksi player
     static private Double headingOffset = 1.; // offset sudut untuk mengamsumsikan arah saat ini sudah sesuai tujuan
-    static private int fieldRadarRadius = 25; // radius jarak deteksi cloud dan asteroid
-    static private int playerDangerRange = 20; // Range player gede dianggap berbahaya
+    static private int fieldRadarRadius = 60; // radius jarak deteksi cloud dan asteroid
     static private int huntingRange = 200;
     static public boolean isAfterburner = false;
 
@@ -89,6 +88,7 @@ public class BotService {
 
         List<GameObject> superNovaBombs = SupernovaService.getSupernovaBombs(gameState);
 
+
         if (!superNovaBombs.isEmpty() 
             && (SupernovaService.isSuperNovaOutsideMap(gameState, superNovaBombs.get(0),gameState.world.radius / 4 + superNovaBombs.get(0).size) 
                 || SupernovaService.isSupernovaNearPlayer(gameState, bot)) 
@@ -113,8 +113,8 @@ public class BotService {
 
             if (teleporter != null)
             {
-                List<GameObject> collapsingObjects = TeleportService.getCollapsingObjectsAfterTeleport(gameState, bot, teleporter, 100);
-                List<GameObject> collapsingPlayers = TeleportService.getCollapsingPlayersAfterTeleport(gameState, bot, teleporter, 100);
+                List<GameObject> collapsingObjects = TeleportService.getCollapsingObjectsAfterTeleport(gameState, bot, teleporter, 200);
+                List<GameObject> collapsingPlayers = TeleportService.getCollapsingPlayersAfterTeleport(gameState, bot, teleporter, 200);
                 boolean isSafe = TeleportService.isTeleportSafe(bot, teleporter, collapsingObjects, collapsingPlayers, true);
 
                 System.out.println(isSafe);
@@ -130,27 +130,29 @@ public class BotService {
             }
         }
 
+        if (!TeleportService.isFired && TeleportService.isTeleportAvailable(bot))
+        {
+            temp = TeleportService.getAttackDirection(bot);
+
+            if (!temp.isZero())
+            {
+                playerAction.action = PlayerActions.FIRETELEPORT;
+                playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(temp));
+                this.playerAction = playerAction;
+
+                TeleportService.shoot(playerAction.heading);
+                return;
+            }
+        }
+
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
-        List<GameObject> shieldList = RadarService.getOtherObjects(ObjectTypes.SHIELD);
-
-        if (!shieldList.isEmpty()) {
-            System.out.println("============SHIELD=============");
-            for (int i = 0; i < playersList.size(); i++) {
-                System.out.println(shieldList.get(i).getPosition().getX() + " " + shieldList.get(i).getPosition().getY());
-            }
-        }
-
-        if (!playersList.isEmpty()) {
-            System.out.println("============PLAYER=============");
-            for (int i = 0; i < playersList.size(); i ++) {
-                System.out.println(playersList.get(i).getPosition().getX() + " " + playersList.get(i).getPosition().getY());
-            }
-        }
+        int maxEnemySize = PlayerService.getBiggestEnemySize();
+        List<GameObject> incomingTeleports = TeleportService.getIncomingTeleporter(bot, maxEnemySize);
 
         if (!playersList.isEmpty()
             && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius 
-            && TorpedoService.isTorpedoAvailable(bot, 40) 
-            && ProjectileService.isPriorHit(bot, playersList.get(0))
+            && TorpedoService.isTorpedoAvailable(bot, 40)
+            && ProjectileService.isPriorHit(bot, playersList.get(0), TorpedoService.missilesSpeed, TorpedoService.missilesSize)
             && !ShieldService.isPlayerShielded(playersList.get(0))
             ) {
             /* menembak */
@@ -165,10 +167,10 @@ public class BotService {
 
         // KASUS PINDAH 1
         
-        List<GameObject> biggerPlayer = PlayerService.getBiggerPlayerInRange(gameState, bot, playerDangerRange);
-        if (!biggerPlayer.isEmpty())
+        List<GameObject> biggerPlayer = PlayerService.getBiggerPlayerInRange(gameState, bot, PlayerService.playerDangerRange);
+        if (!biggerPlayer.isEmpty() || (!incomingTeleports.isEmpty() && maxEnemySize + PlayerService.sizeDifferenceOffset > bot.size))
         {
-            temp = PlayerService.getEscapePlayerVector(gameState, biggerPlayer, bot); /*isi temp dengan nilai arah kabur dari bot besar */
+            temp = PlayerService.getEscapePlayerVector(gameState, biggerPlayer, incomingTeleports, bot); /*isi temp dengan nilai arah kabur dari bot besar */
             t = new EscapeInfo(temp, weights[0]);
             directionVectors.add(t);
             // System.out.println("2");
@@ -307,10 +309,10 @@ public class BotService {
 
         // KASUS PINDAH 3
 
-        // List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange);
+        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange);
         if (!preys.isEmpty())
         {
-            temp = PlayerService.getChasePlayerVector(preys, bot);// isi temp dengan nilai arah KEJAR musuh */
+            temp = PlayerService.getChasePlayerVector(preys, incomingTeleports, bot, maxEnemySize);// isi temp dengan nilai arah KEJAR musuh */
             t = new EscapeInfo(temp, weights[2]);
             directionVectors.add(t);
 
@@ -320,7 +322,7 @@ public class BotService {
         // KASUS  PINDAH 4
 
         // jika keluar map
-        if (FieldService.isOutsideMap(gameState, bot, 50))
+        if (FieldService.isOutsideMap(gameState, bot, RadarService.worldRadiusOffset))
         {
             temp = RadarService.degreeToVector(FieldService.getCenterDirection(gameState, bot));
             t = new EscapeInfo(temp, weights[3]);
@@ -424,6 +426,30 @@ public class BotService {
             }
         }
 
+        // CARI SUPER FOOD
+        // List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
+        // if (!superFoods.isEmpty())
+        // {
+        //     playerAction.action = PlayerActions.FORWARD;
+        //     playerAction.heading = RadarService.getHeadingBetween(bot, superFoods.get(0));
+        //     this.playerAction = playerAction;
+        //     System.out.println("12");
+
+        //     return;
+        // }
+
+        // // CARI SUPER FOOD
+        // List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
+        // if (!superFoods.isEmpty())
+        // {
+        //     playerAction.action = PlayerActions.FORWARD;
+        //     playerAction.heading = RadarService.getHeadingBetween(bot, superFoods.get(0));
+        //     this.playerAction = playerAction;
+        //     System.out.println("12");
+
+        //     return;
+        // }
+
    
         if (SupernovaService.isSupernovaPickupExist(gameState) && SupernovaService.isBotNearestfromPickup(gameState, bot))
         {
@@ -468,7 +494,7 @@ public class BotService {
             }
         }
 
-        var foods = FoodServices.getAllFoods(gameState, bot);
+        var foods = FoodServices.getAllFoods(bot, fieldRadarRadius);
 
         // playerAction.heading = arah ke TARGET
 
