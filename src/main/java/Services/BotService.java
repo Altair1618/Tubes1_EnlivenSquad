@@ -179,8 +179,7 @@ public class BotService {
         /* AFTERBURNER */
         /* OFFENSIVE */
 
-        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset,
-                huntingRange - 100);
+        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange - 100);
 
         /* Kalau belum nyala */
         /*
