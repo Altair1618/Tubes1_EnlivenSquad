@@ -16,6 +16,7 @@ public class TeleportService extends ProjectileService {
     static public boolean hasFound = false;
 
     static public int teleporterSpeed = 20;
+    static public boolean isAttacking = false;
 
     static public void shoot(int angle)
     {
@@ -145,7 +146,7 @@ public class TeleportService extends ProjectileService {
         int totalPreySize = 0;
         int maxPreySize = 0;
         int totalTorpedoDamage = 0;
-        boolean cloudFlag = false;
+        boolean cloudFlag = false, pickUp = false;
 
         for (GameObject player: collapsingPlayers)
         {
@@ -196,6 +197,10 @@ public class TeleportService extends ProjectileService {
                     totalPreySize += obj.size;
                 }
             }
+
+            else if (type == ObjectTypes.SUPERNOVABOMB) return false;
+
+            else if (type == ObjectTypes.SUPERNOVAPICKUP) pickUp = true;
         }
 
        
@@ -204,8 +209,7 @@ public class TeleportService extends ProjectileService {
             return false;
         }
 
-        return(isAttacking? maxPreySize > 0 : !cloudFlag);
-
+        return(isAttacking? (maxPreySize > 0 || pickUp) : !cloudFlag);
     }
 
 }
