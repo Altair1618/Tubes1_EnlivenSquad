@@ -82,7 +82,7 @@ public class ProjectileService {
          */
         double tick_1 = RadarService.getRealDistance(bot, enemy) / TorpedoService.missilesSpeed;
         double tick_2 = (enemy.getSize() + TorpedoService.missilesSize) / enemy.getSpeed();
-        
+
         return (tick_1 < tick_2);
     }
 
