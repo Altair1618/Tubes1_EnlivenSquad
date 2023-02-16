@@ -14,6 +14,7 @@ public class TeleportService extends ProjectileService {
     static public int teleportSizeLimit = 30;
     static public int profitLimit = 0;
     static public boolean hasFound = false;
+    static public int minTeleportDistance = 200;
 
     static public int teleporterSpeed = 20;
     static public boolean isAttacking = false;
@@ -81,7 +82,7 @@ public class TeleportService extends ProjectileService {
     {
         return RadarService.getOtherObjects(ObjectTypes.TELEPORTER)
             .stream()
-            .filter(teleporter -> RadarService.isCollapsing(bot, teleporter.position, biggestEnemySize + PlayerService.playerDangerRange))
+            .filter(teleporter -> ProjectileService.isIncoming(bot, teleporter, biggestEnemySize))
             .collect(Collectors.toList());
     }
 
@@ -146,7 +147,8 @@ public class TeleportService extends ProjectileService {
         int totalPreySize = 0;
         int maxPreySize = 0;
         int totalTorpedoDamage = 0;
-        boolean cloudFlag = false, pickUp = false;
+        boolean pickUp = false;
+        int totalCloudSize = 0;
 
         for (GameObject player: collapsingPlayers)
         {
@@ -175,9 +177,10 @@ public class TeleportService extends ProjectileService {
 
             ObjectTypes type = obj.gameObjectType;
 
-           if (type == ObjectTypes.GASCLOUD && !cloudFlag)
+           if (type == ObjectTypes.GASCLOUD)
            {
-               cloudFlag = true;
+        
+               totalCloudSize += obj.size;
            }
 
             else if (type == ObjectTypes.TORPEDOSALVO)
@@ -208,8 +211,11 @@ public class TeleportService extends ProjectileService {
         {
             return false;
         }
+        
+        if (totalCloudSize > bot.size / 3) return false;
+        if (isAttacking) return maxPreySize > 0 || pickUp;
 
-        return(isAttacking? (maxPreySize > 0 || pickUp) : !cloudFlag);
+        return (maxPreySize > 0 || RadarService.getDistanceBetween(bot, teleporter) >= minTeleportDistance);
     }
 
 }

@@ -469,7 +469,7 @@ public class BotService {
         {
             foods = FoodServices.getAllFoods(bot, fieldRadarRadius);
         }
-
+        
         else
         {
             foods = FoodServices.getAllFoods(gameState, bot);
