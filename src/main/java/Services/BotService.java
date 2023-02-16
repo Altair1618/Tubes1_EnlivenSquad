@@ -131,6 +131,21 @@ public class BotService {
         }
 
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
+        List<GameObject> shieldList = RadarService.getOtherObjects(ObjectTypes.SHIELD);
+
+        if (!shieldList.isEmpty()) {
+            System.out.println("============SHIELD=============");
+            for (int i = 0; i < playersList.size(); i++) {
+                System.out.println(shieldList.get(i).getPosition().getX() + " " + shieldList.get(i).getPosition().getY());
+            }
+        }
+
+        if (!playersList.isEmpty()) {
+            System.out.println("============PLAYER=============");
+            for (int i = 0; i < playersList.size(); i ++) {
+                System.out.println(playersList.get(i).getPosition().getX() + " " + playersList.get(i).getPosition().getY());
+            }
+        }
 
         if (!playersList.isEmpty()
             && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius 
