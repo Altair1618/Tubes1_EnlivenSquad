@@ -7,6 +7,8 @@ import java.util.stream.*;
 
 public class TorpedoService extends ProjectileService {
 
+    static public int missilesSpeed = 60;  // torpedo or supernova
+    static public int missilesSize = 10; // torpedo or supernova
     static public Double dangerZonePercentage = 0.8;
     static public Double dangerZoneRadiusFactor = 5.0;
 

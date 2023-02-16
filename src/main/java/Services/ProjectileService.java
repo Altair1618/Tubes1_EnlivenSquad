@@ -4,8 +4,6 @@ import Models.*;
 import java.util.*;
 
 public class ProjectileService {
-    static public int missilesSpeed = 60;  // torpedo or supernova
-    static public int missilesSize = 10; // torpedo or supernova
 
     static public boolean isIncoming(GameObject bot, GameObject projectile) {
         // Mengembalikan true jika torpedo mengarah ke bot
@@ -53,7 +51,7 @@ public class ProjectileService {
             temp = tmp.mult(-1);
         }
 
-        return temp;
+        return temp.toNormalize();
     }
 
     static public WorldVector nextHeadingAfterProjectiles(GameState gameState, GameObject bot, List<GameObject> incomingProjectiles) {
@@ -66,7 +64,7 @@ public class ProjectileService {
            
             WorldVector temp = nextHeadingAfterProjectile(gameState, bot, projectile);
 
-            Double distance = Math.min(0, RadarService.getRealDistance(projectile, bot));
+            Double distance = Math.max(0, RadarService.getRealDistance(projectile, bot));
             Double weight = distance;
 
             if (distance.equals(0.0)) weight = 0.001;
@@ -79,13 +77,13 @@ public class ProjectileService {
         return res.toNormalize();
     }
 
-    static public boolean isPriorHit(GameObject bot, GameObject enemy) {
+    static public boolean isPriorHit(GameObject bot, GameObject enemy, int projectileSpeed, int projectileSize) {
         /* 
             true jika missiles yang ditembak
             keburu untuk kena musuhnya
          */
-        double tick_1 = RadarService.getRealDistance(bot, enemy) / missilesSpeed;
-        double tick_2 = (enemy.getSize() + missilesSize) / enemy.getSpeed();
+        double tick_1 = (RadarService.getRealDistance(bot, enemy) + enemy.size - projectileSize) / projectileSpeed;
+        double tick_2 = (enemy.getSize() + projectileSize) / enemy.getSpeed();
         
         return (tick_1 < tick_2);
     }

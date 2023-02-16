@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.*;
 
 public class PlayerService {
-
+    static public int playerDangerRange = 20; // Range player gede dianggap berbahaya
     static public int sizeDifferenceOffset = 10; // Minimal selisih size player yang dikejar
 
     static public List<GameObject> getOtherPlayerList(GameState gameState, GameObject bot) {
@@ -63,36 +63,33 @@ public class PlayerService {
         return RadarService.players.stream().filter(item -> isBotBigger(bot, item, offset) && RadarService.getRealDistance(bot, item) <= range).collect(Collectors.toList());
     }
 
-    static public WorldVector getEscapePlayerVector(GameState gameState, List<GameObject> others, GameObject bot) {
-        // Mengembalikan Vektor arah player bila ingin kabur
-        // Others diisi dengan bigger players bukan other players
 
-        return FieldService.getHeadingEscape(gameState, bot, others);
-    }
-
-    static public WorldVector getEscapePlayerVector(GameState gameState, GameObject bot, List<GameObject> others)
+    static public WorldVector getEscapePlayerVector(GameState gameState,  List<GameObject> others, List<GameObject> incomingTeleporters, GameObject bot)
     {
         // mengembalikan arah terbaik player untuk keluar dari cloud (PENDEKATAN PENJUMLAHAN VECTOR DENGAN BOBOT 1 / (jarak yang dibutuhkan untuk escape))
 
         WorldVector total = new WorldVector();
 
-        if (others.size() == 0) {
-            System.out.println("WARNING in PlayerService.getEscapePlayerVector method: collapsingObjects passed has zero size!");
-            return total;
-        }
-
         for (GameObject obj : others) {
 
 
-            Double distance = Math.min(0, RadarService.getRealDistance(obj, bot));
+            Double distance = Math.max(0, RadarService.getRealDistance(obj, bot));
+            Double weight = distance;
+            
+            if (weight.equals(0.0)) weight = 10e-3;
+            else weight = (double) RadarService.roundToEven(weight);
+            total.add(new WorldVector(obj.position, bot.position).toNormalize().div(weight));
+        }
+
+        for (GameObject tp : incomingTeleporters)
+        {
+            Double distance = Math.max(0, RadarService.getRealDistance(tp, bot));
             Double weight = distance;
             
             if (weight.equals(0.0)) weight = 10e-3;
             else weight = (double) RadarService.roundToEven(weight);
 
-            if (weight > 0) weight = 1 / weight;
-            else weight = Math.abs(weight);
-            total.add((new WorldVector(obj.position, bot.position)).toNormalize().mult(weight));
+            total.add(new WorldVector(tp.position, bot.position).toNormalize().div(weight));
         }
 
         if (total.isZero() && others.size() == 2) 
@@ -102,18 +99,44 @@ public class PlayerService {
             
             if (direction.dot(new WorldVector(bot.getPosition(), gameState.world.centerPoint)) > 0) total = direction;
             else total = direction.mult(-1);
-            
         }
-
         return total;
-        
     }
 
-    static public WorldVector getChasePlayerVector(List<GameObject> preys, GameObject bot) {
+    static public WorldVector getChasePlayerVector(List<GameObject> preys, List<GameObject> incomingTeleports, GameObject bot, int maxEnemySize) {
         // Mengembalikan Vektor mengejar player lebih kecil
 
-        if (preys.isEmpty()) return new WorldVector();
+        if (preys.isEmpty() && incomingTeleports.isEmpty()) return new WorldVector();
 
+        if (!preys.isEmpty() && !incomingTeleports.isEmpty())
+        {
+            if (RadarService.getRealDistance(bot, preys.get(0)) > RadarService.getRealDistance(bot.size, maxEnemySize, RadarService.getDistanceBetween(bot, incomingTeleports.get(0))))
+            {
+                return new WorldVector(bot.position, incomingTeleports.get(0).position);
+            }
+
+            return new WorldVector(bot.position, preys.get(0).position);
+        }
+
+        if (preys.isEmpty())
+        {
+            return new WorldVector(bot.position, incomingTeleports.get(0).position);
+        }
         return new WorldVector(bot.position, preys.get(0).position);
+
+    }
+
+    static public int getBiggestEnemySize()
+    {
+        List<GameObject> players = RadarService.players;
+        int res = 0;
+
+        for (GameObject player : players)
+        {
+            if (res < player.size) res = player.size;
+        }
+
+        return res;
+
     }
 }

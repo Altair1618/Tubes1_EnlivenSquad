@@ -4,6 +4,7 @@ import Models.*;
 import java.util.*;
 
 import Enums.ObjectTypes;
+import java.util.stream.*;
 
 public class TeleportService extends ProjectileService {
     
@@ -28,6 +29,7 @@ public class TeleportService extends ProjectileService {
         isFired = false;
         heading = 0;
         hasFound = false;
+        firedTeleportId = null;
     }
 
     static public Boolean isTeleportAvailable(GameObject bot)
@@ -46,7 +48,7 @@ public class TeleportService extends ProjectileService {
         List<GameObject> temp = RadarService.getOtherObjects(ObjectTypes.TELEPORTER);
         
         for (GameObject teleporter : temp) {
-            if (teleporter.getHeading() == heading)
+            if ((!hasFound && teleporter.getHeading() == heading) || (hasFound && firedTeleportId == teleporter.id))
             {
                 if (FieldService.isOutsideMap(gameState, teleporter.position, bot.size))
                 {
@@ -58,6 +60,7 @@ public class TeleportService extends ProjectileService {
                 else
                 {
                     hasFound = true;
+                    firedTeleportId = teleporter.id;
                     return teleporter;
                 }
             }  
@@ -65,6 +68,21 @@ public class TeleportService extends ProjectileService {
 
         if (hasFound) teleport();
         return null;
+    }
+
+
+    static public List<GameObject> getIncomingTeleporter(GameObject bot, int biggestEnemySize)
+    {
+        return RadarService.getOtherObjects(ObjectTypes.TELEPORTER)
+            .stream()
+            .filter(teleporter -> RadarService.isCollapsing(bot, teleporter.position, biggestEnemySize + PlayerService.playerDangerRange))
+            .collect(Collectors.toList());
+    }
+
+    static public boolean isTeleportDangerous(GameObject bot)
+    {
+    
+        return false;
     }
 
     static public List<GameObject> getCollapsingObjectsAfterTeleport(GameState gameState, GameObject bot, GameObject teleporter, int sizeOffset)
@@ -90,7 +108,9 @@ public class TeleportService extends ProjectileService {
 
         for (GameObject player : players)
         {
-            if (player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20 && currentTargetSize < player.size)
+            if (player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20
+                    && currentTargetSize < player.size
+                    && isPriorHit(bot, player, 60, bot.size))
             {
                 target = player;
                 currentTargetSize = player.size;
@@ -120,7 +140,6 @@ public class TeleportService extends ProjectileService {
         int maxPreySize = 0;
         int totalTorpedoDamage = 0;
         boolean cloudFlag = false;
-        boolean asteroidField = false;
 
         for (GameObject player: collapsingPlayers)
         {
@@ -154,11 +173,6 @@ public class TeleportService extends ProjectileService {
                cloudFlag = true;
            }
 
-           else if (type == ObjectTypes.ASTEROIDFIELD)
-           {
-               asteroidField = true;
-           }
-
             else if (type == ObjectTypes.TORPEDOSALVO)
             {
                 if (RadarService.isCollapsing(obj, teleporter.position, bot.size))
@@ -181,7 +195,7 @@ public class TeleportService extends ProjectileService {
        
         if (totalPreySize <= totalTorpedoDamage + (isAttacking? profitLimit : 0))
         {
-            if (totalPreySize > totalTorpedoDamage) return !cloudFlag && (isAttacking? maxPreySize > 0 : !asteroidField);
+            if (totalPreySize > totalTorpedoDamage) return !cloudFlag && (isAttacking? maxPreySize > 0 : true);
 
 
             else return false;
