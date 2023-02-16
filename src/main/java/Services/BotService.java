@@ -150,7 +150,7 @@ public class BotService {
         if (!playersList.isEmpty()
             && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius 
             && TorpedoService.isTorpedoAvailable(bot, 40) 
-            && ProjectileService.isPriorHit(bot, playersList.get(0))
+            && ProjectileService.isPriorHit(bot, playersList.get(0), TorpedoService.missilesSpeed, TorpedoService.missilesSize)
             && !ShieldService.isPlayerShielded(playersList.get(0))
             ) {
             /* menembak */

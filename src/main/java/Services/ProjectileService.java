@@ -80,8 +80,8 @@ public class ProjectileService {
             true jika missiles yang ditembak
             keburu untuk kena musuhnya
          */
-        double tick_1 = RadarService.getRealDistance(bot, enemy) / TorpedoService.missilesSpeed;
-        double tick_2 = (enemy.getSize() + TorpedoService.missilesSize) / enemy.getSpeed();
+        double tick_1 = RadarService.getRealDistance(bot, enemy) / projectileSpeed;
+        double tick_2 = (enemy.getSize() + projectileSize) / enemy.getSpeed();
         
         return (tick_1 < tick_2);
     }

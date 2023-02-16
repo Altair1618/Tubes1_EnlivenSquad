@@ -1,5 +1,3 @@
-Enums\Effects.class
-Services\SupernovaService.class
 Services\RadarService.class
 Enums\ObjectTypes.class
 Models\PlayerAction.class
@@ -7,16 +5,11 @@ Services\FieldService.class
 Models\GameObject.class
 Services\TeleportService.class
 Services\PlayerService.class
-Services\FoodServices.class
-Main.class
 Enums\PlayerActions.class
 Models\GameState.class
 Models\WorldVector.class
-Services\BotService.class
 Services\ProjectileService.class
 Models\GameStateDto.class
-Services\ShieldService.class
 Services\TorpedoService.class
-Services\BotService$EscapeInfo.class
 Models\Position.class
 Models\World.class
