@@ -14,6 +14,7 @@ public class TeleportService extends ProjectileService {
     static public int teleportSizeLimit = 30;
     static public int profitLimit = 0;
     static public boolean hasFound = false;
+    static public int minTeleportDistance = 200;
 
     static public int teleporterSpeed = 20;
     static public boolean isAttacking = false;
@@ -210,8 +211,11 @@ public class TeleportService extends ProjectileService {
         {
             return false;
         }
+        
+        if (totalCloudSize > bot.size / 3) return false;
+        if (isAttacking) return maxPreySize > 0 || pickUp;
 
-        return((totalCloudSize <= bot.size / 3) &&  isAttacking? (maxPreySize > 0 || pickUp) : true);
+        return (maxPreySize > 0 || RadarService.getDistanceBetween(bot, teleporter) >= minTeleportDistance);
     }
 
 }

@@ -88,6 +88,7 @@ public class WorldVector {
     }
 
     public void rotateBy(double angle) {
+        // angle in radian
         double cos = Math.cos(angle);
         double sin = Math.sin(angle);
         double rx = x * cos - y * sin;
@@ -96,6 +97,7 @@ public class WorldVector {
     }
 
     public WorldVector getRotatedBy(double angle) {
+        // angle in radian
         double cos = Math.cos(angle);
         double sin = Math.sin(angle);
         return new WorldVector(x * cos - y * sin, x * sin + y * cos);
@@ -111,6 +113,7 @@ public class WorldVector {
     }
     public Double getAngleTo(WorldVector other)
     {
+        // return degree
         return (this.dot(other) / (this.magnitude() * other.magnitude())) * 180 / Math.PI;
     }
 }

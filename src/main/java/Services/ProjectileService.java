@@ -45,7 +45,7 @@ public class ProjectileService {
 
         // random untuk arah tegak lurus dari projectile datangnya torpedo untuk kabur
     
-        if (tmp.dot(new WorldVector(bot.getPosition(), gameState.world.centerPoint)) > 0) {
+        if (tmp.dot(new WorldVector(incomingProjectile.getPosition(), bot.getPosition())) > 0) {
             temp = tmp;
         } else {
             temp = tmp.mult(-1);
