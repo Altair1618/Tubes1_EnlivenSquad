@@ -70,7 +70,7 @@ public class SupernovaService extends ProjectileService {
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
 
         for (int i = 0; i < playersList.size(); i ++) {
-            if (RadarService.isCollapsing(supernova.get(0), playersList.get(i), 50)) {
+            if (RadarService.isCollapsing(supernova.get(0), playersList.get(i), superNovaSize)) {
                 return true;
             }
         }
