@@ -15,6 +15,7 @@ public class BotService {
     static private Double headingOffset = 1.; // offset sudut untuk mengamsumsikan arah saat ini sudah sesuai tujuan
     static private int fieldRadarRadius = 60; // radius jarak deteksi cloud dan asteroid
     static private int huntingRange = 200;
+    static private boolean isAfterburner = false;
 
     // weight untuk setiap kasus kabur/ngejar
     static private Double[] weights = {
@@ -175,6 +176,84 @@ public class BotService {
             // System.out.println("2");
         }
 
+        /* AFTERBURNER */
+        /* OFFENSIVE */
+
+        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset,
+                huntingRange - 100);
+
+        /* Kalau belum nyala */
+        /*
+         * Kalau ada preys dan
+         * gada player lebih gede di sekitar dan
+         * sedang tidak afterburner
+         */
+        if (!preys.isEmpty() && directionVectors.isEmpty() && !isAfterburner) {
+
+            double distance = RadarService.getRealDistance(bot, preys.get(0));
+            double tick = distance / ((bot.getSpeed() * 2) - preys.get(0).getSpeed());
+
+            if ((bot.getSize() - 2 * tick) > (preys.get(0).getSize() + PlayerService.sizeDifferenceOffset)) {
+                playerAction.action = PlayerActions.STARTAFTERBURNER;
+                playerAction.heading = RadarService.getHeadingBetween(bot, preys.get(0));
+
+                this.playerAction = playerAction;
+
+                isAfterburner = true;
+                System.out.println("AFTERBURNER");
+                return;
+            }
+        }
+
+        /* Kalau sedang nyala */
+        /*
+         * (Kalau ada player lebih gede di sekitar dan
+         * sedang afterburner) atau
+         * (gaada preys di sekitar dan sedang afterburner)
+         */
+        if ((!directionVectors.isEmpty() || preys.isEmpty()) && isAfterburner) {
+
+            playerAction.action = PlayerActions.STOPAFTERBURNER;
+            this.playerAction = playerAction;
+            System.out.println("STOP AFTERBURNER");
+
+            isAfterburner = false;
+
+            return;
+        }
+
+        /*
+         * Kalau ga ada player lebih gede di sekitar dan
+         * lagi ngejar preys dan
+         * sedang afterburner
+         */
+
+        if (directionVectors.isEmpty() && !preys.isEmpty() && isAfterburner) {
+            double distance = RadarService.getRealDistance(bot, preys.get(0));
+            double tick = distance / ((bot.getSpeed() * 2) - preys.get(0).getSpeed());
+
+            /* Kalau ternyata malah bahaya bisa mati */
+            if ((bot.getSize() - 2 * tick) <= (preys.get(0).getSize() + PlayerService.sizeDifferenceOffset)) {
+                playerAction.action = PlayerActions.STOPAFTERBURNER;
+                this.playerAction = playerAction;
+
+                System.out.println("STOP AFTERBURNER");
+                isAfterburner = false;
+
+                return;
+            } else { /* Kalau aman */
+                playerAction.action = PlayerActions.FORWARD;
+                playerAction.heading = RadarService.getHeadingBetween(bot, preys.get(0));
+
+                this.playerAction = playerAction;
+
+                System.out.println("LANJUT AFTERBURNER");
+
+                return;
+            }
+        }
+
+
         List<GameObject> incomingTorpedo = TorpedoService.getIncomingTorpedo(gameState, bot);
 
         temp = calculateResult(directionVectors);
@@ -184,6 +263,15 @@ public class BotService {
         {
             /* jika torpedo (terdekat) di dalam danger zone kita */
             if (TorpedoService.fireTorpedoWhenDanger(bot, incomingTorpedo.get(0))) {
+                if (ShieldService.isShieldAvailable(bot, 60)
+                    && RadarService.getRealDistance(bot, incomingTorpedo.get(0)) <= 60) {
+                    
+                    playerAction.action = PlayerActions.ACTIVATESHIELD;
+
+                    this.playerAction = playerAction;
+                    return;
+                }
+                
                 if (TorpedoService.isTorpedoAvailable(bot, 25)) {
                     /* defend with shooting */
                     playerAction.action = PlayerActions.FIRETORPEDOES;
@@ -231,7 +319,7 @@ public class BotService {
 
         // KASUS PINDAH 3
 
-        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange);
+        // List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange);
         if (!preys.isEmpty() || (!incomingTeleports.isEmpty() && maxEnemySize + PlayerService.sizeDifferenceOffset < bot.size))
         {
             temp = PlayerService.getChasePlayerVector(preys, incomingTeleports, bot, maxEnemySize);// isi temp dengan nilai arah KEJAR musuh */
@@ -332,7 +420,6 @@ public class BotService {
         }
 
         // KASUS SELANJUTNYA ADALAH KASUS TIDAK ADA YANG PERLU DIKEJAR ATAU DIHINDARI
-
 
         if (SupernovaService.isSupernovaPickupExist(gameState) && SupernovaService.isBotNearestfromPickup(gameState, bot))
         {
