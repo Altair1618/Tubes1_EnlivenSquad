@@ -15,6 +15,8 @@ public class ProjectileService {
         return isIncoming(bot, projectile, projectile.size);
     }
 
+
+
     static public boolean isIncoming(GameObject bot, GameObject projectile, int avoidableSize) {
         // Mengembalikan true jika torpedo mengarah ke bot
         // perhitungan dengan konsep segitiga

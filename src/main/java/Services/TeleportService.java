@@ -10,21 +10,24 @@ public class TeleportService extends ProjectileService {
     static public UUID firedTeleportId = null;
     static public int heading = 0;
     static public boolean isFired = false;
-    static public int teleportSizeLimit = 50;
-    static public int profitLimit = 15;
+    static public int teleportSizeLimit = 25;
+    static public int profitLimit = 0;
+    static public boolean hasFound = false;
 
     static public void shoot(int angle)
     {
+        System.out.println("Shooting teleporter");
         isFired = true;
-        
         heading = angle;
+        hasFound = false;
     }
 
     static public void teleport()
     {
-        firedTeleportId = null;
+        System.out.println("Deleting teleporter");
         isFired = false;
         heading = 0;
+        hasFound = false;
     }
 
     static public Boolean isTeleportAvailable(GameObject bot)
@@ -33,15 +36,9 @@ public class TeleportService extends ProjectileService {
         return bot.teleporterCount > 0 && bot.size >= teleportSizeLimit;
     }
 
-    static public Boolean isTeleportAvailable(GameObject bot, int sizeLimit)
-    {
-        // mengembalikan true jika player dapat menggunakan teleport dengan tambahan batas bawah size player yang diperbolehkan
-        return bot.teleporterCount > 0 && bot.size >= sizeLimit;
-    }
-
     static public Boolean isTeleportFired()
     {
-        return firedTeleportId != null;
+        return isFired;
     }
 
     static public GameObject getFiredTeleport(GameState gameState, GameObject bot)
@@ -60,12 +57,13 @@ public class TeleportService extends ProjectileService {
 
                 else
                 {
+                    hasFound = true;
                     return teleporter;
                 }
             }  
         }  
 
-        teleport();
+        if (hasFound) teleport();
         return null;
     }
 
@@ -74,6 +72,13 @@ public class TeleportService extends ProjectileService {
         // mengembalikan semua objek yang akan collapse dengan player setelah memasuki wormhole (pair wormhole tidak diketahui sehingga perlu ditinjau semua untuk kasus terburuk)
    
         return RadarService.getCollapsingObjects(gameState, teleporter.position, bot.size + sizeOffset);
+    }
+
+    static public List<GameObject> getCollapsingPlayersAfterTeleport(GameState gameState, GameObject bot, GameObject teleporter, int sizeOffset)
+    {
+        // mengembalikan semua objek yang akan collapse dengan player setelah memasuki wormhole (pair wormhole tidak diketahui sehingga perlu ditinjau semua untuk kasus terburuk)
+
+        return RadarService.getCollapsingPlayers(gameState, teleporter.position, bot.size + sizeOffset);
     }
 
 
@@ -100,67 +105,89 @@ public class TeleportService extends ProjectileService {
         return new WorldVector();
     }
 
-    static public boolean isTeleportSafe(GameObject bot, List<GameObject> collapsingObjects, boolean isAttacking)
+    static public boolean isTeleportSafe(GameObject bot, GameObject teleporter, List<GameObject> collapsingObjects, List<GameObject> collapsingPlayers, boolean isAttacking)
     {
+        System.out.print("Collapsing objects count : ");
+        System.out.println(collapsingObjects.size());
+        if (collapsingObjects.isEmpty())
+        {
+            if (isAttacking) return false;
+
+            return true;
+        }
+
         int totalPreySize = 0;
         int maxPreySize = 0;
         int totalTorpedoDamage = 0;
         boolean cloudFlag = false;
         boolean asteroidField = false;
 
-        for (GameObject obj : collapsingObjects)
+        for (GameObject player: collapsingPlayers)
         {
-            ObjectTypes type = obj.getGameObjectType();
-            if (type == ObjectTypes.PLAYER)
+            System.out.println("Player near teleporter!");
+            if (RadarService.isCollapsing(player, teleporter.position, bot.size + 20))
             {
-                if (RadarService.isCollapsing(obj, bot))
+                if (bot.size > player.size + PlayerService.sizeDifferenceOffset)
                 {
-                    if (bot.size + totalPreySize > obj.size + PlayerService.sizeDifferenceOffset) 
-                    {
-                        totalPreySize += obj.size; 
-                        
-                        if (maxPreySize < obj.size) maxPreySize = obj.size;
-                    }
 
-                    else return false; 
+                    totalPreySize += player.size;
+
+                    if (maxPreySize < player.size) maxPreySize = player.size;
                 }
 
-                else if (bot.size + totalPreySize <= obj.size + PlayerService.sizeDifferenceOffset)
-                {
-                    return false;
-                }
+                else return false; 
             }
 
-            else if (type == ObjectTypes.GASCLOUD)
+            else if (bot.size <= player.size + PlayerService.sizeDifferenceOffset)
             {
-                cloudFlag = true;
-            }
-
-            else if (type == ObjectTypes.ASTEROIDFIELD)
-            {
-                asteroidField = true;
-            }
-
-            else if (type == ObjectTypes.TORPEDOSALVO)
-            {
-                if (isIncoming(bot, obj))
-                {
-                    totalTorpedoDamage += obj.size;
-
-                    if (bot.size - totalTorpedoDamage <= Math.max(maxPreySize, teleportSizeLimit)) return false;
-                }
+                return false;
             }
         }
 
-        if (bot.size - totalTorpedoDamage <= Math.max(maxPreySize, teleportSizeLimit)) return false;
+        for (GameObject obj : collapsingObjects)
+        {
+
+            ObjectTypes type = obj.gameObjectType;
+
+           if (type == ObjectTypes.GASCLOUD)
+           {
+               cloudFlag = true;
+           }
+
+           else if (type == ObjectTypes.ASTEROIDFIELD)
+           {
+               asteroidField = true;
+           }
+
+            else if (type == ObjectTypes.TORPEDOSALVO)
+            {
+                if (RadarService.isCollapsing(obj, teleporter.position, bot.size))
+                {
+                    totalTorpedoDamage += obj.size;
+
+                    if (bot.size - totalTorpedoDamage <= Math.max(maxPreySize, teleportSizeLimit - 20)) return false;
+                }
+            }
+
+            else if (type == ObjectTypes.FOOD)
+            {
+                if (RadarService.isCollapsing(obj, teleporter.position, bot.size))
+                {
+                    totalPreySize += obj.size;
+                }
+            }
+        }
 
        
         if (totalPreySize <= totalTorpedoDamage + (isAttacking? profitLimit : 0))
         {
-            if (totalPreySize > totalTorpedoDamage) return !cloudFlag && !asteroidField;
+            if (totalPreySize > totalTorpedoDamage) return !cloudFlag && (isAttacking? maxPreySize > 0 : !asteroidField);
+
+
             else return false;
         }
-        
+
+        if (isAttacking && maxPreySize == 0) return false;
 
         return true;
 

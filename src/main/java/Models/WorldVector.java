@@ -18,7 +18,7 @@ public class WorldVector {
     public WorldVector(Position init, Position target)
     {
         this.x = target.x - init.x;
-        this.y = target.y - target.x;
+        this.y = target.y - init.y;
     }
 
     public double getX() {

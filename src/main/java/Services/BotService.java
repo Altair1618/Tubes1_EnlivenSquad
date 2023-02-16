@@ -78,7 +78,7 @@ public class BotService {
 
         if (tickTimer > 0) tickTimer--;
         if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
-        
+
         List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
         WorldVector temp;
         EscapeInfo t;
@@ -101,9 +101,32 @@ public class BotService {
             /* set variabel sudah nembak supernova menjadi false */
             SupernovaService.isDetonated = true;
             SupernovaService.isFired = false;
-            System.out.println("1");
+            // System.out.println("1");
 
             return;
+        }
+
+        if (TeleportService.isFired)
+        {
+            GameObject teleporter = TeleportService.getFiredTeleport(gameState, bot);
+
+            if (teleporter != null)
+            {
+                List<GameObject> collapsingObjects = TeleportService.getCollapsingObjectsAfterTeleport(gameState, bot, teleporter, 100);
+                List<GameObject> collapsingPlayers = TeleportService.getCollapsingPlayersAfterTeleport(gameState, bot, teleporter, 100);
+                boolean isSafe = TeleportService.isTeleportSafe(bot, teleporter, collapsingObjects, collapsingPlayers, true);
+
+                System.out.println(isSafe);
+                if (isSafe)
+                {
+                    System.out.println("TELEPORTING!!!!!!!!!!!!");
+                    playerAction.action = PlayerActions.TELEPORT;
+                    this.playerAction = playerAction;
+
+                    TeleportService.teleport();
+                    return;
+                }
+            }
         }
 
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
@@ -132,7 +155,7 @@ public class BotService {
             temp = PlayerService.getEscapePlayerVector(gameState, biggerPlayer, bot); /*isi temp dengan nilai arah kabur dari bot besar */
             t = new EscapeInfo(temp, weights[0]);
             directionVectors.add(t);
-            System.out.println("2");
+            // System.out.println("2");
         }
 
         /* AFTERBURNER */
@@ -217,7 +240,7 @@ public class BotService {
                     playerAction.heading = RadarService.getHeadingBetween(bot, incomingTorpedo.get(0));
                     this.playerAction = playerAction;
 
-                    System.out.println("3");
+                    // System.out.println("3");
                     return;
                 } else {
                     /* 
@@ -251,7 +274,7 @@ public class BotService {
             temp = TorpedoService.nextHeadingAfterProjectiles(gameState, bot, incomingTorpedo);
             t = new EscapeInfo(temp, weights[1]);
             directionVectors.add(t);
-            System.out.println("4");
+            // System.out.println("4");
         }
 
         // KASUS PINDAH 3
@@ -263,7 +286,7 @@ public class BotService {
             t = new EscapeInfo(temp, weights[2]);
             directionVectors.add(t);
 
-            System.out.println("5");
+            // System.out.println("5");
         }
 
         // KASUS  PINDAH 4
@@ -275,7 +298,7 @@ public class BotService {
             t = new EscapeInfo(temp, weights[3]);
 
             directionVectors.add(t);
-            System.out.println("6");
+            // System.out.println("6");
 
         }
 
@@ -291,7 +314,7 @@ public class BotService {
             t = new EscapeInfo(temp, weights[5]);
 
             directionVectors.add(t);
-            System.out.println("7");
+            // System.out.println("7");
         }
         
         // KASUS PINDAH 6
@@ -306,7 +329,7 @@ public class BotService {
 
             t = new EscapeInfo(temp, weights[6]);
             directionVectors.add(t);
-            System.out.println("8");
+            // System.out.println("8");
             
         }
 
@@ -320,7 +343,7 @@ public class BotService {
 
             t = new EscapeInfo(temp, weights[6]);
             directionVectors.add(t);
-            System.out.println("9");
+            // System.out.println("9");
             
         }
 
@@ -335,7 +358,7 @@ public class BotService {
                 temp = RadarService.degreeToVector(RadarService.getHeadingBetween(bot, foods.get(0))); // isi dengan nilai arah kabur dari supernova bomb */
                 t = new EscapeInfo(temp, weights[7]);
                 directionVectors.add(t);
-                System.out.println("10");
+                // System.out.println("10");
 
             }
         }
@@ -350,7 +373,7 @@ public class BotService {
                 playerAction.action = PlayerActions.FORWARD;
                 playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(res));
                 this.playerAction = playerAction;
-                System.out.println("11");
+                // System.out.println("11");
 
                 return;
             }
@@ -385,28 +408,6 @@ public class BotService {
         //     return;
         // }
 
-
-        // if (TeleportService.isFired)
-        // {
-        //     GameObject teleporter = TeleportService.getFiredTeleport(gameState, bot);
-
-        //     if (teleporter != null)
-        //     {
-        //         List<GameObject> collapsingObjects = TeleportService.getCollapsingObjectsAfterTeleport(gameState, bot, teleporter, playerRadarRadius);
-
-        //         boolean isSafe = TeleportService.isTeleportSafe(bot, collapsingObjects, true);
-
-        //         if (isSafe)
-        //         {
-        //             playerAction.action = PlayerActions.TELEPORT;
-        //             this.playerAction = playerAction;
-
-        //             TeleportService.teleport();
-        //             return;
-        //         }
-        //     }
-        // }
-
         // // CARI SUPER FOOD
         // List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
         // if (!superFoods.isEmpty())
@@ -425,7 +426,7 @@ public class BotService {
             playerAction.action = PlayerActions.FORWARD;
             playerAction.heading = RadarService.getHeadingBetween(bot, SupernovaService.getSupernovaPickupObject(gameState));
             this.playerAction = playerAction;
-            System.out.println("13");
+            // System.out.println("13");
 
             tickTimer = 10;
 
@@ -445,7 +446,7 @@ public class BotService {
                 if (RadarService.isCollapsing(players.get(i), bot, 50)) {
                     // playerAction.heading = arah ke TARGET
                     playerAction.heading = RadarService.getHeadingBetween(bot, players.get(i));
-                    System.out.println("14");
+                    // System.out.println("14");
                     break;
                 }
             }
@@ -462,7 +463,7 @@ public class BotService {
 
         if (foods.size() > 0 && foods != null)
         {
-            System.out.println("15");
+            // System.out.println("15");
             playerAction.action = PlayerActions.FORWARD;
             playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
         }
