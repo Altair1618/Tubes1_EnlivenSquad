@@ -16,6 +16,7 @@ public class BotService {
     static private int fieldRadarRadius = 25; // radius jarak deteksi cloud dan asteroid
     static private int playerDangerRange = 20; // Range player gede dianggap berbahaya
     static private int huntingRange = 200;
+    static public boolean isAfterburner = false;
 
     // weight untuk setiap kasus kabur/ngejar
     static private Double[] weights = {
@@ -159,6 +160,7 @@ public class BotService {
         }
 
         /* AFTERBURNER */
+        /* OFFENSIVE */
 
         List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange - 100);
         
@@ -167,10 +169,10 @@ public class BotService {
          * gada player lebih gede di sekitar dan
          * sedang tidak afterburner
          */
-        if (!preys.isEmpty() && directionVectors.isEmpty() && !Effects.getEffectList(bot.effectsCode).get(0)) {
+        if (!preys.isEmpty() && directionVectors.isEmpty() && !isAfterburner) {
             
             double distance = RadarService.getRealDistance(bot, preys.get(0));
-            double tick = distance / (bot.getSpeed() * 2);
+            double tick = distance / ((bot.getSpeed() * 2) - preys.get(0).getSpeed());
             
             if ((bot.getSize() - 2 * tick) > (preys.get(0).getSize() + PlayerService.sizeDifferenceOffset)) {
                 playerAction.action = PlayerActions.STARTAFTERBURNER;
@@ -178,7 +180,8 @@ public class BotService {
 
                 this.playerAction = playerAction;
 
-                System.out.println("KEJAR BOS");
+                isAfterburner = true;
+                System.out.println("AFTERBURNER");
                 return;
             }
         }
@@ -189,11 +192,13 @@ public class BotService {
          * sedang afterburner) atau
          * (gaada preys di sekitar dan sedang afterburner)
          */
-        if ((!directionVectors.isEmpty() || preys.isEmpty()) && Effects.getEffectList(bot.effectsCode).get(0)) {
+        if ((!directionVectors.isEmpty() || preys.isEmpty()) && isAfterburner) {
             
             playerAction.action = PlayerActions.STOPAFTERBURNER;
             this.playerAction = playerAction;
-            System.out.println("BAHAYA");
+            System.out.println("STOP AFTERBURNER");
+
+            isAfterburner = false;
 
             return;
         }
@@ -204,30 +209,26 @@ public class BotService {
          * sedang afterburner
          */
 
-        if (directionVectors.isEmpty() && !preys.isEmpty() && Effects.getEffectList(bot.effectsCode).get(0)) {
-            playerAction.action = PlayerActions.FORWARD;
-            playerAction.heading = RadarService.getHeadingBetween(bot, preys.get(0));
-
-            this.playerAction = playerAction;
-
-            return;
-        }
-
-        /*
-         * Kalau ada preys dan
-         * ada player lebih gede di sekitar dan
-         * sedang afterburner
-         */
-        if (!preys.isEmpty() && directionVectors.isEmpty() && Effects.getEffectList(bot.effectsCode).get(0)) {
+        if (directionVectors.isEmpty() && !preys.isEmpty() && isAfterburner) {
             double distance = RadarService.getRealDistance(bot, preys.get(0));
-            double tick = distance / (bot.getSpeed() * 2);
-            
+            double tick = distance / ((bot.getSpeed() * 2) - preys.get(0).getSpeed());
+
             /* Kalau ternyata malah bahaya bisa mati */
-            if ((bot.getSize() - 2 * tick) > (preys.get(0).getSize() + PlayerService.sizeDifferenceOffset)) {
+            if ((bot.getSize() - 2 * tick) <= (preys.get(0).getSize() + PlayerService.sizeDifferenceOffset)) {
                 playerAction.action = PlayerActions.STOPAFTERBURNER;
                 this.playerAction = playerAction;
 
-                System.out.println("BAHAYA");
+                System.out.println("STOP AFTERBURNER");
+                isAfterburner = false;
+
+                return;
+            } else { /* Kalau aman */
+                playerAction.action = PlayerActions.FORWARD;
+                playerAction.heading = RadarService.getHeadingBetween(bot, preys.get(0));
+
+                this.playerAction = playerAction;
+
+                System.out.println("LANJUT AFTERBURNER");
 
                 return;
             }
@@ -282,6 +283,8 @@ public class BotService {
         {
             temp = new WorldVector();// temp = nilai arah kabur dari torpedo */
             temp = TorpedoService.nextHeadingAfterProjectiles(gameState, bot, incomingTorpedo);
+            
+        
             t = new EscapeInfo(temp, weights[1]);
             directionVectors.add(t);
             // System.out.println("4");
@@ -391,44 +394,20 @@ public class BotService {
 
         // KASUS SELANJUTNYA ADALAH KASUS TIDAK ADA YANG PERLU DIKEJAR ATAU DIHINDARI
 
-        // if (!TeleportService.isFired && TeleportService.isTeleportAvailable(bot))
-        // {
-        //     temp = TeleportService.getAttackDirection(bot);
+        if (!TeleportService.isFired && TeleportService.isTeleportAvailable(bot))
+        {
+            temp = TeleportService.getAttackDirection(bot);
 
-        //     if (!temp.isZero())
-        //     {
-        //         playerAction.action = PlayerActions.FIRETELEPORT;
-        //         playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(temp));
-        //         this.playerAction = playerAction;
+            if (!temp.isZero())
+            {
+                playerAction.action = PlayerActions.FIRETELEPORT;
+                playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(temp));
+                this.playerAction = playerAction;
 
-        //         TeleportService.shoot(playerAction.heading);
-        //         return;
-        //     }
-        // }
-
-        // CARI SUPER FOOD
-        // List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
-        // if (!superFoods.isEmpty())
-        // {
-        //     playerAction.action = PlayerActions.FORWARD;
-        //     playerAction.heading = RadarService.getHeadingBetween(bot, superFoods.get(0));
-        //     this.playerAction = playerAction;
-        //     System.out.println("12");
-
-        //     return;
-        // }
-
-        // // CARI SUPER FOOD
-        // List<GameObject> superFoods = FoodServices.getSuperFoods(gameState, bot);
-        // if (!superFoods.isEmpty())
-        // {
-        //     playerAction.action = PlayerActions.FORWARD;
-        //     playerAction.heading = RadarService.getHeadingBetween(bot, superFoods.get(0));
-        //     this.playerAction = playerAction;
-        //     System.out.println("12");
-
-        //     return;
-        // }
+                TeleportService.shoot(playerAction.heading);
+                return;
+            }
+        }
 
    
         if (SupernovaService.isSupernovaPickupExist(gameState) && SupernovaService.isBotNearestfromPickup(gameState, bot))

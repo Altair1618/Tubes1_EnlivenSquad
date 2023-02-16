@@ -25,7 +25,12 @@ public class ShieldService {
 
         List<GameObject> shieldList = RadarService.getOtherObjects(ObjectTypes.SHIELD);
 
+        System.out.println(shieldList.size());
+
         for (int i = 0; i < shieldList.size(); i ++) {
+            System.out.println(shieldList.get(i).getPosition().getX() + " " + shieldList.get(i).getPosition().getY());
+            System.out.println(enemy.getPosition().getX() + " " + enemy.getPosition().getY());
+
             if (shieldList.get(i).getPosition().getX() == enemy.getPosition().getX()
             && shieldList.get(i).getPosition().getY() == enemy.getPosition().getY()) {
                 return true;

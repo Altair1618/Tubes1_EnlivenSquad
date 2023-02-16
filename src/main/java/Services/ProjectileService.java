@@ -15,8 +15,6 @@ public class ProjectileService {
         return isIncoming(bot, projectile, projectile.size);
     }
 
-
-
     static public boolean isIncoming(GameObject bot, GameObject projectile, int avoidableSize) {
         // Mengembalikan true jika torpedo mengarah ke bot
         // perhitungan dengan konsep segitiga
@@ -67,7 +65,7 @@ public class ProjectileService {
            
             WorldVector temp = nextHeadingAfterProjectile(gameState, bot, projectile);
 
-            Double distance = Math.min(0, RadarService.getRealDistance(projectile, bot));
+            Double distance = Math.max(0, RadarService.getRealDistance(projectile, bot));
             Double weight = distance;
 
             if (distance.equals(0.0)) weight = 0.001;
