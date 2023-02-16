@@ -12,8 +12,6 @@ public class ProjectileService {
         return isIncoming(bot, projectile, projectile.size);
     }
 
-
-
     static public boolean isIncoming(GameObject bot, GameObject projectile, int avoidableSize) {
         // Mengembalikan true jika torpedo mengarah ke bot
         // perhitungan dengan konsep segitiga
@@ -82,8 +80,8 @@ public class ProjectileService {
             true jika missiles yang ditembak
             keburu untuk kena musuhnya
          */
-        double tick_1 = (RadarService.getRealDistance(bot, enemy) + enemy.size - projectileSize) / projectileSpeed;
-        double tick_2 = (enemy.getSize() + projectileSize) / enemy.getSpeed();
+        double tick_1 = RadarService.getRealDistance(bot, enemy) / TorpedoService.missilesSpeed;
+        double tick_2 = (enemy.getSize() + TorpedoService.missilesSize) / enemy.getSpeed();
         
         return (tick_1 < tick_2);
     }
