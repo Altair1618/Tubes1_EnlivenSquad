@@ -372,24 +372,31 @@ public class BotService {
         if (SupernovaService.isSupernovaAvailable(bot) && !SupernovaService.isFired && tickTimer <= 0)
         /*punya supernova pickup */
         {
-            playerAction.action = PlayerActions.FIRESUPERNOVA;
 
             // players sudah terurut dari terdekat
             List<GameObject> players = PlayerService.getOtherPlayerList(gameState, bot);
 
-            for (int i = 0; i < players.size(); i++) {
-                if (RadarService.isCollapsing(players.get(i), bot, 50)) {
-                    // playerAction.heading = arah ke TARGET
-                    playerAction.heading = RadarService.getHeadingBetween(bot, players.get(i));
-                    // System.out.println("14");
-                    break;
+            int maxWeight = 0;
+            GameObject tempTarget = null;
+            
+            for (GameObject player : players)
+            {
+                if (player.size > maxWeight)
+                {
+                    maxWeight = player.size;
+                    tempTarget = player;
                 }
             }
-            
-            SupernovaService.isFired = true;
 
-            this.playerAction = playerAction;
-            return;
+            if (maxWeight > 0)
+            {   
+                playerAction.action = PlayerActions.FIRESUPERNOVA;
+                playerAction.heading = RadarService.getHeadingBetween(bot, tempTarget);
+                SupernovaService.isFired = true;
+
+                this.playerAction = playerAction;
+                return;
+            }
         }
 
         var foods = FoodServices.getAllFoods(gameState, bot);
