@@ -161,13 +161,18 @@ public class BotService {
         /* AFTERBURNER */
 
         List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange - 100);
+        
         /* Kalau belum nyala */
+        /* Kalau ada preys dan
+         * gada player lebih gede di sekitar dan
+         * sedang tidak afterburner
+         */
         if (!preys.isEmpty() && directionVectors.isEmpty() && !Effects.getEffectList(bot.effectsCode).get(0)) {
             
             double distance = RadarService.getRealDistance(bot, preys.get(0));
             double tick = distance / (bot.getSpeed() * 2);
             
-            if (bot.getSize() - 2 * tick > preys.get(0).getSize() + PlayerService.sizeDifferenceOffset) {
+            if ((bot.getSize() - 2 * tick) > (preys.get(0).getSize() + PlayerService.sizeDifferenceOffset)) {
                 playerAction.action = PlayerActions.STARTAFTERBURNER;
                 playerAction.heading = RadarService.getHeadingBetween(bot, preys.get(0));
 
@@ -179,9 +184,12 @@ public class BotService {
         }
 
         /* Kalau sedang nyala */
-
-        /* Kalau ternyata ada prioritas yang lebih tinggi */
-        if (!directionVectors.isEmpty() && Effects.getEffectList(bot.effectsCode).get(0)) {
+        /*
+         * (Kalau ada player lebih gede di sekitar dan
+         * sedang afterburner) atau
+         * (gaada preys di sekitar dan sedang afterburner)
+         */
+        if ((!directionVectors.isEmpty() || preys.isEmpty()) && Effects.getEffectList(bot.effectsCode).get(0)) {
             
             playerAction.action = PlayerActions.STOPAFTERBURNER;
             this.playerAction = playerAction;
@@ -190,36 +198,38 @@ public class BotService {
             return;
         }
 
+        /*
+         * Kalau ga ada player lebih gede di sekitar dan
+         * lagi ngejar preys dan
+         * sedang afterburner
+         */
+
+        if (directionVectors.isEmpty() && !preys.isEmpty() && Effects.getEffectList(bot.effectsCode).get(0)) {
+            playerAction.action = PlayerActions.FORWARD;
+            playerAction.heading = RadarService.getHeadingBetween(bot, preys.get(0));
+
+            this.playerAction = playerAction;
+
+            return;
+        }
+
+        /*
+         * Kalau ada preys dan
+         * ada player lebih gede di sekitar dan
+         * sedang afterburner
+         */
         if (!preys.isEmpty() && directionVectors.isEmpty() && Effects.getEffectList(bot.effectsCode).get(0)) {
             double distance = RadarService.getRealDistance(bot, preys.get(0));
             double tick = distance / (bot.getSpeed() * 2);
             
             /* Kalau ternyata malah bahaya bisa mati */
-            if (bot.getSize() - 2 * tick > preys.get(0).getSize() + PlayerService.sizeDifferenceOffset) {
+            if ((bot.getSize() - 2 * tick) > (preys.get(0).getSize() + PlayerService.sizeDifferenceOffset)) {
                 playerAction.action = PlayerActions.STOPAFTERBURNER;
                 this.playerAction = playerAction;
 
                 System.out.println("BAHAYA");
 
                 return;
-            } else { /* Kalau aman */
-                if (bot.getHeading() == RadarService.getHeadingBetween(bot, preys.get(0))) {
-                    playerAction.action = PlayerActions.FIRETORPEDOES;
-                    playerAction.heading = bot.getHeading();
-
-                    this.playerAction = playerAction;
-                    System.out.println("KEJAR DAN TEMBAK");
-
-                    return;
-                } else {
-                    playerAction.action = PlayerActions.FORWARD;
-                    playerAction.heading = RadarService.getHeadingBetween(bot, preys.get(0));
-
-                    this.playerAction = playerAction;
-                    System.out.println("KEJAR LAGI KEJAR LAGI");
-
-                    return;
-                }
             }
         }
 
