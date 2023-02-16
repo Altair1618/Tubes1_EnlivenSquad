@@ -58,7 +58,7 @@ public class PlayerService {
     }
 
     static public List<GameObject> getPreys(GameState gameState, GameObject bot, int offset, int range) {
-        // Mengembalikan List Player yang lebih besar dari bot
+        // Mengembalikan List Player yang lebih kecil dari bot
 
         return RadarService.players.stream().filter(item -> isBotBigger(bot, item, offset) && RadarService.getRealDistance(bot, item) <= range).collect(Collectors.toList());
     }
