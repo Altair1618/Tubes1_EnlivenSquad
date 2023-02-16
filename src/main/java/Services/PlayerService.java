@@ -54,7 +54,6 @@ public class PlayerService {
         // Mengembalikan List Player yang lebih besar dari bot
 
         return RadarService.players.stream().filter(item -> !isBotBigger(bot, item) && RadarService.getRealDistance(bot, item) <= range).collect(Collectors.toList());
-
     }
 
     static public List<GameObject> getPreys(GameState gameState, GameObject bot, int offset, int range) {
@@ -72,7 +71,6 @@ public class PlayerService {
 
         for (GameObject obj : others) {
 
-
             Double distance = Math.max(0, RadarService.getRealDistance(obj, bot));
             Double weight = distance;
             
@@ -89,7 +87,7 @@ public class PlayerService {
             if (weight.equals(0.0)) weight = 10e-3;
             else weight = (double) RadarService.roundToEven(weight);
 
-            weight *= 3;
+            weight /= 3;
 
             total.add(ProjectileService.nextHeadingAfterProjectile(gameState, bot, tp).toNormalize().div(weight));
         }
