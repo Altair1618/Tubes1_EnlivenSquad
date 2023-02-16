@@ -6,7 +6,9 @@ import java.util.*;
 import java.util.stream.*;
 
 public class SupernovaService extends ProjectileService {
-    static private int superNovaSize = 100; // asumsi besar ledakan supernova
+    static public int superNovaSize = 100; // asumsi besar ledakan supernova
+    static public boolean isDetonated = false; // apakah supernova bomb sudah didetonate
+    static public boolean isFired = false; // apakah supernova bomb sudah ditembak
 
     static public boolean isSupernovaAvailable(GameObject bot) {
         // True jika supernovaAvailable

@@ -7,10 +7,25 @@ import Enums.ObjectTypes;
 
 public class TeleportService extends ProjectileService {
     
-    static UUID firedTeleportId = null;
-    static public int teleportSizeLimit = 25;
-    static public int lowestTeleportSize = 20;
+    static public UUID firedTeleportId = null;
+    static public int heading = 0;
+    static public boolean isFired = false;
+    static public int teleportSizeLimit = 50;
     static public int profitLimit = 15;
+
+    static public void shoot(int angle)
+    {
+        isFired = true;
+        
+        heading = angle;
+    }
+
+    static public void teleport()
+    {
+        firedTeleportId = null;
+        isFired = false;
+        heading = 0;
+    }
 
     static public Boolean isTeleportAvailable(GameObject bot)
     {
@@ -34,11 +49,11 @@ public class TeleportService extends ProjectileService {
         List<GameObject> temp = RadarService.getOtherObjects(ObjectTypes.TELEPORTER);
         
         for (GameObject teleporter : temp) {
-            if (teleporter.id == firedTeleportId)
+            if (teleporter.getHeading() == heading)
             {
                 if (FieldService.isOutsideMap(gameState, teleporter.position, bot.size))
                 {
-                    firedTeleportId = null;
+                    teleport();
                     return null;
 
                 }
@@ -48,8 +63,9 @@ public class TeleportService extends ProjectileService {
                     return teleporter;
                 }
             }  
-        }
+        }  
 
+        teleport();
         return null;
     }
 
@@ -60,7 +76,31 @@ public class TeleportService extends ProjectileService {
         return RadarService.getCollapsingObjects(gameState, teleporter.position, bot.size + sizeOffset);
     }
 
-    static public boolean isTeleportSafe(GameObject bot, List<GameObject> collapsingObjects)
+
+    static public WorldVector getAttackDirection(GameObject bot)
+    {
+        List<GameObject> players = RadarService.players;
+        GameObject target = null;
+        int currentTargetSize = 0;
+
+        for (GameObject player : players)
+        {
+            if (player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20 && currentTargetSize < player.size)
+            {
+                target = player;
+                currentTargetSize = player.size;
+            }
+        }
+
+        if (currentTargetSize != 0)
+        {
+            return new WorldVector(bot.position, target.position);
+        }
+
+        return new WorldVector();
+    }
+
+    static public boolean isTeleportSafe(GameObject bot, List<GameObject> collapsingObjects, boolean isAttacking)
     {
         int totalPreySize = 0;
         int maxPreySize = 0;
@@ -114,13 +154,16 @@ public class TeleportService extends ProjectileService {
 
         if (bot.size - totalTorpedoDamage <= Math.max(maxPreySize, teleportSizeLimit)) return false;
 
-        if (totalPreySize <= totalTorpedoDamage + profitLimit)
+       
+        if (totalPreySize <= totalTorpedoDamage + (isAttacking? profitLimit : 0))
         {
             if (totalPreySize > totalTorpedoDamage) return !cloudFlag && !asteroidField;
             else return false;
         }
+        
 
         return true;
+
     }
 
 }

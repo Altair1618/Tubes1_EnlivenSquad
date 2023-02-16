@@ -33,7 +33,6 @@ public class PlayerService {
         }
 
         return res;
-
     }
 
     static public int getOtherPlayerHeading(GameObject other) {
@@ -64,11 +63,11 @@ public class PlayerService {
         return RadarService.players.stream().filter(item -> isBotBigger(bot, item, offset) && RadarService.getRealDistance(bot, item) <= range).collect(Collectors.toList());
     }
 
-    static public WorldVector getEscapePlayerVector(List<GameObject> others, GameObject bot) {
+    static public WorldVector getEscapePlayerVector(GameState gameState, List<GameObject> others, GameObject bot) {
         // Mengembalikan Vektor arah player bila ingin kabur
         // Others diisi dengan bigger players bukan other players
 
-        return FieldService.getHeadingEscape(bot, others);
+        return FieldService.getHeadingEscape(gameState, bot, others);
     }
 
     static public WorldVector getEscapePlayerVector(GameObject bot, List<GameObject> others)
@@ -113,9 +112,8 @@ public class PlayerService {
     static public WorldVector getChasePlayerVector(List<GameObject> preys, GameObject bot) {
         // Mengembalikan Vektor mengejar player lebih kecil
 
-        return FieldService.getHeadingEscape(bot, preys);
-        // WorldVector res = new WorldVector();
+        if (preys.isEmpty()) return new WorldVector();
 
-        // int count = 0;
+        return new WorldVector(bot.position, preys.get(0).position);
     }
 }
