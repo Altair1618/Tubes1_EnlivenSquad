@@ -60,12 +60,4 @@ public class TorpedoService extends ProjectileService {
 
         return false;
     }
-
-    static public WorldVector getInverseDirection(GameObject torpedo)
-    {
-        WorldVector temp = RadarService.degreeToVector(torpedo.getHeading());
-        
-        
-    }
-
 }
