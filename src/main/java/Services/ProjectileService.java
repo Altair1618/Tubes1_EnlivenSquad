@@ -61,7 +61,7 @@ public class ProjectileService {
         WorldVector res = new WorldVector();
 
         incomingProjectiles.forEach((projectile) -> {
-           
+
             WorldVector temp = nextHeadingAfterProjectile(gameState, bot, projectile);
 
             Double distance = Math.max(0, RadarService.getRealDistance(projectile, bot));

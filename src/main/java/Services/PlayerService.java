@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.*;
 
 public class PlayerService {
-    static public int playerDangerRange = 20; // Range player gede dianggap berbahaya
+    static public int playerDangerRange = 40; // Range player gede dianggap berbahaya
     static public int sizeDifferenceOffset = 10; // Minimal selisih size player yang dikejar
 
     static public List<GameObject> getOtherPlayerList(GameState gameState, GameObject bot) {
@@ -89,7 +89,9 @@ public class PlayerService {
             if (weight.equals(0.0)) weight = 10e-3;
             else weight = (double) RadarService.roundToEven(weight);
 
-            total.add(new WorldVector(tp.position, bot.position).toNormalize().div(weight));
+            weight *= 3;
+
+            total.add(ProjectileService.nextHeadingAfterProjectile(gameState, bot, tp).toNormalize().div(weight));
         }
 
         if (total.isZero() && others.size() == 2) 
