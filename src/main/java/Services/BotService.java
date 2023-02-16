@@ -115,7 +115,7 @@ public class BotService {
             {
                 List<GameObject> collapsingObjects = TeleportService.getCollapsingObjectsAfterTeleport(gameState, bot, teleporter, 200);
                 List<GameObject> collapsingPlayers = TeleportService.getCollapsingPlayersAfterTeleport(gameState, bot, teleporter, 200);
-                boolean isSafe = TeleportService.isTeleportSafe(bot, teleporter, collapsingObjects, collapsingPlayers, true);
+                boolean isSafe = TeleportService.isTeleportSafe(bot, teleporter, collapsingObjects, collapsingPlayers, TeleportService.isAttacking);
 
                 System.out.println(isSafe);
                 if (isSafe)
@@ -132,6 +132,7 @@ public class BotService {
 
         if (!TeleportService.isFired && TeleportService.isTeleportAvailable(bot))
         {
+            
             temp = TeleportService.getAttackDirection(bot);
 
             if (!temp.isZero())
@@ -139,7 +140,7 @@ public class BotService {
                 playerAction.action = PlayerActions.FIRETELEPORT;
                 playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(temp));
                 this.playerAction = playerAction;
-
+                TeleportService.isAttacking = true;
                 TeleportService.shoot(playerAction.heading);
                 return;
             }
@@ -420,7 +421,7 @@ public class BotService {
 
         // KASUS SELANJUTNYA ADALAH KASUS TIDAK ADA YANG PERLU DIKEJAR ATAU DIHINDARI
 
-        if (SupernovaService.isSupernovaPickupExist(gameState) && SupernovaService.isBotNearestfromPickup(gameState, bot))
+        if (SupernovaService.isSupernovaPickupExist(gameState, bot, fieldRadarRadius) && SupernovaService.isBotNearestfromPickup(gameState, bot))
         {
             playerAction.action = PlayerActions.FORWARD;
             playerAction.heading = RadarService.getHeadingBetween(bot, SupernovaService.getSupernovaPickupObject(gameState));
@@ -432,7 +433,6 @@ public class BotService {
             return;
         }
 
-    
         if (SupernovaService.isSupernovaAvailable(bot) && !SupernovaService.isFired && tickTimer <= 0)
         /*punya supernova pickup */
         {
@@ -463,7 +463,17 @@ public class BotService {
             }
         }
 
-        var foods = FoodServices.getAllFoods(bot, fieldRadarRadius);
+        List<GameObject> foods;
+        
+        if (!TeleportService.isFired && TeleportService.isTeleportAvailable(bot))
+        {
+            foods = FoodServices.getAllFoods(bot, fieldRadarRadius);
+        }
+
+        else
+        {
+            foods = FoodServices.getAllFoods(gameState, bot);
+        }
 
         // playerAction.heading = arah ke TARGET
 
@@ -472,6 +482,24 @@ public class BotService {
             // System.out.println("15");
             playerAction.action = PlayerActions.FORWARD;
             playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+        }
+
+        else if (!TeleportService.isFired && TeleportService.isTeleportAvailable(bot))
+        {
+            playerAction.action = PlayerActions.TELEPORT;
+            foods = FoodServices.getAllFoods(gameState, bot);
+
+            if (!foods.isEmpty())
+            {
+                playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+            }
+
+            else
+            {
+                playerAction.heading = RadarService.getHeadingBetween(bot.position, gameState.world.centerPoint);
+            }
+
+            TeleportService.isAttacking = false;
         }
 
         else

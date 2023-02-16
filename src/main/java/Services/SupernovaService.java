@@ -16,9 +16,9 @@ public class SupernovaService extends ProjectileService {
         return (bot.supernovaAvailable == 1);
     }
 
-    static public boolean isSupernovaPickupExist(GameState gameState) {
+    static public boolean isSupernovaPickupExist(GameState gameState, GameObject bot, int radarRadius) {
         // Mengecek apakah terdapat supernova pickup di world
-        var SupernovaPickup = gameState.getGameObjects().stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP).collect(Collectors.toList());
+        var SupernovaPickup = RadarService.getOtherObjects(ObjectTypes.SUPERNOVAPICKUP, bot, radarRadius);
         return !SupernovaPickup.isEmpty();
     }
 
