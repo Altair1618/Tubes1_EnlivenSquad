@@ -65,8 +65,7 @@ public class TorpedoService extends ProjectileService {
     {
         WorldVector temp = RadarService.degreeToVector(torpedo.getHeading());
         
-        return temp;
+        
     }
-
 
 }
