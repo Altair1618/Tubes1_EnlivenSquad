@@ -459,7 +459,7 @@ public class BotService {
                 this.playerAction = playerAction;
 
                 if (desc1 == "Avoid") desc1 += "[]";
-                if (desc2 == "Chasing") desc2 += "[]";
+                if (desc2 == " | Chasing") desc2 += "[]";
                 printInfo(gameState, playerAction, desc1 + desc2);
 
                 return;
