@@ -14,7 +14,7 @@ public class TeleportService extends ProjectileService {
     static public int teleportSizeLimit = 30;
     static public int profitLimit = 0;
     static public boolean hasFound = false;
-    static public int minTeleportDistance = 200;
+    static public int minTeleportDistance = 100;
 
     static public int teleporterSpeed = 20;
     static public boolean isAttacking = false;
@@ -116,7 +116,7 @@ public class TeleportService extends ProjectileService {
         for (GameObject player : players)
         {
             int tempDistance = RadarService.roundToEven(RadarService.getRealDistance(bot, player));
-            if (player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20
+            if ((player.size >= 20) && player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20
                     && (target == null || currentTargetDistance > tempDistance)
             )
             {

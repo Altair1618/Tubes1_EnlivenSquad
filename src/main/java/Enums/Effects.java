@@ -26,12 +26,12 @@ public enum Effects {
             if (temp >= ctr)
             {
                 temp -= ctr;
-                res.add(true);
+                res.add(0, true);
             }
 
             else
             {
-                res.add(false);
+                res.add(0, false);
             }
 
             ctr /= 2;
