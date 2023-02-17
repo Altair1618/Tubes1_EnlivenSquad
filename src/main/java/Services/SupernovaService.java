@@ -43,12 +43,6 @@ public class SupernovaService extends ProjectileService {
         return nearest == bot;
     }
 
-    static public boolean isSupernovaBombExist(GameState gameState) {
-        // Mengecek apakah terdapat bom supernova di world
-        var SupernovaPickup = gameState.getGameObjects().stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB).collect(Collectors.toList());
-        return !SupernovaPickup.isEmpty();
-    }
-
     static public List<GameObject> getSupernovaBombs(GameState gameState) {
         // I.S Supernova Pickup Exist
         var bombList = gameState.getGameObjects()

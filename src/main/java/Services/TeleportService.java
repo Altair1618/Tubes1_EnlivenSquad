@@ -21,7 +21,7 @@ public class TeleportService extends ProjectileService {
 
     static public void shoot(int angle)
     {
-        System.out.println("Shooting teleporter");
+
         isFired = true;
         heading = angle;
         hasFound = false;
@@ -29,7 +29,7 @@ public class TeleportService extends ProjectileService {
 
     static public void teleport()
     {
-        System.out.println("Deleting teleporter");
+
         isFired = false;
         heading = 0;
         hasFound = false;
@@ -40,11 +40,6 @@ public class TeleportService extends ProjectileService {
     {
         // mengembalikan true jika player dapat menggunakan teleport
         return bot.teleporterCount > 0 && bot.size >= teleportSizeLimit;
-    }
-
-    static public Boolean isTeleportFired()
-    {
-        return isFired;
     }
 
     static public GameObject getFiredTeleport(GameState gameState, GameObject bot)
@@ -84,12 +79,6 @@ public class TeleportService extends ProjectileService {
             .stream()
             .filter(teleporter -> ProjectileService.isIncoming(bot, teleporter, biggestEnemySize))
             .collect(Collectors.toList());
-    }
-
-    static public boolean isTeleportDangerous(GameObject bot)
-    {
-    
-        return false;
     }
 
     static public List<GameObject> getCollapsingObjectsAfterTeleport(GameState gameState, GameObject bot, GameObject teleporter, int sizeOffset)
@@ -135,8 +124,7 @@ public class TeleportService extends ProjectileService {
 
     static public boolean isTeleportSafe(GameState gameState, GameObject bot, GameObject teleporter, List<GameObject> collapsingObjects, List<GameObject> collapsingPlayers, boolean isAttacking)
     {
-        System.out.print("Collapsing objects count : ");
-        System.out.println(collapsingObjects.size());
+
         if (collapsingObjects.isEmpty())
         {
             if (isAttacking) return false;
@@ -152,7 +140,7 @@ public class TeleportService extends ProjectileService {
 
         for (GameObject player: collapsingPlayers)
         {
-            System.out.println("Player near teleporter!");
+
             if (RadarService.isCollapsing(player, teleporter.position, bot.size))
             {
 

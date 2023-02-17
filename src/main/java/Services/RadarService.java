@@ -90,17 +90,6 @@ public class RadarService {
                 .collect(Collectors.toList());
     }
 
-    static public List<GameObject> getNearestOtherObjects(GameObject bot, ObjectTypes type)
-    {
-
-
-        if (objects.get(type).isEmpty()) return new ArrayList<GameObject>();
-
-        Double distance = RadarService.getRealDistance(bot, objects.get(type).get(0));
-        
-        return objects.get(type).stream().filter(item -> RadarService.getRealDistance(bot, item).equals(distance)).collect(Collectors.toList());
-    }
-
     static public Double getRealDistance(int radius1, int radius2, double distance)
     {
         // can return negative distance if collapsing
@@ -152,27 +141,6 @@ public class RadarService {
         return (direction + 360) % 360;
     }
 
-    static public int getHeadingBetween(Position p1, Position p2) {
-        // mengembalikan arah (global, bukan lokal) menuju p2 dari p1 (dalam derajat) 
-        var direction = toDegrees(Math.atan2(p2.y - p1.y,
-                p2.x - p1.x));
-        return (direction + 360) % 360;
-    }
-
-    static public Position nextPosition(int heading, GameObject bot)
-    {
-        // mengembalikan prediksi posisi bot pada tik berikutnya
-        int speed = bot.speed;
-
-        // List<Boolean> effectList = Effects.getEffectList(bot.effectsCode);
-
-        // if (effectList.get(0)) speed *= 2;
-        // if (effectList.get(1)) speed /= 2;
-
-        double rad = heading * Math.PI / 180;
-        return new Position(roundToEven(bot.getPosition().x + speed * Math.cos(rad)), roundToEven(bot.getPosition().y + speed * Math.sin(rad)));
-    }
-
     static public boolean isCollapsing(GameObject object1, GameObject object2)
     {
         // mengembalikan true jika object1 dan object2 collapse
@@ -197,14 +165,6 @@ public class RadarService {
         return (object.size + size > distance);
     }
 
-    static public boolean isCollapsing(GameObject object, Position p, Integer size, int offset)
-    {
-        // mengembalikan true jika object1 dan object2 collapse
-        long distance = roundToEven(getDistanceBetween(object, p));
-
-        return (object.size + size + offset > distance);
-    }
-
     static public List<GameObject> getCollapsingPlayers(GameState gameState, Position position, Integer size)
     {
         // mengembalikan objek-objek bertipe tertentu yang sedang collapse dengan bot pada posisi dan size tertentu
@@ -222,14 +182,6 @@ public class RadarService {
 
     }
 
-    static public List<GameObject> getCollapsingObjects(GameState gameState, GameObject bot, ObjectTypes type)
-    {
-        // mengembalikan objek-objek bertipe tertentu yang sedang collapse dengan bot 
-        
-        return getOtherObjects(type).stream().filter(obj -> isCollapsing(obj, bot)).collect(Collectors.toList());
-   
-    }
-
     static public Double getDistanceFromZero(GameObject object, GameState gameState) {
         // Mengembalikan Jarak Objek dari Center
         Position center = gameState.getWorld().getCenterPoint();
@@ -244,14 +196,6 @@ public class RadarService {
         var triangleX = Math.abs(p.getX() - center.getX());
         var triangleY = Math.abs(p.getY() - center.getY());
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
-    }
-
-    static public boolean isInWorld(Position p, GameState gameState, GameObject bot, int offset) {
-        return getDistanceFromZero(p, gameState) < gameState.getWorld().getRadius() - bot.getSize() - offset;
-    }
-
-    static public boolean isInWorld(GameObject object, GameState gameState, GameObject bot, int offset) {
-        return getDistanceFromZero(object, gameState) < gameState.getWorld().getRadius() - bot.getSize() - offset;
     }
 
     static public Double vectorToDegree(WorldVector v)

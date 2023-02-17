@@ -15,31 +15,6 @@ public class PlayerService {
         return RadarService.players;
     }
 
-    static public List<GameObject> getNearestPlayers(GameState gameState, GameObject bot)
-    {
-        List<GameObject> players = getOtherPlayerList(gameState, bot);
-        List<GameObject> res = new ArrayList<GameObject>();
-
-        if (players.isEmpty()) return res;
-
-        res.add(players.get(0));
-
-        int i = 1;
-        double distance = RadarService.getRealDistance(bot, players.get(0));
-
-        while (i < players.size() && RadarService.getRealDistance(bot, players.get(i)).equals(distance))
-        {
-            res.add(players.get(i));
-        }
-
-        return res;
-    }
-
-    static public int getOtherPlayerHeading(GameObject other) {
-        // Mengembalikan Heading Player Lain
-        return other.getHeading();
-    }
-
     static public boolean isBotBigger(GameObject bot, GameObject other) {
         // Mengembalikan Apakah Bot Lebih Besar Daripada Player other
         return bot.getSize() > other.getSize();
