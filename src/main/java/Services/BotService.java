@@ -539,16 +539,21 @@ public class BotService {
 
             foods = FoodServices.getAllFoods(gameState, bot);
 
-            if (!foods.isEmpty())
+            if (foods.size() > 20)
             {
-                playerAction.action = PlayerActions.FIRETELEPORT;
-                playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(TeleportService.escapeDirection(gameState, bot)));
-                tpTimer = 100;
+                temp = TeleportService.escapeDirection(gameState, bot);
 
-                TeleportService.isAttacking = false;
-                TeleportService.shoot(playerAction.heading);
-
-                printInfo(gameState, playerAction, "Teleporting to foods");
+                if (!temp.isZero())
+                {
+                    playerAction.action = PlayerActions.FIRETELEPORT;
+                    playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(TeleportService.escapeDirection(gameState, bot)));
+                    tpTimer = 100;
+    
+                    TeleportService.isAttacking = false;
+                    TeleportService.shoot(playerAction.heading);
+    
+                    printInfo(gameState, playerAction, "Teleporting to foods");
+                }
             }
         }
 
