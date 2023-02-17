@@ -459,7 +459,7 @@ public class BotService {
                 this.playerAction = playerAction;
 
                 if (desc1 == "Avoid") desc1 += "[]";
-                if (desc2 == "Chasing") desc2 += "[]";
+                if (desc2 == " | Chasing") desc2 += "[]";
                 printInfo(gameState, playerAction, desc1 + desc2);
 
                 return;
@@ -468,7 +468,7 @@ public class BotService {
 
         // KASUS SELANJUTNYA ADALAH KASUS TIDAK ADA YANG PERLU DIKEJAR ATAU DIHINDARI
 
-        if (SupernovaService.isSupernovaPickupExist(gameState, bot, fieldRadarRadius) && SupernovaService.isBotNearestfromPickup(gameState, bot))
+        if (SupernovaService.isSupernovaPickupExist(gameState, bot, fieldRadarRadius) && SupernovaService.isBotNearestfromPickup(gameState, bot) && SupernovaService.isSupernovaPickupSafe(gameState, fieldRadarRadius))
         {
             playerAction.action = PlayerActions.FORWARD;
             playerAction.heading = RadarService.getHeadingBetween(bot, SupernovaService.getSupernovaPickupObject(gameState));
@@ -539,16 +539,21 @@ public class BotService {
 
             foods = FoodServices.getAllFoods(gameState, bot);
 
-            if (!foods.isEmpty())
+            if (foods.size() > 20)
             {
-                playerAction.action = PlayerActions.FIRETELEPORT;
-                playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(TeleportService.escapeDirection(gameState, bot)));
-                tpTimer = 100;
+                temp = TeleportService.escapeDirection(gameState, bot);
 
-                TeleportService.isAttacking = false;
-                TeleportService.shoot(playerAction.heading);
-
-                printInfo(gameState, playerAction, "Teleporting to foods");
+                if (!temp.isZero())
+                {
+                    playerAction.action = PlayerActions.FIRETELEPORT;
+                    playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(TeleportService.escapeDirection(gameState, bot)));
+                    tpTimer = 100;
+    
+                    TeleportService.isAttacking = false;
+                    TeleportService.shoot(playerAction.heading);
+    
+                    printInfo(gameState, playerAction, "Teleporting to foods");
+                }
             }
         }
 
