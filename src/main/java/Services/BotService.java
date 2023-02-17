@@ -155,6 +155,7 @@ public class BotService {
         if (isAfterburner && bot.size <= afterBurnerSizeLimit)
         {
             playerAction.action = PlayerActions.STOPAFTERBURNER;
+            playerAction.heading = bot.getHeading();
             this.playerAction = playerAction;
 
             System.out.println("STOP AFTERBURNER");
@@ -166,11 +167,13 @@ public class BotService {
         int maxEnemySize = PlayerService.getBiggestEnemySize();
         List<GameObject> incomingTeleports = TeleportService.getIncomingTeleporter(bot, maxEnemySize + 20);
 
+        if (!playersList.isEmpty() && Effects.getEffectList(playersList.get(0).effectsCode).get(4))
+            System.out.println("DONT SHOOOOOOOOOOOOOOOOOOOT!!!!!!!!!");
         if (!playersList.isEmpty()
             && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius 
             && TorpedoService.isTorpedoAvailable(bot, 40)
             && ProjectileService.isPriorHit(bot, playersList.get(0), TorpedoService.missilesSpeed, TorpedoService.missilesSize)
-            && !ShieldService.isPlayerShielded(playersList.get(0))
+            && !Effects.getEffectList(playersList.get(0).effectsCode).get(4)
             ) {
             /* menembak */
 
@@ -231,6 +234,7 @@ public class BotService {
         if ((!directionVectors.isEmpty() || preys.isEmpty()) && isAfterburner) {
 
             playerAction.action = PlayerActions.STOPAFTERBURNER;
+            playerAction.heading = bot.getHeading();
             this.playerAction = playerAction;
             System.out.println("STOP AFTERBURNER");
 
@@ -252,6 +256,7 @@ public class BotService {
             /* Kalau ternyata malah bahaya bisa mati */
             if ((bot.getSize() - 2 * tick) <= (preys.get(0).getSize() + PlayerService.sizeDifferenceOffset)) {
                 playerAction.action = PlayerActions.STOPAFTERBURNER;
+                playerAction.heading = bot.getHeading();
                 this.playerAction = playerAction;
 
                 System.out.println("STOP AFTERBURNER");
@@ -377,7 +382,7 @@ public class BotService {
         // KASUS PINDAH 6
         // jika masuk cloud
 
-        List<GameObject> collapsingClouds = FieldService.getCollapsingClouds(bot, fieldRadarRadius);
+        List<GameObject> collapsingClouds = FieldService.getCollapsingClouds(bot, Math.min(10, fieldRadarRadius - bot.size));
 
         if (!collapsingClouds.isEmpty())
         {
@@ -392,7 +397,7 @@ public class BotService {
 
         // KASUS PINDAH 7
         // jika masuk asteroid
-        List<GameObject> collapsingAsteroids = FieldService.getCollapsingAsteroids(bot, fieldRadarRadius);
+        List<GameObject> collapsingAsteroids = FieldService.getCollapsingAsteroids(bot, Math.min( 10,fieldRadarRadius - bot.size));
         if (!collapsingAsteroids.isEmpty())
         {
 
@@ -508,7 +513,7 @@ public class BotService {
 
             if (!foods.isEmpty())
             {
-                playerAction.action = PlayerActions.TELEPORT;
+                playerAction.action = PlayerActions.FIRETELEPORT;
                 playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(TeleportService.escapeDirection(gameState, bot)));
                 tpTimer = gameState.world.radius * 3 / TeleportService.teleporterSpeed;
 

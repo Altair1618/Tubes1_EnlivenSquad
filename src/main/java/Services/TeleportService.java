@@ -116,7 +116,7 @@ public class TeleportService extends ProjectileService {
         for (GameObject player : players)
         {
             int tempDistance = RadarService.roundToEven(RadarService.getRealDistance(bot, player));
-            if (player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20
+            if ((player.size >= 20) && player.size + PlayerService.sizeDifferenceOffset <= bot.size - 20
                     && (target == null || currentTargetDistance > tempDistance)
             )
             {
