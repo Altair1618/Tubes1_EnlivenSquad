@@ -468,7 +468,7 @@ public class BotService {
 
         // KASUS SELANJUTNYA ADALAH KASUS TIDAK ADA YANG PERLU DIKEJAR ATAU DIHINDARI
 
-        if (SupernovaService.isSupernovaPickupExist(gameState, bot, fieldRadarRadius) && SupernovaService.isBotNearestfromPickup(gameState, bot))
+        if (SupernovaService.isSupernovaPickupExist(gameState, bot, fieldRadarRadius) && SupernovaService.isBotNearestfromPickup(gameState, bot) && SupernovaService.isSupernovaPickupSafe(gameState, fieldRadarRadius))
         {
             playerAction.action = PlayerActions.FORWARD;
             playerAction.heading = RadarService.getHeadingBetween(bot, SupernovaService.getSupernovaPickupObject(gameState));
