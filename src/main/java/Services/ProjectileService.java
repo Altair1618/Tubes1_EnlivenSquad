@@ -21,7 +21,7 @@ public class ProjectileService {
         int torpedoHeading = projectile.getHeading();
         int headingBetween = RadarService.getHeadingBetween(projectile, bot);
         double distance = RadarService.getRealDistance(projectile, bot);
-        int radius = avoidableSize + projectile.getSize();
+        int radius = avoidableSize + bot.size;
 
         // offset = asin(radius / jarak torpedo ke bot)
         double offSet = RadarService.toDegrees(Math.asin(radius / distance));

@@ -213,9 +213,26 @@ public class TeleportService extends ProjectileService {
         }
         
         if (totalCloudSize > bot.size / 3) return false;
+
         if (isAttacking) return maxPreySize > 0 || pickUp;
 
         return (maxPreySize > 0 || RadarService.getDistanceBetween(bot, teleporter) >= Math.min(minTeleportDistance, gameState.world.radius / 3));
+    }
+
+    static public WorldVector escapeDirection(GameState gameSate, GameObject bot)
+    {
+        List<GameObject> foods = RadarService.allFoods;
+
+        if (foods.isEmpty()) return new WorldVector();
+
+        WorldVector total = new WorldVector();
+        for (GameObject food : foods)
+        {
+            total.add(new WorldVector(gameSate.world.centerPoint, food.position));
+        }
+        total = total.div(foods.size());
+        total.add(new WorldVector((double) -bot.position.x, (double) -bot.position.y));
+        return total;
     }
 
 }
