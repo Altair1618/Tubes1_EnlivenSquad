@@ -10,9 +10,10 @@ public class BotService {
     private PlayerAction playerAction;
     private GameState gameState;
 
-    static private int tickTimer = 0; // timer tick, > 0 jika timer hidup
+    static private int tickTimer = 0; // timer tick, > 0 jika timer hidup, solve bug engine pada supernova
+    static private int tpTimer = 0; // solve bug engine pada teleport
     static private int playerRadarRadius = 400; // radius jarak deteksi player
-    static private Double headingOffset = 1.; // offset sudut untuk mengamsumsikan arah saat ini sudah sesuai tujuan
+    static private Double headingOffset = 5.; // offset sudut untuk mengamsumsikan arah saat ini sudah sesuai tujuan
     static private int fieldRadarRadius = 60; // radius jarak deteksi cloud dan asteroid
     static private int huntingRange = 200;
     static private boolean isAfterburner = false;
@@ -77,7 +78,10 @@ public class BotService {
     public void computeNextPlayerAction(PlayerAction playerAction) {
 
         if (tickTimer > 0) tickTimer--;
+        if (tpTimer > 0) tpTimer--;
         if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
+
+        if (tpTimer == 0 && TeleportService.isFired) TeleportService.teleport();
 
         List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
         WorldVector temp;
@@ -115,7 +119,7 @@ public class BotService {
             {
                 List<GameObject> collapsingObjects = TeleportService.getCollapsingObjectsAfterTeleport(gameState, bot, teleporter, 200);
                 List<GameObject> collapsingPlayers = TeleportService.getCollapsingPlayersAfterTeleport(gameState, bot, teleporter, 200);
-                boolean isSafe = TeleportService.isTeleportSafe(bot, teleporter, collapsingObjects, collapsingPlayers, TeleportService.isAttacking);
+                boolean isSafe = TeleportService.isTeleportSafe(gameState, bot, teleporter, collapsingObjects, collapsingPlayers, TeleportService.isAttacking);
 
                 System.out.println(isSafe);
                 if (isSafe)
@@ -142,6 +146,7 @@ public class BotService {
                 this.playerAction = playerAction;
                 TeleportService.isAttacking = true;
                 TeleportService.shoot(playerAction.heading);
+                tpTimer = gameState.world.radius * 3 / TeleportService.teleporterSpeed;
                 return;
             }
         }
@@ -168,7 +173,7 @@ public class BotService {
 
         // KASUS PINDAH 1
         
-        List<GameObject> biggerPlayer = PlayerService.getBiggerPlayerInRange(gameState, bot, PlayerService.playerDangerRange);
+        List<GameObject> biggerPlayer = PlayerService.getBiggerPlayerInRange(gameState, bot, Math.min(PlayerService.playerDangerRange, gameState.world.radius / 5));
         if (!biggerPlayer.isEmpty() || (!incomingTeleports.isEmpty() && maxEnemySize + PlayerService.sizeDifferenceOffset > bot.size))
         {
             temp = PlayerService.getEscapePlayerVector(gameState, biggerPlayer, incomingTeleports, bot); /*isi temp dengan nilai arah kabur dari bot besar */
@@ -351,7 +356,7 @@ public class BotService {
         {
             temp = new WorldVector(); // isi dengan nilai arah kabur dari supernova bomb */
             temp = SupernovaService.nextHeadingAfterProjectile(gameState, bot, incomingSupernova.get(0));
-            t = new EscapeInfo(temp, weights[5]);
+            t = new EscapeInfo(temp, weights[4]);
 
             directionVectors.add(t);
             // System.out.println("7");
@@ -367,7 +372,7 @@ public class BotService {
             
             temp = FieldService.getHeadingEscape(gameState, bot, collapsingClouds);
 
-            t = new EscapeInfo(temp, weights[6]);
+            t = new EscapeInfo(temp, weights[5]);
             directionVectors.add(t);
             // System.out.println("8");
             
@@ -498,6 +503,8 @@ public class BotService {
             {
                 playerAction.heading = RadarService.getHeadingBetween(bot.position, gameState.world.centerPoint);
             }
+
+            tpTimer = gameState.world.radius * 3 / TeleportService.teleporterSpeed;
 
             TeleportService.isAttacking = false;
         }
