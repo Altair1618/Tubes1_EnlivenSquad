@@ -22,6 +22,9 @@
 | 13521148 | Johanes Lee	                |
 
 ## Screenshots
+<p align="center">
+    <img src="https://github.com/Altair1618/Tubes1_EnlivenSquad/blob/main/img/EnlivenBot.jpg" width="400">
+</p>
 
 ## Project Status
 Project is: complete
