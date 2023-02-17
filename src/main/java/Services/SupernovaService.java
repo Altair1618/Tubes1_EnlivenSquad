@@ -22,6 +22,12 @@ public class SupernovaService extends ProjectileService {
         return !SupernovaPickup.isEmpty();
     }
 
+    static public boolean isSupernovaPickupSafe(GameState gameState, int offset) {
+        GameObject pickup = getSupernovaPickupObject(gameState);
+        return (RadarService.getOtherObjects(ObjectTypes.GASCLOUD, pickup, offset).isEmpty()
+                && RadarService.getOtherObjects(ObjectTypes.ASTEROIDFIELD, pickup, offset).isEmpty());
+    }
+
     static public GameObject getSupernovaPickupObject(GameState gameState) {
         // I.S Supernova Pickup Exist
         var SupernovaPickup = gameState.getGameObjects().stream().filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP).collect(Collectors.toList());
