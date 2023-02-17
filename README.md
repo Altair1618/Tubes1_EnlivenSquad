@@ -2,6 +2,17 @@
 
 ## Greedy Algorithm
 
+Karena banyaknya alternatif solusi yang dapat diimplementasikan, dirancang beberapa teknik atau strategi greedy yang dikelompokkan berdasarkan objek yang memengaruhi aksi tersebut. Dalam implementasi bot ini, terdapat strategi
+
+1. Greedy by Using Supernova
+2. Greedy by Teleport
+3. Greedy by Firing Torpedoes
+4. Greedy by Escaping
+5. Greedy by Defense
+6. Greedy by Hunting
+7. Greedy by World Border
+8. Greedy by Obstacle
+9. Greedy by Food
 
 ## Requirement
 1. Java Virtual Machine (JVM) versi 11 atau lebih baru.
