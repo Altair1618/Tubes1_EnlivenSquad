@@ -12,14 +12,6 @@ public class TorpedoService extends ProjectileService {
     static public Double dangerZonePercentage = 0.8;
     static public Double dangerZoneRadiusFactor = 5.0;
 
-    static public int torpedoSizeLimit = 50;
-
-    static public boolean isTorpedoAvailable(GameObject bot) {
-        // True if player can fire torpedo
-        // default bot.size >= 50
-        return bot.torpedoSalvoCount > 0 && bot.size >= torpedoSizeLimit;
-    }
-
     static public boolean isTorpedoAvailable(GameObject bot, int sizeLimit) {
         // True if player can fire torpedo
         // with bot.size >= sizeLimit
