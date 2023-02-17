@@ -82,7 +82,7 @@ public class BotService {
         if (tpTimer > 0) tpTimer--;
         if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
 
-        if (tpTimer == 0 && TeleportService.isFired) TeleportService.teleport();
+        if (tpTimer == 0 && TeleportService.isFired && !TeleportService.hasFound) TeleportService.teleport();
 
         List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
         WorldVector temp;
@@ -147,7 +147,7 @@ public class BotService {
                 this.playerAction = playerAction;
                 TeleportService.isAttacking = true;
                 TeleportService.shoot(playerAction.heading);
-                tpTimer = gameState.world.radius * 3 / TeleportService.teleporterSpeed;
+                tpTimer = 100;
                 return;
             }
         }
@@ -515,7 +515,7 @@ public class BotService {
             {
                 playerAction.action = PlayerActions.FIRETELEPORT;
                 playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(TeleportService.escapeDirection(gameState, bot)));
-                tpTimer = gameState.world.radius * 3 / TeleportService.teleporterSpeed;
+                tpTimer = 100;
 
                 TeleportService.isAttacking = false;
             }
