@@ -17,7 +17,7 @@ public class BotService {
     static private int fieldRadarRadius = 60; // radius jarak deteksi cloud dan asteroid
     static private int huntingRange = 200;
     static private boolean isAfterburner = false;
-    static private int afterBurnerSizeLimit = 20;
+    static private int afterBurnerSizeLimit = 40;
 
     // weight untuk setiap kasus kabur/ngejar
     static private Double[] weights = {
@@ -172,6 +172,7 @@ public class BotService {
 
             return;
         }
+        
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
         int maxEnemySize = PlayerService.getBiggestEnemySize();
         List<GameObject> incomingTeleports = TeleportService.getIncomingTeleporter(bot, maxEnemySize + 20);
@@ -209,8 +210,7 @@ public class BotService {
         /* AFTERBURNER */
         /* OFFENSIVE */
 
-        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset,
-                huntingRange - 100);
+        List<GameObject> preys = PlayerService.getPreys(gameState, bot, PlayerService.sizeDifferenceOffset, huntingRange - 100);
 
         /* Kalau belum nyala */
         /*

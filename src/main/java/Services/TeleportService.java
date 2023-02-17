@@ -14,7 +14,7 @@ public class TeleportService extends ProjectileService {
     static public int teleportSizeLimit = 40;
     static public int profitLimit = 0;
     static public boolean hasFound = false;
-    static public int minTeleportDistance = 200;
+    static public int minTeleportDistance = 100;
 
     static public int teleporterSpeed = 20;
     static public boolean isAttacking = false;
