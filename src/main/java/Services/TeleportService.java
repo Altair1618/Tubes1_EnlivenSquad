@@ -11,7 +11,7 @@ public class TeleportService extends ProjectileService {
     static public UUID firedTeleportId = null;
     static public int heading = 0;
     static public boolean isFired = false;
-    static public int teleportSizeLimit = 30;
+    static public int teleportSizeLimit = 40;
     static public int profitLimit = 0;
     static public boolean hasFound = false;
     static public int minTeleportDistance = 100;
