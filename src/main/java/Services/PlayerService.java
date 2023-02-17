@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.*;
 
 public class PlayerService {
-    static public int playerDangerRange = 200; // Range player gede dianggap berbahaya
+    static public int playerDangerRange = 400; // Range player gede dianggap berbahaya
     static public int sizeDifferenceOffset = 10; // Minimal selisih size player yang dikejar
 
     static public List<GameObject> getOtherPlayerList(GameState gameState, GameObject bot) {

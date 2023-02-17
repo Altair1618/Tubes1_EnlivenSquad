@@ -17,6 +17,7 @@ public class BotService {
     static private int fieldRadarRadius = 60; // radius jarak deteksi cloud dan asteroid
     static private int huntingRange = 200;
     static private boolean isAfterburner = false;
+    static private int afterBurnerSizeLimit = 20;
 
     // weight untuk setiap kasus kabur/ngejar
     static private Double[] weights = {
@@ -151,9 +152,19 @@ public class BotService {
             }
         }
 
+        if (isAfterburner && bot.size <= afterBurnerSizeLimit)
+        {
+            playerAction.action = PlayerActions.STOPAFTERBURNER;
+            this.playerAction = playerAction;
+
+            System.out.println("STOP AFTERBURNER");
+            isAfterburner = false;
+
+            return;
+        }
         List<GameObject> playersList = PlayerService.getOtherPlayerList(gameState, bot);
         int maxEnemySize = PlayerService.getBiggestEnemySize();
-        List<GameObject> incomingTeleports = TeleportService.getIncomingTeleporter(bot, maxEnemySize);
+        List<GameObject> incomingTeleports = TeleportService.getIncomingTeleporter(bot, maxEnemySize + 20);
 
         if (!playersList.isEmpty()
             && RadarService.getRealDistance(bot, playersList.get(0)) <= playerRadarRadius 
@@ -234,7 +245,7 @@ public class BotService {
          * sedang afterburner
          */
 
-        if (directionVectors.isEmpty() && !preys.isEmpty() && isAfterburner) {
+        if (isAfterburner) {
             double distance = RadarService.getRealDistance(bot, preys.get(0));
             double tick = distance / ((bot.getSpeed() * 2) - preys.get(0).getSpeed());
 
@@ -492,22 +503,17 @@ public class BotService {
 
         else if (!TeleportService.isFired && TeleportService.isTeleportAvailable(bot))
         {
-            playerAction.action = PlayerActions.TELEPORT;
+
             foods = FoodServices.getAllFoods(gameState, bot);
 
             if (!foods.isEmpty())
             {
-                playerAction.heading = RadarService.getHeadingBetween(bot, foods.get(0));
+                playerAction.action = PlayerActions.TELEPORT;
+                playerAction.heading = RadarService.roundToEven(RadarService.vectorToDegree(TeleportService.escapeDirection(gameState, bot)));
+                tpTimer = gameState.world.radius * 3 / TeleportService.teleporterSpeed;
+
+                TeleportService.isAttacking = false;
             }
-
-            else
-            {
-                playerAction.heading = RadarService.getHeadingBetween(bot.position, gameState.world.centerPoint);
-            }
-
-            tpTimer = gameState.world.radius * 3 / TeleportService.teleporterSpeed;
-
-            TeleportService.isAttacking = false;
         }
 
         else
