@@ -8,12 +8,14 @@
 2. IntelliJ IDEA versi 2021.3 atau lebih baru.
 3. Apache Maven 3.8.4
 
-# How To Use
+## How To Use
 1. Pastikan memiliki maven
 2. Start run.bat
 3. Pastikan Anda memiliki memori yang cukup untuk mencatat log
 4. Jika berhasil, maka akan terdapat console yang menampilkan keadaan permainan
 5. Jika ingin melihat tampilan, bisa menggunakan visualizer
+
+## Nama Kelompok
 
 | NIM      | Nama                         |
 | -------- | ---------------------------- |
