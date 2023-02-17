@@ -133,7 +133,7 @@ public class TeleportService extends ProjectileService {
         return new WorldVector();
     }
 
-    static public boolean isTeleportSafe(GameObject bot, GameObject teleporter, List<GameObject> collapsingObjects, List<GameObject> collapsingPlayers, boolean isAttacking)
+    static public boolean isTeleportSafe(GameState gameState, GameObject bot, GameObject teleporter, List<GameObject> collapsingObjects, List<GameObject> collapsingPlayers, boolean isAttacking)
     {
         System.out.print("Collapsing objects count : ");
         System.out.println(collapsingObjects.size());
@@ -215,7 +215,7 @@ public class TeleportService extends ProjectileService {
         if (totalCloudSize > bot.size / 3) return false;
         if (isAttacking) return maxPreySize > 0 || pickUp;
 
-        return (maxPreySize > 0 || RadarService.getDistanceBetween(bot, teleporter) >= minTeleportDistance);
+        return (maxPreySize > 0 || RadarService.getDistanceBetween(bot, teleporter) >= Math.min(minTeleportDistance, gameState.world.radius / 3));
     }
 
 }
