@@ -152,7 +152,7 @@ public class BotService {
             }
         }
 
-        if (isAfterburner && bot.size <= afterBurnerSizeLimit)
+        if ((isAfterburner || Effects.getEffectList(bot.effectsCode).get(0)) && bot.size <= afterBurnerSizeLimit)
         {
             playerAction.action = PlayerActions.STOPAFTERBURNER;
             playerAction.heading = bot.getHeading();
