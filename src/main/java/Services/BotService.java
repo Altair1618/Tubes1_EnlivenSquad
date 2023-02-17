@@ -83,7 +83,7 @@ public class BotService {
         if (gameState == null || gameState.world == null || gameState.world.radius == null || gameState.world.centerPoint == null) return;
 
         if (tpTimer == 0 && TeleportService.isFired && !TeleportService.hasFound) TeleportService.teleport();
-
+        if (tpTimer > 0 && !TeleportService.isFired) tpTimer = 0;
         List<EscapeInfo> directionVectors = new ArrayList<EscapeInfo>();
         WorldVector temp;
         EscapeInfo t;
@@ -518,6 +518,7 @@ public class BotService {
                 tpTimer = 100;
 
                 TeleportService.isAttacking = false;
+                TeleportService.shoot(playerAction.heading);
             }
         }
 
